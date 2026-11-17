@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>STM32L4S5QIIx 引脚功能速查</title>
+<meta name="description" content="STM32L4S5QIIx 引脚功能速查 全引脚功能与复用功能速查表">
+<style>
+:root{
+  --bg:#0d1117;--card:#161b22;--card2:#1c2128;--line:#30363d;--line2:#262c36;
+  --text:#e6edf3;--muted:#8b949e;--dim:#6e7681;
+  --blue:#58a6ff;--amber:#d29922;--amber-bg:#1f1a10;
+  --green:#3fb950;--purple:#a371f7;--slate:#8b949e;
+  --gold:#e3b341;--gold2:#f2c75c;
+  --mono:"JetBrains Mono","Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;
+  --sans:"Inter","Segoe UI Variable Text","Segoe UI","Source Han Sans CN","Source Han Sans SC","Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+  font-size:13.5px;line-height:1.7;-webkit-font-smoothing:antialiased;font-feature-settings:'tnum';
+  zoom:1.2}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.topbar{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
+.topbar .wrap{display:flex;align-items:center;gap:8px;height:48px;font-size:12.5px}
+.crumb{color:var(--muted)}.sep{color:var(--dim)}.spacer{flex:1}
+.stamp{color:var(--dim);font-family:var(--mono);font-size:11.5px}
+h1{font-size:26px;margin:26px 0 6px;letter-spacing:-.4px;font-weight:650}
+.sub{color:var(--muted);margin:0 0 16px;font-size:13.5px}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.bdg{background:rgba(56,139,253,.13);border:1px solid rgba(56,139,253,.42);border-radius:999px;
+  padding:5px 11px;font-size:11.5px;color:#9dc6ff;display:flex;gap:6px;align-items:baseline;white-space:nowrap}
+.bdg b{color:#d7e9ff;font-family:var(--mono);font-size:11.5px;font-weight:600}
+.bdg.hi{background:rgba(56,139,253,.26);border-color:rgba(56,139,253,.70)}.bdg.hi b{color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:18px}
+.card h2{font-size:15px;margin:0 0 4px;font-weight:650;letter-spacing:-.2px}
+.card-head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.hint{color:var(--dim);font-size:12px;margin:10px 0 0;text-align:center}
+.die-wrap{display:flex;justify-content:center;padding:6px 0 2px}
+#die{display:block;width:100%;max-width:760px;height:auto;aspect-ratio:1/1}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:11.5px;color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;flex:1;justify-content:flex-end}
+#q{flex:1;min-width:200px;max-width:330px;border:1px solid var(--line);border-radius:8px;
+  padding:7px 11px;font-size:13px;font-family:var(--sans);background:#0d1117;outline:none;
+  color:var(--text);-webkit-text-fill-color:var(--text)}
+#q::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted);opacity:1}
+#q:focus{border-color:#58a6ff;background:var(--card);box-shadow:0 0 0 3px rgba(56,139,253,.15)}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chips button{border:1px solid var(--line);background:var(--card);border-radius:7px;
+  padding:5px 9px;font-size:11.5px;color:var(--muted);cursor:pointer;font-family:var(--sans)}
+.chips button:hover{border-color:#484f58;color:var(--text)}
+.chips button.on{background:rgba(56,139,253,.15);border-color:rgba(56,139,253,.50);color:var(--blue);font-weight:600}
+.table-wrap{overflow:auto;max-height:min(70vh,720px);min-height:300px;
+  border:1px solid var(--line);border-radius:10px;-webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;scrollbar-color:#3a424c #0d1117}
+.table-wrap::-webkit-scrollbar{width:11px;height:11px}
+.table-wrap::-webkit-scrollbar-track{background:#0d1117}
+.table-wrap::-webkit-scrollbar-thumb{background:#3a424c;border-radius:7px;border:2px solid #0d1117}
+.table-wrap::-webkit-scrollbar-thumb:hover{background:#4d5661}
+table{width:100%;min-width:820px;border-collapse:collapse;font-size:12.5px}
+thead th{position:sticky;top:0;background:#1c2128;text-align:left;font-weight:600;
+  font-size:11.5px;color:var(--muted);padding:9px 10px;
+  box-shadow:inset 0 -1px 0 var(--line);
+  white-space:nowrap;z-index:5}
+tbody td{padding:9px 11px;border-bottom:1px solid var(--line2);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#1c2128}
+tbody tr.hl{background:rgba(210,153,11,.20)!important;box-shadow:inset 3px 0 0 #ffa657}
+tbody tr.hl td{background:rgba(210,153,11,.06)}
+@keyframes rowflash{0%,100%{background:rgba(210,153,11,.20)}50%{background:rgba(255,166,87,.42)}}
+tbody tr.hl.flash{animation:rowflash .7s ease 2}
+.c-num{width:52px;text-align:center;font-family:var(--mono);color:var(--gold);font-size:11.5px;font-weight:600}
+.c-name{width:118px}.c-kind{width:58px}.c-note{width:210px}
+.pname{font-family:var(--mono);font-weight:700;font-size:12.5px;color:var(--gold2)}
+.psuf{display:inline-block;box-sizing:border-box;height:15px;line-height:13px;padding:0 5px;
+  border-radius:999px;margin-left:4px;vertical-align:1px;font-family:var(--mono);font-size:8.5px;
+  border:1px solid rgba(139,148,158,.40);background:rgba(139,148,158,.12);
+  color:#a2acb9;white-space:nowrap;letter-spacing:-.2px}
+.psuf.wkup{color:#e3b341;background:rgba(227,179,65,.16);border-color:rgba(227,179,65,.48)}
+.psuf.osc {color:#56d4dd;background:rgba(57,197,207,.16);border-color:rgba(57,197,207,.50)}
+.psuf.rst {color:#ffa657;background:rgba(240,136,62,.16);border-color:rgba(240,136,62,.50)}
+.psuf.boot{color:#c297ff;background:rgba(163,113,247,.16);border-color:rgba(163,113,247,.50)}
+.adot{display:inline-block;width:4px;height:4px;border-radius:50%;background:#3fb950;margin-left:3px;vertical-align:3px}
+.tag{display:inline-block;box-sizing:border-box;height:20px;line-height:18px;padding:0 8px;
+  border-radius:999px;font-size:10.5px;font-family:var(--mono);white-space:nowrap;
+  border:1px solid transparent;vertical-align:middle}
+.t-gpio{color:#8ccaff;background:rgba(56,139,253,.20);border-color:rgba(56,139,253,.55)}
+.t-power{color:#b9c2cd;background:#21262d;border-color:#30363d}
+.t-ground{color:#b9c2cd;background:#21262d;border-color:#30363d}
+.t-reset{color:#ffc466;background:rgba(210,153,34,.18);border-color:rgba(210,153,34,.60)}
+.t-special{color:#a5b0bd;background:#1c2128;border-color:var(--line)}
+.afbox{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.af{display:inline-block;box-sizing:border-box;height:20px;line-height:18px;padding:0 9px;
+  border-radius:999px;font-family:var(--mono);font-size:10.5px;background:#1c2128;
+  border:1px solid var(--line);color:#c9d1d9;white-space:nowrap;vertical-align:middle}
+.af em{font-style:normal;font-size:9.5px;opacity:.62;margin-right:4px;font-weight:400}
+.af.c-tim {background:rgba(63,185,80,.28);border-color:rgba(63,185,80,.85);color:#8ef0a3}
+.af.c-uart{background:rgba(56,139,253,.28);border-color:rgba(56,139,253,.78);color:#8ccaff}
+.af.c-spi {background:rgba(57,197,207,.28);border-color:rgba(57,197,207,.82);color:#89eef5}
+.af.c-i2c {background:rgba(240,136,62,.28);border-color:rgba(240,136,62,.82);color:#ffc48f}
+.af.c-ana {background:rgba(219,97,162,.28);border-color:rgba(219,97,162,.82);color:#ffb0da}
+.af.c-cmp {background:rgba(219,97,162,.18);border-color:rgba(219,97,162,.55);color:#eb7cb6}
+.af.c-usb {background:rgba(163,113,247,.28);border-color:rgba(163,113,247,.82);color:#dcbaff}
+.af.c-bus {background:rgba(121,192,255,.28);border-color:rgba(121,192,255,.82);color:#d0eaff}
+.af.c-sys {background:#1c2128;border-color:#30363d;color:#a5b0bd}
+.af.c-def {background:#1c2128;border-color:var(--line);color:#a5b0bd}
+.af.ext{opacity:.78}
+.aflegend{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin:0 0 10px;font-size:10px}
+.aflegend .lb{color:var(--dim);font-size:10.5px;margin-right:3px}
+.aflegend .af{font-size:10px;padding:1px 6px}
+
+.row:not(.expanded) .af:nth-child(n+6){display:none}
+.row .more{display:inline-flex;cursor:pointer;color:#8b949e;font-size:10.5px;
+  padding:1px 5px;border-radius:4px;background:#21262d;border:1px solid #21262d;font-family:var(--mono)}
+.row.expanded .more{display:none}
+.row{cursor:pointer}
+.note{font-size:11px;color:#d0d8e2;line-height:1.5}
+.note::before{content:"";display:inline-block;width:3px;height:3px;border-radius:50%;
+  background:var(--gold);margin-right:5px;vertical-align:2px}
+.qhint{font-size:11.5px;color:var(--dim);margin:0 0 14px;line-height:1.6}
+.sigrow.ext .sig{color:#5a6672}
+.sigrow.ext .qpin{opacity:.55}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px;align-items:start}
+.qgrp{grid-column:1/-1;font-size:11px;font-weight:700;letter-spacing:.08em;
+  color:var(--dim);text-transform:uppercase;margin:14px 0 2px}
+.qgrp:first-child{margin-top:0}
+.pg{border:1px solid #2d3b52;border-radius:9px;overflow:hidden;background:#1a2333}
+.pg-h{background:#222e42;padding:6px 10px;font-family:var(--mono);font-size:11.5px;
+  font-weight:700;color:#79c0ff;border-bottom:1px solid #2d3b52;display:flex;justify-content:space-between;align-items:center}
+.pg-h span{font-size:10px;color:#9aacc6;font-weight:400}
+.pg-b{padding:7px 10px;display:flex;flex-direction:column;gap:3px;background:#1a2333}
+.sigrow{display:flex;gap:8px;align-items:baseline;font-size:11.5px}
+.sig{font-family:var(--mono);color:var(--muted);min-width:66px;flex-shrink:0;font-size:10.5px}
+.plist{display:flex;flex-wrap:wrap;gap:4px}
+.qpin{display:inline-block;box-sizing:border-box;height:17px;line-height:15px;padding:0 5px;border-radius:999px;font-family:var(--mono);font-size:10.5px;
+  background:rgba(56,139,253,.15);color:var(--blue);cursor:pointer;border:1px solid rgba(56,139,253,.40)}
+.qpin:hover{background:rgba(56,139,253,.40)}
+@keyframes qhit{0%,100%{box-shadow:0 0 0 0 rgba(255,166,87,0)}30%{box-shadow:0 0 0 5px rgba(255,166,87,.65);background:#d2990b;color:#fff;border-color:#ffa657}}
+.qpin.hit{animation:qhit .65s ease}
+.qpin b{font-weight:400;color:#58a6ff;font-size:7.5px;margin-left:1px;vertical-align:super}
+.empty{text-align:center;color:var(--dim);padding:26px;font-size:13px}
+.siblings{display:flex;flex-wrap:wrap;gap:6px}
+.sib{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:6px;
+  border:1px solid var(--line);background:#0d1117;color:var(--muted)}
+.sib.cur{background:rgba(56,139,253,.15);border-color:rgba(56,139,253,.50);color:var(--blue);font-weight:600}
+footer{color:var(--dim);font-size:11.5px;text-align:center;padding:24px 20px 38px;
+  line-height:1.9;border-top:1px solid var(--line);margin-top:6px}
+footer code{font-family:var(--mono);background:#21262d;padding:1px 5px;border-radius:4px}
+@media(max-width:760px){
+  h1{font-size:21px}.card{padding:14px}.stamp{display:none}
+  #q{max-width:none}.tools{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="crumb" href="../index.html">← 全部芯片</a>
+    <span class="sep">/</span>
+    <span class="crumb">STM32L4R5/S5</span>
+    <span class="spacer"></span>
+    <span class="stamp">2026-11-16 16:43</span>
+  </div>
+</div>
+
+<main class="wrap">
+  <h1>STM32L4S5QIIx 引脚功能速查</h1>
+  <p class="sub" id="sub"></p>
+  <div class="badges" id="badges"></div>
+
+  <section class="card" id="diecard" hidden>
+    <div class="card-head" style="margin-bottom:6px">
+      <h2>引脚分布图 <span style="font-weight:400;color:var(--dim);font-size:11.5px">俯视图 · 逆时针 1→132</span></h2>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="die-wrap"><svg id="die" viewBox="110 110 425 425" role="img" aria-label="引脚分布图"></svg></div>
+    <p class="hint">鼠标悬停看引脚名 · 点击可在下方总表中定位</p>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>引脚功能总表 <span id="count" style="font-weight:400;color:var(--dim);font-size:11.5px"></span></h2>
+      <div class="tools">
+        <input id="q" type="search" placeholder="搜索：脚号 / 引脚名 / 外设" autocomplete="off">
+        <div class="chips" id="filters"></div>
+      </div>
+    </div>
+    <div class="aflegend">
+      <span class="lb">配色</span>
+      <span class="af c-tim">定时器</span>
+      <span class="af c-uart">串口</span>
+      <span class="af c-spi">SPI / I2S</span>
+      <span class="af c-i2c">I2C</span>
+      <span class="af c-ana">模拟</span>
+      <span class="af c-usb">USB / PD</span>
+      <span class="af c-bus">CAN / ETH</span>
+      <span class="af c-sys">系统</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="c-num">脚号</th>
+          <th class="c-name">引脚</th>
+          <th class="c-kind">类型</th>
+          <th class="c-af">复用功能（AF）</th>
+          <th class="c-note">备注</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="empty" hidden>没有匹配的引脚</div>
+  </section>
+
+  <section class="card" id="quickcard" hidden>
+    <h2 style="margin-bottom:6px">常用外设引脚速查</h2>
+    <p class="qhint">同一外设可路由到多组引脚，实际使用选其中一组；CK / CTS / RTS / DE / NSS 属同步与硬件流控等扩展功能，普通串口只需 TX / RX</p>
+    <div class="qgrid" id="quick"></div>
+  </section>
+
+  <section class="card" id="sibcard" hidden>
+    <h2 style="margin-bottom:12px">同系列其他型号</h2>
+    <div class="siblings" id="siblings"></div>
+  </section>
+</main>
+
+<footer>
+  数据来源：STM32CubeMX 器件库（<code>UFBGA132</code> · <code>STM32L4+</code>）<br>
+  本页由 <code>build_site.py</code> 于 2026-11-16 16:43 生成 · 一切以芯片数据手册为准
+</footer>
+
+<script>
+window.__SIBLINGS__=[{"name":"STM32L4R5A(G-I)Ix","file":"STM32L4R5A_G-I_Ix.html","cur":false},{"name":"STM32L4R5AIIxP","file":"STM32L4R5AIIxP.html","cur":false},{"name":"STM32L4R5Q(G-I)Ix","file":"STM32L4R5Q_G-I_Ix.html","cur":false},{"name":"STM32L4R5QGIxS","file":"STM32L4R5QGIxS.html","cur":false},{"name":"STM32L4R5QIIxP","file":"STM32L4R5QIIxP.html","cur":false},{"name":"STM32L4R5V(G-I)Tx","file":"STM32L4R5V_G-I_Tx.html","cur":false},{"name":"STM32L4R5Z(G-I)Tx","file":"STM32L4R5Z_G-I_Tx.html","cur":false},{"name":"STM32L4R5Z(G-I)Yx","file":"STM32L4R5Z_G-I_Yx.html","cur":false},{"name":"STM32L4R5ZITxP","file":"STM32L4R5ZITxP.html","cur":false},{"name":"STM32L4S5AIIx","file":"STM32L4S5AIIx.html","cur":false},{"name":"STM32L4S5QIIx","file":"STM32L4S5QIIx.html","cur":true},{"name":"STM32L4S5VITx","file":"STM32L4S5VITx.html","cur":false},{"name":"STM32L4S5ZITx","file":"STM32L4S5ZITx.html","cur":false},{"name":"STM32L4S5ZIYx","file":"STM32L4S5ZIYx.html","cur":false}];
+const D = {"name":"STM32L4S5QIIx","family":"STM32L4+","line":"STM32L4R5/S5","package":"UFBGA132","pins":[{"n":null,"name":"PE3","raw":"PE3","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"TRACED0","sig":"SYS_TRACED0","af":0},{"p":"TIM3","s":"CH1","sig":"TIM3_CH1","af":2},{"p":"OCTOSPIM","s":"P1_DQS","sig":"OCTOSPIM_P1_DQS","af":3},{"p":"TSC","s":"G7_IO2","sig":"TSC_G7_IO2","af":9},{"p":"FMC","s":"A19","sig":"FMC_A19","af":12},{"p":"SAI1","s":"SD_B","sig":"SAI1_SD_B","af":13}],"notes":[]},{"n":null,"name":"PE1","raw":"PE1","type":"I/O","kind":"gpio","af":[{"p":"DCMI","s":"D3","sig":"DCMI_D3","af":10},{"p":"FMC","s":"NBL1","sig":"FMC_NBL1","af":12},{"p":"TIM17","s":"CH1","sig":"TIM17_CH1","af":14}],"notes":[]},{"n":null,"name":"PB8","raw":"PB8","type":"I/O","kind":"gpio","af":[{"p":"TIM4","s":"CH3","sig":"TIM4_CH3","af":2},{"p":"SAI1","s":"CK1","sig":"SAI1_CK1","af":3},{"p":"I2C1","s":"SCL","sig":"I2C1_SCL","af":4},{"p":"DFSDM1","s":"CKOUT","sig":"DFSDM1_CKOUT","af":5},{"p":"DFSDM1","s":"DATIN6","sig":"DFSDM1_DATIN6","af":6},{"p":"SDMMC1","s":"CKIN","sig":"SDMMC1_CKIN","af":8},{"p":"CAN1","s":"RX","sig":"CAN1_RX","af":9},{"p":"DCMI","s":"D6","sig":"DCMI_D6","af":10},{"p":"SDMMC1","s":"D4","sig":"SDMMC1_D4","af":12},{"p":"SAI1","s":"MCLK_A","sig":"SAI1_MCLK_A","af":13},{"p":"TIM16","s":"CH1","sig":"TIM16_CH1","af":14}],"notes":[]},{"n":null,"name":"PH3","raw":"PH3-BOOT0","type":"I/O","kind":"gpio","af":[],"notes":["复用为 BOOT0，启动模式由选项字节决定"]},{"n":null,"name":"PD7","raw":"PD7","type":"I/O","kind":"gpio","af":[{"p":"DFSDM1","s":"CKIN1","sig":"DFSDM1_CKIN1","af":6},{"p":"USART2","s":"CK","sig":"USART2_CK","af":7},{"p":"OCTOSPIM","s":"P1_IO7","sig":"OCTOSPIM_P1_IO7","af":10},{"p":"FMC","s":"NCE","sig":"FMC_NCE","af":12},{"p":"FMC","s":"NE1","sig":"FMC_NE1","af":12}],"notes":[]},{"n":null,"name":"PD5","raw":"PD5","type":"I/O","kind":"gpio","af":[{"p":"USART2","s":"TX","sig":"USART2_TX","af":7},{"p":"OCTOSPIM","s":"P1_IO5","sig":"OCTOSPIM_P1_IO5","af":10},{"p":"FMC","s":"NWE","sig":"FMC_NWE","af":12}],"notes":[]},{"n":null,"name":"PB4","raw":"PB4 (NJTRST)","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"JTRST","sig":"SYS_JTRST","af":0},{"p":"TIM3","s":"CH1","sig":"TIM3_CH1","af":2},{"p":"I2C3","s":"SDA","sig":"I2C3_SDA","af":4},{"p":"SPI1","s":"MISO","sig":"SPI1_MISO","af":5},{"p":"SPI3","s":"MISO","sig":"SPI3_MISO","af":6},{"p":"USART1","s":"CTS","sig":"USART1_CTS","af":7},{"p":"USART1","s":"NSS","sig":"USART1_NSS","af":7},{"p":"UART5","s":"DE","sig":"UART5_DE","af":8},{"p":"UART5","s":"RTS","sig":"UART5_RTS","af":8},{"p":"TSC","s":"G2_IO1","sig":"TSC_G2_IO1","af":9},{"p":"DCMI","s":"D12","sig":"DCMI_D12","af":10},{"p":"SAI1","s":"MCLK_B","sig":"SAI1_MCLK_B","af":13},{"p":"TIM17","s":"BKIN","sig":"TIM17_BKIN","af":14},{"p":"COMP2","s":"INP","sig":"COMP2_INP","af":null}],"notes":["调试口，复位后默认启用；量产可释放"]},{"n":null,"name":"PB3","raw":"PB3 (JTDO/TRACESWO)","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"JTDO-SWO","sig":"SYS_JTDO-SWO","af":0},{"p":"TIM2","s":"CH2","sig":"TIM2_CH2","af":1},{"p":"SPI1","s":"SCK","sig":"SPI1_SCK","af":5},{"p":"SPI3","s":"SCK","sig":"SPI3_SCK","af":6},{"p":"USART1","s":"DE","sig":"USART1_DE","af":7},{"p":"USART1","s":"RTS","sig":"USART1_RTS","af":7},{"p":"CRS","s":"SYNC","sig":"CRS_SYNC","af":10},{"p":"SAI1","s":"SCK_B","sig":"SAI1_SCK_B","af":13},{"p":"COMP2","s":"INM","sig":"COMP2_INM","af":null}],"notes":["调试口，复位后默认启用；量产可释放"]},{"n":null,"name":"PA15","raw":"PA15 (JTDI)","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"JTDI","sig":"SYS_JTDI","af":0},{"p":"TIM2","s":"CH1","sig":"TIM2_CH1","af":1},{"p":"TIM2","s":"ETR","sig":"TIM2_ETR","af":2},{"p":"USART2","s":"RX","sig":"USART2_RX","af":3},{"p":"SPI1","s":"NSS","sig":"SPI1_NSS","af":5},{"p":"SPI3","s":"NSS","sig":"SPI3_NSS","af":6},{"p":"USART3","s":"DE","sig":"USART3_DE","af":7},{"p":"USART3","s":"RTS","sig":"USART3_RTS","af":7},{"p":"UART4","s":"DE","sig":"UART4_DE","af":8},{"p":"UART4","s":"RTS","sig":"UART4_RTS","af":8},{"p":"TSC","s":"G3_IO1","sig":"TSC_G3_IO1","af":9},{"p":"SAI2","s":"FS_B","sig":"SAI2_FS_B","af":13},{"p":"ADC1","s":"EXTI15","sig":"ADC1_EXTI15","af":null}],"notes":["调试口，复位后默认启用；量产可释放"]},{"n":null,"name":"PA14","raw":"PA14 (JTCK/SWCLK)","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"JTCK-SWCLK","sig":"SYS_JTCK-SWCLK","af":0},{"p":"LPTIM1","s":"OUT","sig":"LPTIM1_OUT","af":1},{"p":"I2C1","s":"SMBA","sig":"I2C1_SMBA","af":4},{"p":"I2C4","s":"SMBA","sig":"I2C4_SMBA","af":5},{"p":"USB","s":"OTG_FS_SOF","sig":"USB_OTG_FS_SOF","af":10},{"p":"SAI1","s":"FS_B","sig":"SAI1_FS_B","af":13}],"notes":["调试口，复位后默认启用；量产可释放"]},{"n":null,"name":"PA13","raw":"PA13 (JTMS/SWDIO)","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"JTMS-SWDIO","sig":"SYS_JTMS-SWDIO","af":0},{"p":"IR","s":"OUT","sig":"IR_OUT","af":1},{"p":"USB","s":"OTG_FS_NOE","sig":"USB_OTG_FS_NOE","af":10},{"p":"SAI1","s":"SD_B","sig":"SAI1_SD_B","af":13}],"notes":["调试口，复位后默认启用；量产可释放"]},{"n":null,"name":"PA12","raw":"PA12","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"ETR","sig":"TIM1_ETR","af":1},{"p":"SPI1","s":"MOSI","sig":"SPI1_MOSI","af":5},{"p":"USART1","s":"DE","sig":"USART1_DE","af":7},{"p":"USART1","s":"RTS","sig":"USART1_RTS","af":7},{"p":"CAN1","s":"TX","sig":"CAN1_TX","af":9},{"p":"USB","s":"OTG_FS_DP","sig":"USB_OTG_FS_DP","af":10}],"notes":[]},{"n":null,"name":"PE4","raw":"PE4","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"TRACED1","sig":"SYS_TRACED1","af":0},{"p":"TIM3","s":"CH2","sig":"TIM3_CH2","af":2},{"p":"SAI1","s":"D2","sig":"SAI1_D2","af":3},{"p":"DFSDM1","s":"DATIN3","sig":"DFSDM1_DATIN3","af":6},{"p":"TSC","s":"G7_IO3","sig":"TSC_G7_IO3","af":9},{"p":"DCMI","s":"D4","sig":"DCMI_D4","af":10},{"p":"FMC","s":"A20","sig":"FMC_A20","af":12},{"p":"SAI1","s":"FS_A","sig":"SAI1_FS_A","af":13}],"notes":[]},{"n":null,"name":"PE2","raw":"PE2","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"TRACECLK","sig":"SYS_TRACECLK","af":0},{"p":"TIM3","s":"ETR","sig":"TIM3_ETR","af":2},{"p":"SAI1","s":"CK1","sig":"SAI1_CK1","af":3},{"p":"TSC","s":"G7_IO1","sig":"TSC_G7_IO1","af":9},{"p":"FMC","s":"A23","sig":"FMC_A23","af":12},{"p":"SAI1","s":"MCLK_A","sig":"SAI1_MCLK_A","af":13}],"notes":[]},{"n":null,"name":"PB9","raw":"PB9","type":"I/O","kind":"gpio","af":[{"p":"IR","s":"OUT","sig":"IR_OUT","af":1},{"p":"TIM4","s":"CH4","sig":"TIM4_CH4","af":2},{"p":"SAI1","s":"D2","sig":"SAI1_D2","af":3},{"p":"I2C1","s":"SDA","sig":"I2C1_SDA","af":4},{"p":"SPI2","s":"NSS","sig":"SPI2_NSS","af":5},{"p":"DFSDM1","s":"CKIN6","sig":"DFSDM1_CKIN6","af":6},{"p":"SDMMC1","s":"CDIR","sig":"SDMMC1_CDIR","af":8},{"p":"CAN1","s":"TX","sig":"CAN1_TX","af":9},{"p":"DCMI","s":"D7","sig":"DCMI_D7","af":10},{"p":"SDMMC1","s":"D5","sig":"SDMMC1_D5","af":12},{"p":"SAI1","s":"FS_A","sig":"SAI1_FS_A","af":13},{"p":"TIM17","s":"CH1","sig":"TIM17_CH1","af":14},{"p":"DAC1","s":"EXTI9","sig":"DAC1_EXTI9","af":null}],"notes":[]},{"n":null,"name":"PB7","raw":"PB7","type":"I/O","kind":"gpio","af":[{"p":"LPTIM1","s":"IN2","sig":"LPTIM1_IN2","af":1},{"p":"TIM4","s":"CH2","sig":"TIM4_CH2","af":2},{"p":"I2C1","s":"SDA","sig":"I2C1_SDA","af":4},{"p":"I2C4","s":"SDA","sig":"I2C4_SDA","af":5},{"p":"DFSDM1","s":"CKIN5","sig":"DFSDM1_CKIN5","af":6},{"p":"USART1","s":"RX","sig":"USART1_RX","af":7},{"p":"UART4","s":"CTS","sig":"UART4_CTS","af":8},{"p":"TSC","s":"G2_IO4","sig":"TSC_G2_IO4","af":9},{"p":"DCMI","s":"VSYNC","sig":"DCMI_VSYNC","af":10},{"p":"FMC","s":"NL","sig":"FMC_NL","af":12},{"p":"TIM8","s":"BKIN","sig":"TIM8_BKIN","af":13},{"p":"TIM17","s":"CH1N","sig":"TIM17_CH1N","af":14},{"p":"COMP2","s":"INM","sig":"COMP2_INM","af":null},{"p":"SYS","s":"PVD_IN","sig":"SYS_PVD_IN","af":null}],"notes":[]},{"n":null,"name":"PB6","raw":"PB6","type":"I/O","kind":"gpio","af":[{"p":"LPTIM1","s":"ETR","sig":"LPTIM1_ETR","af":1},{"p":"TIM4","s":"CH1","sig":"TIM4_CH1","af":2},{"p":"I2C1","s":"SCL","sig":"I2C1_SCL","af":4},{"p":"I2C4","s":"SCL","sig":"I2C4_SCL","af":5},{"p":"DFSDM1","s":"DATIN5","sig":"DFSDM1_DATIN5","af":6},{"p":"USART1","s":"TX","sig":"USART1_TX","af":7},{"p":"TSC","s":"G2_IO3","sig":"TSC_G2_IO3","af":9},{"p":"DCMI","s":"D5","sig":"DCMI_D5","af":10},{"p":"TIM8","s":"BKIN2","sig":"TIM8_BKIN2","af":12},{"p":"SAI1","s":"FS_B","sig":"SAI1_FS_B","af":13},{"p":"TIM16","s":"CH1N","sig":"TIM16_CH1N","af":14},{"p":"COMP2","s":"INP","sig":"COMP2_INP","af":null}],"notes":[]},{"n":null,"name":"PD6","raw":"PD6","type":"I/O","kind":"gpio","af":[{"p":"SAI1","s":"D1","sig":"SAI1_D1","af":3},{"p":"DCMI","s":"D10","sig":"DCMI_D10","af":4},{"p":"SPI3","s":"MOSI","sig":"SPI3_MOSI","af":5},{"p":"DFSDM1","s":"DATIN1","sig":"DFSDM1_DATIN1","af":6},{"p":"USART2","s":"RX","sig":"USART2_RX","af":7},{"p":"OCTOSPIM","s":"P1_IO6","sig":"OCTOSPIM_P1_IO6","af":10},{"p":"FMC","s":"NWAIT","sig":"FMC_NWAIT","af":12},{"p":"SAI1","s":"SD_A","sig":"SAI1_SD_A","af":13}],"notes":[]},{"n":null,"name":"PD4","raw":"PD4","type":"I/O","kind":"gpio","af":[{"p":"SPI2","s":"MOSI","sig":"SPI2_MOSI","af":5},{"p":"DFSDM1","s":"CKIN0","sig":"DFSDM1_CKIN0","af":6},{"p":"USART2","s":"DE","sig":"USART2_DE","af":7},{"p":"USART2","s":"RTS","sig":"USART2_RTS","af":7},{"p":"OCTOSPIM","s":"P1_IO4","sig":"OCTOSPIM_P1_IO4","af":10},{"p":"FMC","s":"NOE","sig":"FMC_NOE","af":12}],"notes":[]},{"n":null,"name":"PD3","raw":"PD3","type":"I/O","kind":"gpio","af":[{"p":"SPI2","s":"SCK","sig":"SPI2_SCK","af":3},{"p":"DCMI","s":"D5","sig":"DCMI_D5","af":4},{"p":"SPI2","s":"MISO","sig":"SPI2_MISO","af":5},{"p":"DFSDM1","s":"DATIN0","sig":"DFSDM1_DATIN0","af":6},{"p":"USART2","s":"CTS","sig":"USART2_CTS","af":7},{"p":"USART2","s":"NSS","sig":"USART2_NSS","af":7},{"p":"OCTOSPIM","s":"P2_NCS","sig":"OCTOSPIM_P2_NCS","af":10},{"p":"FMC","s":"CLK","sig":"FMC_CLK","af":12}],"notes":[]},{"n":null,"name":"PD1","raw":"PD1","type":"I/O","kind":"gpio","af":[{"p":"SPI2","s":"SCK","sig":"SPI2_SCK","af":5},{"p":"DFSDM1","s":"CKIN7","sig":"DFSDM1_CKIN7","af":6},{"p":"CAN1","s":"TX","sig":"CAN1_TX","af":9},{"p":"FMC","s":"D3","sig":"FMC_D3","af":12},{"p":"FMC","s":"DA3","sig":"FMC_DA3","af":12}],"notes":[]},{"n":null,"name":"PC12","raw":"PC12","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"TRACED3","sig":"SYS_TRACED3","af":0},{"p":"SPI3","s":"MOSI","sig":"SPI3_MOSI","af":6},{"p":"USART3","s":"CK","sig":"USART3_CK","af":7},{"p":"UART5","s":"TX","sig":"UART5_TX","af":8},{"p":"TSC","s":"G3_IO4","sig":"TSC_G3_IO4","af":9},{"p":"DCMI","s":"D9","sig":"DCMI_D9","af":10},{"p":"SDMMC1","s":"CK","sig":"SDMMC1_CK","af":12},{"p":"SAI2","s":"SD_B","sig":"SAI2_SD_B","af":13}],"notes":[]},{"n":null,"name":"PC10","raw":"PC10","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"TRACED1","sig":"SYS_TRACED1","af":0},{"p":"SPI3","s":"SCK","sig":"SPI3_SCK","af":6},{"p":"USART3","s":"TX","sig":"USART3_TX","af":7},{"p":"UART4","s":"TX","sig":"UART4_TX","af":8},{"p":"TSC","s":"G3_IO2","sig":"TSC_G3_IO2","af":9},{"p":"DCMI","s":"D8","sig":"DCMI_D8","af":10},{"p":"SDMMC1","s":"D2","sig":"SDMMC1_D2","af":12},{"p":"SAI2","s":"SCK_B","sig":"SAI2_SCK_B","af":13}],"notes":[]},{"n":null,"name":"PA11","raw":"PA11","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH4","sig":"TIM1_CH4","af":1},{"p":"SPI1","s":"MISO","sig":"SPI1_MISO","af":5},{"p":"USART1","s":"CTS","sig":"USART1_CTS","af":7},{"p":"USART1","s":"NSS","sig":"USART1_NSS","af":7},{"p":"CAN1","s":"RX","sig":"CAN1_RX","af":9},{"p":"USB","s":"OTG_FS_DM","sig":"USB_OTG_FS_DM","af":10},{"p":"TIM1","s":"BKIN2","sig":"TIM1_BKIN2","af":12},{"p":"ADC1","s":"EXTI11","sig":"ADC1_EXTI11","af":null}],"notes":[]},{"n":null,"name":"PC13","raw":"PC13","type":"I/O","kind":"gpio","af":[{"p":"RTC","s":"OUT_ALARM","sig":"RTC_OUT_ALARM","af":null},{"p":"RTC","s":"OUT_CALIB","sig":"RTC_OUT_CALIB","af":null},{"p":"RTC","s":"TAMP1","sig":"RTC_TAMP1","af":null},{"p":"RTC","s":"TS","sig":"RTC_TS","af":null},{"p":"SYS","s":"WKUP2","sig":"SYS_WKUP2","af":null}],"notes":[]},{"n":null,"name":"PE5","raw":"PE5","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"TRACED2","sig":"SYS_TRACED2","af":0},{"p":"TIM3","s":"CH3","sig":"TIM3_CH3","af":2},{"p":"SAI1","s":"CK2","sig":"SAI1_CK2","af":3},{"p":"DFSDM1","s":"CKIN3","sig":"DFSDM1_CKIN3","af":6},{"p":"TSC","s":"G7_IO4","sig":"TSC_G7_IO4","af":9},{"p":"DCMI","s":"D6","sig":"DCMI_D6","af":10},{"p":"FMC","s":"A21","sig":"FMC_A21","af":12},{"p":"SAI1","s":"SCK_A","sig":"SAI1_SCK_A","af":13}],"notes":[]},{"n":null,"name":"PE0","raw":"PE0","type":"I/O","kind":"gpio","af":[{"p":"TIM4","s":"ETR","sig":"TIM4_ETR","af":2},{"p":"DCMI","s":"D2","sig":"DCMI_D2","af":10},{"p":"FMC","s":"NBL0","sig":"FMC_NBL0","af":12},{"p":"TIM16","s":"CH1","sig":"TIM16_CH1","af":14}],"notes":[]},{"n":null,"name":"VDD","raw":"VDD","type":"Power","kind":"power","af":[],"notes":[]},{"n":null,"name":"PB5","raw":"PB5","type":"I/O","kind":"gpio","af":[{"p":"LPTIM1","s":"IN1","sig":"LPTIM1_IN1","af":1},{"p":"TIM3","s":"CH2","sig":"TIM3_CH2","af":2},{"p":"I2C1","s":"SMBA","sig":"I2C1_SMBA","af":4},{"p":"SPI1","s":"MOSI","sig":"SPI1_MOSI","af":5},{"p":"SPI3","s":"MOSI","sig":"SPI3_MOSI","af":6},{"p":"USART1","s":"CK","sig":"USART1_CK","af":7},{"p":"UART5","s":"CTS","sig":"UART5_CTS","af":8},{"p":"TSC","s":"G2_IO2","sig":"TSC_G2_IO2","af":9},{"p":"DCMI","s":"D10","sig":"DCMI_D10","af":10},{"p":"COMP2","s":"OUT","sig":"COMP2_OUT","af":12},{"p":"SAI1","s":"SD_B","sig":"SAI1_SD_B","af":13},{"p":"TIM16","s":"BKIN","sig":"TIM16_BKIN","af":14}],"notes":[]},{"n":null,"name":"PG14","raw":"PG14","type":"I/O","kind":"gpio","af":[{"p":"I2C1","s":"SCL","sig":"I2C1_SCL","af":4},{"p":"FMC","s":"A25","sig":"FMC_A25","af":12}],"notes":[]},{"n":null,"name":"PG13","raw":"PG13","type":"I/O","kind":"gpio","af":[{"p":"I2C1","s":"SDA","sig":"I2C1_SDA","af":4},{"p":"USART1","s":"CK","sig":"USART1_CK","af":7},{"p":"FMC","s":"A24","sig":"FMC_A24","af":12}],"notes":[]},{"n":null,"name":"PD2","raw":"PD2","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"TRACED2","sig":"SYS_TRACED2","af":0},{"p":"TIM3","s":"ETR","sig":"TIM3_ETR","af":2},{"p":"USART3","s":"DE","sig":"USART3_DE","af":7},{"p":"USART3","s":"RTS","sig":"USART3_RTS","af":7},{"p":"UART5","s":"RX","sig":"UART5_RX","af":8},{"p":"TSC","s":"SYNC","sig":"TSC_SYNC","af":9},{"p":"DCMI","s":"D11","sig":"DCMI_D11","af":10},{"p":"SDMMC1","s":"CMD","sig":"SDMMC1_CMD","af":12}],"notes":[]},{"n":null,"name":"PD0","raw":"PD0","type":"I/O","kind":"gpio","af":[{"p":"SPI2","s":"NSS","sig":"SPI2_NSS","af":5},{"p":"DFSDM1","s":"DATIN7","sig":"DFSDM1_DATIN7","af":6},{"p":"CAN1","s":"RX","sig":"CAN1_RX","af":9},{"p":"FMC","s":"D2","sig":"FMC_D2","af":12},{"p":"FMC","s":"DA2","sig":"FMC_DA2","af":12}],"notes":[]},{"n":null,"name":"PC11","raw":"PC11","type":"I/O","kind":"gpio","af":[{"p":"DCMI","s":"D2","sig":"DCMI_D2","af":4},{"p":"OCTOSPIM","s":"P1_NCS","sig":"OCTOSPIM_P1_NCS","af":5},{"p":"SPI3","s":"MISO","sig":"SPI3_MISO","af":6},{"p":"USART3","s":"RX","sig":"USART3_RX","af":7},{"p":"UART4","s":"RX","sig":"UART4_RX","af":8},{"p":"TSC","s":"G3_IO3","sig":"TSC_G3_IO3","af":9},{"p":"DCMI","s":"D4","sig":"DCMI_D4","af":10},{"p":"SDMMC1","s":"D3","sig":"SDMMC1_D3","af":12},{"p":"SAI2","s":"MCLK_B","sig":"SAI2_MCLK_B","af":13},{"p":"ADC1","s":"EXTI11","sig":"ADC1_EXTI11","af":null}],"notes":[]},{"n":null,"name":"VDDUSB","raw":"VDDUSB","type":"Power","kind":"power","af":[],"notes":[]},{"n":null,"name":"PA10","raw":"PA10","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH3","sig":"TIM1_CH3","af":1},{"p":"SAI1","s":"D1","sig":"SAI1_D1","af":3},{"p":"DCMI","s":"D1","sig":"DCMI_D1","af":5},{"p":"USART1","s":"RX","sig":"USART1_RX","af":7},{"p":"USB","s":"OTG_FS_ID","sig":"USB_OTG_FS_ID","af":10},{"p":"SAI1","s":"SD_A","sig":"SAI1_SD_A","af":13},{"p":"TIM17","s":"BKIN","sig":"TIM17_BKIN","af":14}],"notes":[]},{"n":null,"name":"PC14","raw":"PC14-OSC32_IN (PC14)","type":"I/O","kind":"gpio","af":[{"p":"RCC","s":"OSC32_IN","sig":"RCC_OSC32_IN","af":null}],"notes":["外部晶振输入/输出"]},{"n":null,"name":"PE6","raw":"PE6","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"TRACED3","sig":"SYS_TRACED3","af":0},{"p":"TIM3","s":"CH4","sig":"TIM3_CH4","af":2},{"p":"SAI1","s":"D1","sig":"SAI1_D1","af":3},{"p":"DCMI","s":"D7","sig":"DCMI_D7","af":10},{"p":"FMC","s":"A22","sig":"FMC_A22","af":12},{"p":"SAI1","s":"SD_A","sig":"SAI1_SD_A","af":13},{"p":"RTC","s":"TAMP3","sig":"RTC_TAMP3","af":null},{"p":"SYS","s":"WKUP3","sig":"SYS_WKUP3","af":null}],"notes":[]},{"n":null,"name":"VSS","raw":"VSS","type":"Power","kind":"ground","af":[],"notes":[]},{"n":null,"name":"PF2","raw":"PF2","type":"I/O","kind":"gpio","af":[{"p":"I2C2","s":"SMBA","sig":"I2C2_SMBA","af":4},{"p":"OCTOSPIM","s":"P2_IO2","sig":"OCTOSPIM_P2_IO2","af":5},{"p":"FMC","s":"A2","sig":"FMC_A2","af":12}],"notes":[]},{"n":null,"name":"PF1","raw":"PF1","type":"I/O","kind":"gpio","af":[{"p":"I2C2","s":"SCL","sig":"I2C2_SCL","af":4},{"p":"OCTOSPIM","s":"P2_IO1","sig":"OCTOSPIM_P2_IO1","af":5},{"p":"FMC","s":"A1","sig":"FMC_A1","af":12}],"notes":[]},{"n":null,"name":"PF0","raw":"PF0","type":"I/O","kind":"gpio","af":[{"p":"I2C2","s":"SDA","sig":"I2C2_SDA","af":4},{"p":"OCTOSPIM","s":"P2_IO0","sig":"OCTOSPIM_P2_IO0","af":5},{"p":"FMC","s":"A0","sig":"FMC_A0","af":12}],"notes":[]},{"n":null,"name":"PG12","raw":"PG12","type":"I/O","kind":"gpio","af":[{"p":"LPTIM1","s":"ETR","sig":"LPTIM1_ETR","af":1},{"p":"OCTOSPIM","s":"P2_NCS","sig":"OCTOSPIM_P2_NCS","af":5},{"p":"SPI3","s":"NSS","sig":"SPI3_NSS","af":6},{"p":"USART1","s":"DE","sig":"USART1_DE","af":7},{"p":"USART1","s":"RTS","sig":"USART1_RTS","af":7},{"p":"FMC","s":"NE4","sig":"FMC_NE4","af":12},{"p":"SAI2","s":"SD_A","sig":"SAI2_SD_A","af":13}],"notes":[]},{"n":null,"name":"PG10","raw":"PG10","type":"I/O","kind":"gpio","af":[{"p":"LPTIM1","s":"IN1","sig":"LPTIM1_IN1","af":1},{"p":"OCTOSPIM","s":"P2_IO7","sig":"OCTOSPIM_P2_IO7","af":5},{"p":"SPI3","s":"MISO","sig":"SPI3_MISO","af":6},{"p":"USART1","s":"RX","sig":"USART1_RX","af":7},{"p":"FMC","s":"NE3","sig":"FMC_NE3","af":12},{"p":"SAI2","s":"FS_A","sig":"SAI2_FS_A","af":13},{"p":"TIM15","s":"CH1","sig":"TIM15_CH1","af":14}],"notes":[]},{"n":null,"name":"PG9","raw":"PG9","type":"I/O","kind":"gpio","af":[{"p":"OCTOSPIM","s":"P2_IO6","sig":"OCTOSPIM_P2_IO6","af":5},{"p":"SPI3","s":"SCK","sig":"SPI3_SCK","af":6},{"p":"USART1","s":"TX","sig":"USART1_TX","af":7},{"p":"FMC","s":"NCE","sig":"FMC_NCE","af":12},{"p":"FMC","s":"NE2","sig":"FMC_NE2","af":12},{"p":"SAI2","s":"SCK_A","sig":"SAI2_SCK_A","af":13},{"p":"TIM15","s":"CH1N","sig":"TIM15_CH1N","af":14},{"p":"DAC1","s":"EXTI9","sig":"DAC1_EXTI9","af":null}],"notes":[]},{"n":null,"name":"PA9","raw":"PA9","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH2","sig":"TIM1_CH2","af":1},{"p":"SPI2","s":"SCK","sig":"SPI2_SCK","af":3},{"p":"DCMI","s":"D0","sig":"DCMI_D0","af":5},{"p":"USART1","s":"TX","sig":"USART1_TX","af":7},{"p":"SAI1","s":"FS_A","sig":"SAI1_FS_A","af":13},{"p":"TIM15","s":"BKIN","sig":"TIM15_BKIN","af":14},{"p":"DAC1","s":"EXTI9","sig":"DAC1_EXTI9","af":null},{"p":"USB","s":"OTG_FS_VBUS","sig":"USB_OTG_FS_VBUS","af":null}],"notes":[]},{"n":null,"name":"PA8","raw":"PA8","type":"I/O","kind":"gpio","af":[{"p":"RCC","s":"MCO","sig":"RCC_MCO","af":0},{"p":"TIM1","s":"CH1","sig":"TIM1_CH1","af":1},{"p":"SAI1","s":"CK2","sig":"SAI1_CK2","af":3},{"p":"USART1","s":"CK","sig":"USART1_CK","af":7},{"p":"USB","s":"OTG_FS_SOF","sig":"USB_OTG_FS_SOF","af":10},{"p":"SAI1","s":"SCK_A","sig":"SAI1_SCK_A","af":13},{"p":"LPTIM2","s":"OUT","sig":"LPTIM2_OUT","af":14}],"notes":[]},{"n":null,"name":"PC9","raw":"PC9","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"TRACED0","sig":"SYS_TRACED0","af":0},{"p":"TIM3","s":"CH4","sig":"TIM3_CH4","af":2},{"p":"TIM8","s":"CH4","sig":"TIM8_CH4","af":3},{"p":"DCMI","s":"D3","sig":"DCMI_D3","af":4},{"p":"I2C3","s":"SDA","sig":"I2C3_SDA","af":6},{"p":"TSC","s":"G4_IO4","sig":"TSC_G4_IO4","af":9},{"p":"USB","s":"OTG_FS_NOE","sig":"USB_OTG_FS_NOE","af":10},{"p":"SDMMC1","s":"D1","sig":"SDMMC1_D1","af":12},{"p":"SAI2","s":"EXTCLK","sig":"SAI2_EXTCLK","af":13},{"p":"TIM8","s":"BKIN2","sig":"TIM8_BKIN2","af":14},{"p":"DAC1","s":"EXTI9","sig":"DAC1_EXTI9","af":null}],"notes":[]},{"n":null,"name":"PC15","raw":"PC15-OSC32_OUT (PC15)","type":"I/O","kind":"gpio","af":[{"p":"ADC1","s":"EXTI15","sig":"ADC1_EXTI15","af":null},{"p":"RCC","s":"OSC32_OUT","sig":"RCC_OSC32_OUT","af":null}],"notes":["外部晶振输入/输出"]},{"n":null,"name":"VBAT","raw":"VBAT","type":"Power","kind":"power","af":[],"notes":["备份域供电，接 1.55–3.6V；不用时接 VDD"]},{"n":null,"name":"VSS","raw":"VSS","type":"Power","kind":"ground","af":[],"notes":[]},{"n":null,"name":"PF3","raw":"PF3","type":"I/O","kind":"gpio","af":[{"p":"OCTOSPIM","s":"P2_IO3","sig":"OCTOSPIM_P2_IO3","af":5},{"p":"FMC","s":"A3","sig":"FMC_A3","af":12}],"notes":[]},{"n":null,"name":"PG5","raw":"PG5","type":"I/O","kind":"gpio","af":[{"p":"SPI1","s":"NSS","sig":"SPI1_NSS","af":5},{"p":"LPUART1","s":"CTS","sig":"LPUART1_CTS","af":8},{"p":"FMC","s":"A15","sig":"FMC_A15","af":12},{"p":"SAI2","s":"SD_B","sig":"SAI2_SD_B","af":13}],"notes":[]},{"n":null,"name":"PC8","raw":"PC8","type":"I/O","kind":"gpio","af":[{"p":"TIM3","s":"CH3","sig":"TIM3_CH3","af":2},{"p":"TIM8","s":"CH3","sig":"TIM8_CH3","af":3},{"p":"TSC","s":"G4_IO3","sig":"TSC_G4_IO3","af":9},{"p":"DCMI","s":"D2","sig":"DCMI_D2","af":10},{"p":"SDMMC1","s":"D0","sig":"SDMMC1_D0","af":12}],"notes":[]},{"n":null,"name":"PC7","raw":"PC7","type":"I/O","kind":"gpio","af":[{"p":"TIM3","s":"CH2","sig":"TIM3_CH2","af":2},{"p":"TIM8","s":"CH2","sig":"TIM8_CH2","af":3},{"p":"DFSDM1","s":"DATIN3","sig":"DFSDM1_DATIN3","af":6},{"p":"SDMMC1","s":"D123DIR","sig":"SDMMC1_D123DIR","af":8},{"p":"TSC","s":"G4_IO2","sig":"TSC_G4_IO2","af":9},{"p":"DCMI","s":"D1","sig":"DCMI_D1","af":10},{"p":"SDMMC1","s":"D7","sig":"SDMMC1_D7","af":12},{"p":"SAI2","s":"MCLK_B","sig":"SAI2_MCLK_B","af":13}],"notes":[]},{"n":null,"name":"PC6","raw":"PC6","type":"I/O","kind":"gpio","af":[{"p":"TIM3","s":"CH1","sig":"TIM3_CH1","af":2},{"p":"TIM8","s":"CH1","sig":"TIM8_CH1","af":3},{"p":"DFSDM1","s":"CKIN3","sig":"DFSDM1_CKIN3","af":6},{"p":"SDMMC1","s":"D0DIR","sig":"SDMMC1_D0DIR","af":8},{"p":"TSC","s":"G4_IO1","sig":"TSC_G4_IO1","af":9},{"p":"DCMI","s":"D0","sig":"DCMI_D0","af":10},{"p":"SDMMC1","s":"D6","sig":"SDMMC1_D6","af":12},{"p":"SAI2","s":"MCLK_A","sig":"SAI2_MCLK_A","af":13}],"notes":[]},{"n":null,"name":"PH0","raw":"PH0-OSC_IN (PH0)","type":"I/O","kind":"gpio","af":[{"p":"RCC","s":"OSC_IN","sig":"RCC_OSC_IN","af":null}],"notes":["外部晶振输入/输出"]},{"n":null,"name":"VSS","raw":"VSS","type":"Power","kind":"ground","af":[],"notes":[]},{"n":null,"name":"PF4","raw":"PF4","type":"I/O","kind":"gpio","af":[{"p":"OCTOSPIM","s":"P2_CLK","sig":"OCTOSPIM_P2_CLK","af":5},{"p":"FMC","s":"A4","sig":"FMC_A4","af":12}],"notes":[]},{"n":null,"name":"PF5","raw":"PF5","type":"I/O","kind":"gpio","af":[{"p":"FMC","s":"A5","sig":"FMC_A5","af":12}],"notes":[]},{"n":null,"name":"VSS","raw":"VSS","type":"Power","kind":"ground","af":[],"notes":[]},{"n":null,"name":"VSS","raw":"VSS","type":"Power","kind":"ground","af":[],"notes":[]},{"n":null,"name":"PG3","raw":"PG3","type":"I/O","kind":"gpio","af":[{"p":"SPI1","s":"MISO","sig":"SPI1_MISO","af":5},{"p":"FMC","s":"A13","sig":"FMC_A13","af":12},{"p":"SAI2","s":"FS_B","sig":"SAI2_FS_B","af":13}],"notes":[]},{"n":null,"name":"PG4","raw":"PG4","type":"I/O","kind":"gpio","af":[{"p":"SPI1","s":"MOSI","sig":"SPI1_MOSI","af":5},{"p":"FMC","s":"A14","sig":"FMC_A14","af":12},{"p":"SAI2","s":"MCLK_B","sig":"SAI2_MCLK_B","af":13}],"notes":[]},{"n":null,"name":"VSS","raw":"VSS","type":"Power","kind":"ground","af":[],"notes":[]},{"n":null,"name":"VSS","raw":"VSS","type":"Power","kind":"ground","af":[],"notes":[]},{"n":null,"name":"PH1","raw":"PH1-OSC_OUT (PH1)","type":"I/O","kind":"gpio","af":[{"p":"RCC","s":"OSC_OUT","sig":"RCC_OSC_OUT","af":null}],"notes":["外部晶振输入/输出"]},{"n":null,"name":"VDD","raw":"VDD","type":"Power","kind":"power","af":[],"notes":[]},{"n":null,"name":"PG11","raw":"PG11","type":"I/O","kind":"gpio","af":[{"p":"LPTIM1","s":"IN2","sig":"LPTIM1_IN2","af":1},{"p":"OCTOSPIM","s":"P1_IO5","sig":"OCTOSPIM_P1_IO5","af":3},{"p":"SPI3","s":"MOSI","sig":"SPI3_MOSI","af":6},{"p":"USART1","s":"CTS","sig":"USART1_CTS","af":7},{"p":"USART1","s":"NSS","sig":"USART1_NSS","af":7},{"p":"SAI2","s":"MCLK_A","sig":"SAI2_MCLK_A","af":13},{"p":"TIM15","s":"CH2","sig":"TIM15_CH2","af":14},{"p":"ADC1","s":"EXTI11","sig":"ADC1_EXTI11","af":null}],"notes":[]},{"n":null,"name":"PG6","raw":"PG6","type":"I/O","kind":"gpio","af":[{"p":"OCTOSPIM","s":"P1_DQS","sig":"OCTOSPIM_P1_DQS","af":3},{"p":"I2C3","s":"SMBA","sig":"I2C3_SMBA","af":4},{"p":"LPUART1","s":"DE","sig":"LPUART1_DE","af":8},{"p":"LPUART1","s":"RTS","sig":"LPUART1_RTS","af":8}],"notes":[]},{"n":null,"name":"VDD","raw":"VDD","type":"Power","kind":"power","af":[],"notes":[]},{"n":null,"name":"VDDIO2","raw":"VDDIO2","type":"Power","kind":"power","af":[],"notes":[]},{"n":null,"name":"PG1","raw":"PG1","type":"I/O","kind":"gpio","af":[{"p":"OCTOSPIM","s":"P2_IO5","sig":"OCTOSPIM_P2_IO5","af":5},{"p":"TSC","s":"G8_IO4","sig":"TSC_G8_IO4","af":9},{"p":"FMC","s":"A11","sig":"FMC_A11","af":12}],"notes":[]},{"n":null,"name":"PG2","raw":"PG2","type":"I/O","kind":"gpio","af":[{"p":"SPI1","s":"SCK","sig":"SPI1_SCK","af":5},{"p":"FMC","s":"A12","sig":"FMC_A12","af":12},{"p":"SAI2","s":"SCK_B","sig":"SAI2_SCK_B","af":13}],"notes":[]},{"n":null,"name":"VDD","raw":"VDD","type":"Power","kind":"power","af":[],"notes":[]},{"n":null,"name":"VDD","raw":"VDD","type":"Power","kind":"power","af":[],"notes":[]},{"n":null,"name":"PC0","raw":"PC0","type":"I/O","kind":"gpio","af":[{"p":"LPTIM1","s":"IN1","sig":"LPTIM1_IN1","af":1},{"p":"I2C3","s":"SCL","sig":"I2C3_SCL","af":4},{"p":"DFSDM1","s":"DATIN4","sig":"DFSDM1_DATIN4","af":6},{"p":"LPUART1","s":"RX","sig":"LPUART1_RX","af":8},{"p":"SAI2","s":"FS_A","sig":"SAI2_FS_A","af":13},{"p":"LPTIM2","s":"IN1","sig":"LPTIM2_IN1","af":14},{"p":"ADC1","s":"IN1","sig":"ADC1_IN1","af":null}],"notes":[]},{"n":null,"name":"NRST","raw":"NRST","type":"Reset","kind":"reset","af":[],"notes":["复位脚 NRST，低有效，内部弱上拉"]},{"n":null,"name":"VDD","raw":"VDD","type":"Power","kind":"power","af":[],"notes":[]},{"n":null,"name":"PG7","raw":"PG7","type":"I/O","kind":"gpio","af":[{"p":"SAI1","s":"CK1","sig":"SAI1_CK1","af":3},{"p":"I2C3","s":"SCL","sig":"I2C3_SCL","af":4},{"p":"OCTOSPIM","s":"P2_DQS","sig":"OCTOSPIM_P2_DQS","af":5},{"p":"DFSDM1","s":"CKOUT","sig":"DFSDM1_CKOUT","af":6},{"p":"LPUART1","s":"TX","sig":"LPUART1_TX","af":8},{"p":"FMC","s":"INT","sig":"FMC_INT","af":12},{"p":"SAI1","s":"MCLK_A","sig":"SAI1_MCLK_A","af":13}],"notes":[]},{"n":null,"name":"PG0","raw":"PG0","type":"I/O","kind":"gpio","af":[{"p":"OCTOSPIM","s":"P2_IO4","sig":"OCTOSPIM_P2_IO4","af":5},{"p":"TSC","s":"G8_IO3","sig":"TSC_G8_IO3","af":9},{"p":"FMC","s":"A10","sig":"FMC_A10","af":12}],"notes":[]},{"n":null,"name":"PD15","raw":"PD15","type":"I/O","kind":"gpio","af":[{"p":"TIM4","s":"CH4","sig":"TIM4_CH4","af":2},{"p":"FMC","s":"D1","sig":"FMC_D1","af":12},{"p":"FMC","s":"DA1","sig":"FMC_DA1","af":12},{"p":"ADC1","s":"EXTI15","sig":"ADC1_EXTI15","af":null}],"notes":[]},{"n":null,"name":"PD14","raw":"PD14","type":"I/O","kind":"gpio","af":[{"p":"TIM4","s":"CH3","sig":"TIM4_CH3","af":2},{"p":"FMC","s":"D0","sig":"FMC_D0","af":12},{"p":"FMC","s":"DA0","sig":"FMC_DA0","af":12}],"notes":[]},{"n":null,"name":"PD13","raw":"PD13","type":"I/O","kind":"gpio","af":[{"p":"TIM4","s":"CH2","sig":"TIM4_CH2","af":2},{"p":"I2C4","s":"SDA","sig":"I2C4_SDA","af":4},{"p":"TSC","s":"G6_IO4","sig":"TSC_G6_IO4","af":9},{"p":"FMC","s":"A18","sig":"FMC_A18","af":12},{"p":"LPTIM2","s":"OUT","sig":"LPTIM2_OUT","af":14}],"notes":[]},{"n":null,"name":"VSSA/VREF-","raw":"VSSA/VREF-","type":"Power","kind":"ground","af":[],"notes":["ADC/DAC 参考电压输入","模拟地，单点接地"]},{"n":null,"name":"PC1","raw":"PC1","type":"I/O","kind":"gpio","af":[{"p":"SYS","s":"TRACED0","sig":"SYS_TRACED0","af":0},{"p":"LPTIM1","s":"OUT","sig":"LPTIM1_OUT","af":1},{"p":"SPI2","s":"MOSI","sig":"SPI2_MOSI","af":3},{"p":"I2C3","s":"SDA","sig":"I2C3_SDA","af":4},{"p":"DFSDM1","s":"CKIN4","sig":"DFSDM1_CKIN4","af":6},{"p":"LPUART1","s":"TX","sig":"LPUART1_TX","af":8},{"p":"OCTOSPIM","s":"P1_IO4","sig":"OCTOSPIM_P1_IO4","af":10},{"p":"SAI1","s":"SD_A","sig":"SAI1_SD_A","af":13},{"p":"ADC1","s":"IN2","sig":"ADC1_IN2","af":null}],"notes":[]},{"n":null,"name":"PC2","raw":"PC2","type":"I/O","kind":"gpio","af":[{"p":"LPTIM1","s":"IN2","sig":"LPTIM1_IN2","af":1},{"p":"SPI2","s":"MISO","sig":"SPI2_MISO","af":5},{"p":"DFSDM1","s":"CKOUT","sig":"DFSDM1_CKOUT","af":6},{"p":"OCTOSPIM","s":"P1_IO5","sig":"OCTOSPIM_P1_IO5","af":10},{"p":"ADC1","s":"IN3","sig":"ADC1_IN3","af":null}],"notes":[]},{"n":null,"name":"PA4","raw":"PA4","type":"I/O","kind":"gpio","af":[{"p":"OCTOSPIM","s":"P1_NCS","sig":"OCTOSPIM_P1_NCS","af":3},{"p":"SPI1","s":"NSS","sig":"SPI1_NSS","af":5},{"p":"SPI3","s":"NSS","sig":"SPI3_NSS","af":6},{"p":"USART2","s":"CK","sig":"USART2_CK","af":7},{"p":"DCMI","s":"HSYNC","sig":"DCMI_HSYNC","af":10},{"p":"SAI1","s":"FS_B","sig":"SAI1_FS_B","af":13},{"p":"LPTIM2","s":"OUT","sig":"LPTIM2_OUT","af":14},{"p":"ADC1","s":"IN9","sig":"ADC1_IN9","af":null},{"p":"DAC1","s":"OUT1","sig":"DAC1_OUT1","af":null}],"notes":[]},{"n":null,"name":"PA7","raw":"PA7","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH1N","sig":"TIM1_CH1N","af":1},{"p":"TIM3","s":"CH2","sig":"TIM3_CH2","af":2},{"p":"TIM8","s":"CH1N","sig":"TIM8_CH1N","af":3},{"p":"I2C3","s":"SCL","sig":"I2C3_SCL","af":4},{"p":"SPI1","s":"MOSI","sig":"SPI1_MOSI","af":5},{"p":"OCTOSPIM","s":"P1_IO2","sig":"OCTOSPIM_P1_IO2","af":10},{"p":"TIM17","s":"CH1","sig":"TIM17_CH1","af":14},{"p":"ADC1","s":"IN12","sig":"ADC1_IN12","af":null},{"p":"OPAMP2","s":"VINM","sig":"OPAMP2_VINM","af":null}],"notes":[]},{"n":null,"name":"PG8","raw":"PG8","type":"I/O","kind":"gpio","af":[{"p":"I2C3","s":"SDA","sig":"I2C3_SDA","af":4},{"p":"LPUART1","s":"RX","sig":"LPUART1_RX","af":8}],"notes":[]},{"n":null,"name":"PF12","raw":"PF12","type":"I/O","kind":"gpio","af":[{"p":"OCTOSPIM","s":"P2_DQS","sig":"OCTOSPIM_P2_DQS","af":5},{"p":"FMC","s":"A6","sig":"FMC_A6","af":12}],"notes":[]},{"n":null,"name":"PF14","raw":"PF14","type":"I/O","kind":"gpio","af":[{"p":"I2C4","s":"SCL","sig":"I2C4_SCL","af":4},{"p":"DFSDM1","s":"CKIN6","sig":"DFSDM1_CKIN6","af":6},{"p":"TSC","s":"G8_IO1","sig":"TSC_G8_IO1","af":9},{"p":"FMC","s":"A8","sig":"FMC_A8","af":12}],"notes":[]},{"n":null,"name":"PF15","raw":"PF15","type":"I/O","kind":"gpio","af":[{"p":"I2C4","s":"SDA","sig":"I2C4_SDA","af":4},{"p":"TSC","s":"G8_IO2","sig":"TSC_G8_IO2","af":9},{"p":"FMC","s":"A9","sig":"FMC_A9","af":12},{"p":"ADC1","s":"EXTI15","sig":"ADC1_EXTI15","af":null}],"notes":[]},{"n":null,"name":"PD12","raw":"PD12","type":"I/O","kind":"gpio","af":[{"p":"TIM4","s":"CH1","sig":"TIM4_CH1","af":2},{"p":"I2C4","s":"SCL","sig":"I2C4_SCL","af":4},{"p":"USART3","s":"DE","sig":"USART3_DE","af":7},{"p":"USART3","s":"RTS","sig":"USART3_RTS","af":7},{"p":"TSC","s":"G6_IO3","sig":"TSC_G6_IO3","af":9},{"p":"FMC","s":"A17","sig":"FMC_A17","af":12},{"p":"SAI2","s":"FS_A","sig":"SAI2_FS_A","af":13},{"p":"LPTIM2","s":"IN1","sig":"LPTIM2_IN1","af":14},{"p":"FMC","s":"ALE","sig":"FMC_ALE","af":null}],"notes":[]},{"n":null,"name":"PD11","raw":"PD11","type":"I/O","kind":"gpio","af":[{"p":"I2C4","s":"SMBA","sig":"I2C4_SMBA","af":4},{"p":"USART3","s":"CTS","sig":"USART3_CTS","af":7},{"p":"USART3","s":"NSS","sig":"USART3_NSS","af":7},{"p":"TSC","s":"G6_IO2","sig":"TSC_G6_IO2","af":9},{"p":"FMC","s":"A16","sig":"FMC_A16","af":12},{"p":"SAI2","s":"SD_A","sig":"SAI2_SD_A","af":13},{"p":"LPTIM2","s":"ETR","sig":"LPTIM2_ETR","af":14},{"p":"ADC1","s":"EXTI11","sig":"ADC1_EXTI11","af":null},{"p":"FMC","s":"CLE","sig":"FMC_CLE","af":null}],"notes":[]},{"n":null,"name":"PD10","raw":"PD10","type":"I/O","kind":"gpio","af":[{"p":"USART3","s":"CK","sig":"USART3_CK","af":7},{"p":"TSC","s":"G6_IO1","sig":"TSC_G6_IO1","af":9},{"p":"FMC","s":"D15","sig":"FMC_D15","af":12},{"p":"FMC","s":"DA15","sig":"FMC_DA15","af":12},{"p":"SAI2","s":"SCK_A","sig":"SAI2_SCK_A","af":13}],"notes":[]},{"n":null,"name":"PG15","raw":"PG15","type":"I/O","kind":"gpio","af":[{"p":"LPTIM1","s":"OUT","sig":"LPTIM1_OUT","af":1},{"p":"I2C1","s":"SMBA","sig":"I2C1_SMBA","af":4},{"p":"OCTOSPIM","s":"P2_DQS","sig":"OCTOSPIM_P2_DQS","af":5},{"p":"DCMI","s":"D13","sig":"DCMI_D13","af":10},{"p":"ADC1","s":"EXTI15","sig":"ADC1_EXTI15","af":null}],"notes":[]},{"n":null,"name":"PC3","raw":"PC3","type":"I/O","kind":"gpio","af":[{"p":"LPTIM1","s":"ETR","sig":"LPTIM1_ETR","af":1},{"p":"SAI1","s":"D1","sig":"SAI1_D1","af":3},{"p":"SPI2","s":"MOSI","sig":"SPI2_MOSI","af":5},{"p":"OCTOSPIM","s":"P1_IO6","sig":"OCTOSPIM_P1_IO6","af":10},{"p":"SAI1","s":"SD_A","sig":"SAI1_SD_A","af":13},{"p":"LPTIM2","s":"ETR","sig":"LPTIM2_ETR","af":14},{"p":"ADC1","s":"IN4","sig":"ADC1_IN4","af":null}],"notes":[]},{"n":null,"name":"PA2","raw":"PA2","type":"I/O","kind":"gpio","af":[{"p":"TIM2","s":"CH3","sig":"TIM2_CH3","af":1},{"p":"TIM5","s":"CH3","sig":"TIM5_CH3","af":2},{"p":"USART2","s":"TX","sig":"USART2_TX","af":7},{"p":"LPUART1","s":"TX","sig":"LPUART1_TX","af":8},{"p":"OCTOSPIM","s":"P1_NCS","sig":"OCTOSPIM_P1_NCS","af":10},{"p":"SAI2","s":"EXTCLK","sig":"SAI2_EXTCLK","af":13},{"p":"TIM15","s":"CH1","sig":"TIM15_CH1","af":14},{"p":"ADC1","s":"IN7","sig":"ADC1_IN7","af":null},{"p":"RCC","s":"LSCO","sig":"RCC_LSCO","af":null},{"p":"SYS","s":"WKUP4","sig":"SYS_WKUP4","af":null}],"notes":[]},{"n":null,"name":"PA5","raw":"PA5","type":"I/O","kind":"gpio","af":[{"p":"TIM2","s":"CH1","sig":"TIM2_CH1","af":1},{"p":"TIM2","s":"ETR","sig":"TIM2_ETR","af":2},{"p":"TIM8","s":"CH1N","sig":"TIM8_CH1N","af":3},{"p":"SPI1","s":"SCK","sig":"SPI1_SCK","af":5},{"p":"LPTIM2","s":"ETR","sig":"LPTIM2_ETR","af":14},{"p":"ADC1","s":"IN10","sig":"ADC1_IN10","af":null},{"p":"DAC1","s":"OUT2","sig":"DAC1_OUT2","af":null}],"notes":[]},{"n":null,"name":"PC4","raw":"PC4","type":"I/O","kind":"gpio","af":[{"p":"USART3","s":"TX","sig":"USART3_TX","af":7},{"p":"OCTOSPIM","s":"P1_IO7","sig":"OCTOSPIM_P1_IO7","af":10},{"p":"ADC1","s":"IN13","sig":"ADC1_IN13","af":null},{"p":"COMP1","s":"INM","sig":"COMP1_INM","af":null}],"notes":[]},{"n":null,"name":"PF11","raw":"PF11","type":"I/O","kind":"gpio","af":[{"p":"DCMI","s":"D12","sig":"DCMI_D12","af":10},{"p":"ADC1","s":"EXTI11","sig":"ADC1_EXTI11","af":null}],"notes":[]},{"n":null,"name":"PF13","raw":"PF13","type":"I/O","kind":"gpio","af":[{"p":"I2C4","s":"SMBA","sig":"I2C4_SMBA","af":4},{"p":"DFSDM1","s":"DATIN6","sig":"DFSDM1_DATIN6","af":6},{"p":"FMC","s":"A7","sig":"FMC_A7","af":12}],"notes":[]},{"n":null,"name":"PD9","raw":"PD9","type":"I/O","kind":"gpio","af":[{"p":"USART3","s":"RX","sig":"USART3_RX","af":7},{"p":"DCMI","s":"PIXCLK","sig":"DCMI_PIXCLK","af":10},{"p":"FMC","s":"D14","sig":"FMC_D14","af":12},{"p":"FMC","s":"DA14","sig":"FMC_DA14","af":12},{"p":"SAI2","s":"MCLK_A","sig":"SAI2_MCLK_A","af":13},{"p":"DAC1","s":"EXTI9","sig":"DAC1_EXTI9","af":null}],"notes":[]},{"n":null,"name":"PD8","raw":"PD8","type":"I/O","kind":"gpio","af":[{"p":"USART3","s":"TX","sig":"USART3_TX","af":7},{"p":"DCMI","s":"HSYNC","sig":"DCMI_HSYNC","af":10},{"p":"FMC","s":"D13","sig":"FMC_D13","af":12},{"p":"FMC","s":"DA13","sig":"FMC_DA13","af":12}],"notes":[]},{"n":null,"name":"PB15","raw":"PB15","type":"I/O","kind":"gpio","af":[{"p":"RTC","s":"REFIN","sig":"RTC_REFIN","af":0},{"p":"TIM1","s":"CH3N","sig":"TIM1_CH3N","af":1},{"p":"TIM8","s":"CH3N","sig":"TIM8_CH3N","af":3},{"p":"SPI2","s":"MOSI","sig":"SPI2_MOSI","af":5},{"p":"DFSDM1","s":"CKIN2","sig":"DFSDM1_CKIN2","af":6},{"p":"TSC","s":"G1_IO4","sig":"TSC_G1_IO4","af":9},{"p":"SAI2","s":"SD_A","sig":"SAI2_SD_A","af":13},{"p":"TIM15","s":"CH2","sig":"TIM15_CH2","af":14},{"p":"ADC1","s":"EXTI15","sig":"ADC1_EXTI15","af":null}],"notes":[]},{"n":null,"name":"PB14","raw":"PB14","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH2N","sig":"TIM1_CH2N","af":1},{"p":"TIM8","s":"CH2N","sig":"TIM8_CH2N","af":3},{"p":"I2C2","s":"SDA","sig":"I2C2_SDA","af":4},{"p":"SPI2","s":"MISO","sig":"SPI2_MISO","af":5},{"p":"DFSDM1","s":"DATIN2","sig":"DFSDM1_DATIN2","af":6},{"p":"USART3","s":"DE","sig":"USART3_DE","af":7},{"p":"USART3","s":"RTS","sig":"USART3_RTS","af":7},{"p":"TSC","s":"G1_IO3","sig":"TSC_G1_IO3","af":9},{"p":"SAI2","s":"MCLK_A","sig":"SAI2_MCLK_A","af":13},{"p":"TIM15","s":"CH1","sig":"TIM15_CH1","af":14}],"notes":[]},{"n":null,"name":"PB13","raw":"PB13","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH1N","sig":"TIM1_CH1N","af":1},{"p":"I2C2","s":"SCL","sig":"I2C2_SCL","af":4},{"p":"SPI2","s":"SCK","sig":"SPI2_SCK","af":5},{"p":"DFSDM1","s":"CKIN1","sig":"DFSDM1_CKIN1","af":6},{"p":"USART3","s":"CTS","sig":"USART3_CTS","af":7},{"p":"USART3","s":"NSS","sig":"USART3_NSS","af":7},{"p":"LPUART1","s":"CTS","sig":"LPUART1_CTS","af":8},{"p":"TSC","s":"G1_IO2","sig":"TSC_G1_IO2","af":9},{"p":"SAI2","s":"SCK_A","sig":"SAI2_SCK_A","af":13},{"p":"TIM15","s":"CH1N","sig":"TIM15_CH1N","af":14}],"notes":[]},{"n":null,"name":"VREF+","raw":"VREF+","type":"MonoIO","kind":"power","af":[{"p":"VREFBUF","s":"OUT","sig":"VREFBUF_OUT","af":null}],"notes":["ADC/DAC 参考电压输入"]},{"n":null,"name":"PA0","raw":"PA0","type":"I/O","kind":"gpio","af":[{"p":"TIM2","s":"CH1","sig":"TIM2_CH1","af":1},{"p":"TIM5","s":"CH1","sig":"TIM5_CH1","af":2},{"p":"TIM8","s":"ETR","sig":"TIM8_ETR","af":3},{"p":"USART2","s":"CTS","sig":"USART2_CTS","af":7},{"p":"USART2","s":"NSS","sig":"USART2_NSS","af":7},{"p":"UART4","s":"TX","sig":"UART4_TX","af":8},{"p":"SAI1","s":"EXTCLK","sig":"SAI1_EXTCLK","af":13},{"p":"TIM2","s":"ETR","sig":"TIM2_ETR","af":14},{"p":"ADC1","s":"IN5","sig":"ADC1_IN5","af":null},{"p":"OPAMP1","s":"VINP","sig":"OPAMP1_VINP","af":null},{"p":"RTC","s":"TAMP2","sig":"RTC_TAMP2","af":null},{"p":"SYS","s":"WKUP1","sig":"SYS_WKUP1","af":null}],"notes":[]},{"n":null,"name":"PA3","raw":"PA3","type":"I/O","kind":"gpio","af":[{"p":"TIM2","s":"CH4","sig":"TIM2_CH4","af":1},{"p":"TIM5","s":"CH4","sig":"TIM5_CH4","af":2},{"p":"SAI1","s":"CK1","sig":"SAI1_CK1","af":3},{"p":"USART2","s":"RX","sig":"USART2_RX","af":7},{"p":"LPUART1","s":"RX","sig":"LPUART1_RX","af":8},{"p":"OCTOSPIM","s":"P1_CLK","sig":"OCTOSPIM_P1_CLK","af":10},{"p":"SAI1","s":"MCLK_A","sig":"SAI1_MCLK_A","af":13},{"p":"TIM15","s":"CH2","sig":"TIM15_CH2","af":14},{"p":"ADC1","s":"IN8","sig":"ADC1_IN8","af":null},{"p":"OPAMP1","s":"VOUT","sig":"OPAMP1_VOUT","af":null}],"notes":[]},{"n":null,"name":"PA6","raw":"PA6","type":"I/O","kind":"gpio","af":[{"p":"TIM3","s":"CH1","sig":"TIM3_CH1","af":2},{"p":"DCMI","s":"PIXCLK","sig":"DCMI_PIXCLK","af":4},{"p":"SPI1","s":"MISO","sig":"SPI1_MISO","af":5},{"p":"USART3","s":"CTS","sig":"USART3_CTS","af":7},{"p":"USART3","s":"NSS","sig":"USART3_NSS","af":7},{"p":"LPUART1","s":"CTS","sig":"LPUART1_CTS","af":8},{"p":"OCTOSPIM","s":"P1_IO3","sig":"OCTOSPIM_P1_IO3","af":10},{"p":"TIM1","s":"BKIN","sig":"TIM1_BKIN","af":12},{"p":"TIM8","s":"BKIN","sig":"TIM8_BKIN","af":13},{"p":"TIM16","s":"CH1","sig":"TIM16_CH1","af":14},{"p":"ADC1","s":"IN11","sig":"ADC1_IN11","af":null},{"p":"OPAMP2","s":"VINP","sig":"OPAMP2_VINP","af":null}],"notes":[]},{"n":null,"name":"PC5","raw":"PC5","type":"I/O","kind":"gpio","af":[{"p":"SAI1","s":"D3","sig":"SAI1_D3","af":3},{"p":"USART3","s":"RX","sig":"USART3_RX","af":7},{"p":"ADC1","s":"IN14","sig":"ADC1_IN14","af":null},{"p":"COMP1","s":"INP","sig":"COMP1_INP","af":null},{"p":"SYS","s":"WKUP5","sig":"SYS_WKUP5","af":null}],"notes":[]},{"n":null,"name":"PB2","raw":"PB2","type":"I/O","kind":"gpio","af":[{"p":"RTC","s":"OUT_ALARM","sig":"RTC_OUT_ALARM","af":0},{"p":"RTC","s":"OUT_CALIB","sig":"RTC_OUT_CALIB","af":0},{"p":"LPTIM1","s":"OUT","sig":"LPTIM1_OUT","af":1},{"p":"I2C3","s":"SMBA","sig":"I2C3_SMBA","af":4},{"p":"DFSDM1","s":"CKIN0","sig":"DFSDM1_CKIN0","af":6},{"p":"OCTOSPIM","s":"P1_DQS","sig":"OCTOSPIM_P1_DQS","af":10},{"p":"COMP1","s":"INP","sig":"COMP1_INP","af":null}],"notes":[]},{"n":null,"name":"PE8","raw":"PE8","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH1N","sig":"TIM1_CH1N","af":1},{"p":"DFSDM1","s":"CKIN2","sig":"DFSDM1_CKIN2","af":6},{"p":"FMC","s":"D5","sig":"FMC_D5","af":12},{"p":"FMC","s":"DA5","sig":"FMC_DA5","af":12},{"p":"SAI1","s":"SCK_B","sig":"SAI1_SCK_B","af":13}],"notes":[]},{"n":null,"name":"PE10","raw":"PE10","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH2N","sig":"TIM1_CH2N","af":1},{"p":"DFSDM1","s":"DATIN4","sig":"DFSDM1_DATIN4","af":6},{"p":"TSC","s":"G5_IO1","sig":"TSC_G5_IO1","af":9},{"p":"OCTOSPIM","s":"P1_CLK","sig":"OCTOSPIM_P1_CLK","af":10},{"p":"FMC","s":"D7","sig":"FMC_D7","af":12},{"p":"FMC","s":"DA7","sig":"FMC_DA7","af":12},{"p":"SAI1","s":"MCLK_B","sig":"SAI1_MCLK_B","af":13}],"notes":[]},{"n":null,"name":"PE12","raw":"PE12","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH3N","sig":"TIM1_CH3N","af":1},{"p":"SPI1","s":"NSS","sig":"SPI1_NSS","af":5},{"p":"DFSDM1","s":"DATIN5","sig":"DFSDM1_DATIN5","af":6},{"p":"TSC","s":"G5_IO3","sig":"TSC_G5_IO3","af":9},{"p":"OCTOSPIM","s":"P1_IO0","sig":"OCTOSPIM_P1_IO0","af":10},{"p":"FMC","s":"D9","sig":"FMC_D9","af":12},{"p":"FMC","s":"DA9","sig":"FMC_DA9","af":12}],"notes":[]},{"n":null,"name":"PB10","raw":"PB10","type":"I/O","kind":"gpio","af":[{"p":"TIM2","s":"CH3","sig":"TIM2_CH3","af":1},{"p":"I2C4","s":"SCL","sig":"I2C4_SCL","af":3},{"p":"I2C2","s":"SCL","sig":"I2C2_SCL","af":4},{"p":"SPI2","s":"SCK","sig":"SPI2_SCK","af":5},{"p":"DFSDM1","s":"DATIN7","sig":"DFSDM1_DATIN7","af":6},{"p":"USART3","s":"TX","sig":"USART3_TX","af":7},{"p":"LPUART1","s":"RX","sig":"LPUART1_RX","af":8},{"p":"TSC","s":"SYNC","sig":"TSC_SYNC","af":9},{"p":"OCTOSPIM","s":"P1_CLK","sig":"OCTOSPIM_P1_CLK","af":10},{"p":"COMP1","s":"OUT","sig":"COMP1_OUT","af":12},{"p":"SAI1","s":"SCK_A","sig":"SAI1_SCK_A","af":13}],"notes":[]},{"n":null,"name":"PB11","raw":"PB11","type":"I/O","kind":"gpio","af":[{"p":"TIM2","s":"CH4","sig":"TIM2_CH4","af":1},{"p":"I2C4","s":"SDA","sig":"I2C4_SDA","af":3},{"p":"I2C2","s":"SDA","sig":"I2C2_SDA","af":4},{"p":"DFSDM1","s":"CKIN7","sig":"DFSDM1_CKIN7","af":6},{"p":"USART3","s":"RX","sig":"USART3_RX","af":7},{"p":"LPUART1","s":"TX","sig":"LPUART1_TX","af":8},{"p":"OCTOSPIM","s":"P1_NCS","sig":"OCTOSPIM_P1_NCS","af":10},{"p":"COMP2","s":"OUT","sig":"COMP2_OUT","af":12},{"p":"ADC1","s":"EXTI11","sig":"ADC1_EXTI11","af":null}],"notes":[]},{"n":null,"name":"PB12","raw":"PB12","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"BKIN","sig":"TIM1_BKIN","af":3},{"p":"I2C2","s":"SMBA","sig":"I2C2_SMBA","af":4},{"p":"SPI2","s":"NSS","sig":"SPI2_NSS","af":5},{"p":"DFSDM1","s":"DATIN1","sig":"DFSDM1_DATIN1","af":6},{"p":"USART3","s":"CK","sig":"USART3_CK","af":7},{"p":"LPUART1","s":"DE","sig":"LPUART1_DE","af":8},{"p":"LPUART1","s":"RTS","sig":"LPUART1_RTS","af":8},{"p":"TSC","s":"G1_IO1","sig":"TSC_G1_IO1","af":9},{"p":"SAI2","s":"FS_A","sig":"SAI2_FS_A","af":13},{"p":"TIM15","s":"BKIN","sig":"TIM15_BKIN","af":14}],"notes":[]},{"n":null,"name":"VDDA","raw":"VDDA","type":"Power","kind":"power","af":[],"notes":["模拟供电，必须接；与 VDD 之间加磁珠"]},{"n":null,"name":"PA1","raw":"PA1","type":"I/O","kind":"gpio","af":[{"p":"TIM2","s":"CH2","sig":"TIM2_CH2","af":1},{"p":"TIM5","s":"CH2","sig":"TIM5_CH2","af":2},{"p":"I2C1","s":"SMBA","sig":"I2C1_SMBA","af":4},{"p":"SPI1","s":"SCK","sig":"SPI1_SCK","af":5},{"p":"USART2","s":"DE","sig":"USART2_DE","af":7},{"p":"USART2","s":"RTS","sig":"USART2_RTS","af":7},{"p":"UART4","s":"RX","sig":"UART4_RX","af":8},{"p":"OCTOSPIM","s":"P1_DQS","sig":"OCTOSPIM_P1_DQS","af":10},{"p":"TIM15","s":"CH1N","sig":"TIM15_CH1N","af":14},{"p":"ADC1","s":"IN6","sig":"ADC1_IN6","af":null},{"p":"OPAMP1","s":"VINM","sig":"OPAMP1_VINM","af":null}],"notes":[]},{"n":null,"name":"OPAMP1_VINM","raw":"OPAMP1_VINM","type":"MonoIO","kind":"special","af":[{"p":"OPAMP1","s":"VINM","sig":"OPAMP1_VINM","af":null}],"notes":[]},{"n":null,"name":"OPAMP2_VINM","raw":"OPAMP2_VINM","type":"MonoIO","kind":"special","af":[{"p":"OPAMP2","s":"VINM","sig":"OPAMP2_VINM","af":null}],"notes":[]},{"n":null,"name":"PB0","raw":"PB0","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH2N","sig":"TIM1_CH2N","af":1},{"p":"TIM3","s":"CH3","sig":"TIM3_CH3","af":2},{"p":"TIM8","s":"CH2N","sig":"TIM8_CH2N","af":3},{"p":"SPI1","s":"NSS","sig":"SPI1_NSS","af":5},{"p":"USART3","s":"CK","sig":"USART3_CK","af":7},{"p":"OCTOSPIM","s":"P1_IO1","sig":"OCTOSPIM_P1_IO1","af":10},{"p":"COMP1","s":"OUT","sig":"COMP1_OUT","af":12},{"p":"SAI1","s":"EXTCLK","sig":"SAI1_EXTCLK","af":13},{"p":"ADC1","s":"IN15","sig":"ADC1_IN15","af":null},{"p":"OPAMP2","s":"VOUT","sig":"OPAMP2_VOUT","af":null}],"notes":[]},{"n":null,"name":"PB1","raw":"PB1","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH3N","sig":"TIM1_CH3N","af":1},{"p":"TIM3","s":"CH4","sig":"TIM3_CH4","af":2},{"p":"TIM8","s":"CH3N","sig":"TIM8_CH3N","af":3},{"p":"DFSDM1","s":"DATIN0","sig":"DFSDM1_DATIN0","af":6},{"p":"USART3","s":"DE","sig":"USART3_DE","af":7},{"p":"USART3","s":"RTS","sig":"USART3_RTS","af":7},{"p":"LPUART1","s":"DE","sig":"LPUART1_DE","af":8},{"p":"LPUART1","s":"RTS","sig":"LPUART1_RTS","af":8},{"p":"OCTOSPIM","s":"P1_IO0","sig":"OCTOSPIM_P1_IO0","af":10},{"p":"LPTIM2","s":"IN1","sig":"LPTIM2_IN1","af":14},{"p":"ADC1","s":"IN16","sig":"ADC1_IN16","af":null},{"p":"COMP1","s":"INM","sig":"COMP1_INM","af":null}],"notes":[]},{"n":null,"name":"PE7","raw":"PE7","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"ETR","sig":"TIM1_ETR","af":1},{"p":"DFSDM1","s":"DATIN2","sig":"DFSDM1_DATIN2","af":6},{"p":"FMC","s":"D4","sig":"FMC_D4","af":12},{"p":"FMC","s":"DA4","sig":"FMC_DA4","af":12},{"p":"SAI1","s":"SD_B","sig":"SAI1_SD_B","af":13}],"notes":[]},{"n":null,"name":"PE9","raw":"PE9","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH1","sig":"TIM1_CH1","af":1},{"p":"DFSDM1","s":"CKOUT","sig":"DFSDM1_CKOUT","af":6},{"p":"FMC","s":"D6","sig":"FMC_D6","af":12},{"p":"FMC","s":"DA6","sig":"FMC_DA6","af":12},{"p":"SAI1","s":"FS_B","sig":"SAI1_FS_B","af":13},{"p":"DAC1","s":"EXTI9","sig":"DAC1_EXTI9","af":null}],"notes":[]},{"n":null,"name":"PE11","raw":"PE11","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH2","sig":"TIM1_CH2","af":1},{"p":"DFSDM1","s":"CKIN4","sig":"DFSDM1_CKIN4","af":6},{"p":"TSC","s":"G5_IO2","sig":"TSC_G5_IO2","af":9},{"p":"OCTOSPIM","s":"P1_NCS","sig":"OCTOSPIM_P1_NCS","af":10},{"p":"FMC","s":"D8","sig":"FMC_D8","af":12},{"p":"FMC","s":"DA8","sig":"FMC_DA8","af":12},{"p":"ADC1","s":"EXTI11","sig":"ADC1_EXTI11","af":null}],"notes":[]},{"n":null,"name":"PE13","raw":"PE13","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH3","sig":"TIM1_CH3","af":1},{"p":"SPI1","s":"SCK","sig":"SPI1_SCK","af":5},{"p":"DFSDM1","s":"CKIN5","sig":"DFSDM1_CKIN5","af":6},{"p":"TSC","s":"G5_IO4","sig":"TSC_G5_IO4","af":9},{"p":"OCTOSPIM","s":"P1_IO1","sig":"OCTOSPIM_P1_IO1","af":10},{"p":"FMC","s":"D10","sig":"FMC_D10","af":12},{"p":"FMC","s":"DA10","sig":"FMC_DA10","af":12}],"notes":[]},{"n":null,"name":"PE14","raw":"PE14","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"CH4","sig":"TIM1_CH4","af":1},{"p":"TIM1","s":"BKIN2","sig":"TIM1_BKIN2","af":3},{"p":"SPI1","s":"MISO","sig":"SPI1_MISO","af":5},{"p":"OCTOSPIM","s":"P1_IO2","sig":"OCTOSPIM_P1_IO2","af":10},{"p":"FMC","s":"D11","sig":"FMC_D11","af":12},{"p":"FMC","s":"DA11","sig":"FMC_DA11","af":12}],"notes":[]},{"n":null,"name":"PE15","raw":"PE15","type":"I/O","kind":"gpio","af":[{"p":"TIM1","s":"BKIN","sig":"TIM1_BKIN","af":3},{"p":"SPI1","s":"MOSI","sig":"SPI1_MOSI","af":5},{"p":"OCTOSPIM","s":"P1_IO3","sig":"OCTOSPIM_P1_IO3","af":10},{"p":"FMC","s":"D12","sig":"FMC_D12","af":12},{"p":"FMC","s":"DA12","sig":"FMC_DA12","af":12},{"p":"ADC1","s":"EXTI15","sig":"ADC1_EXTI15","af":null}],"notes":[]}],"spec":{"core":"Arm Cortex-M4","freq":"120","flash":"2048","ram":"640","ionb":"110","vmin":"1.71","vmax":"3.6","tmin":"-40","tmax":"125","ip":{"ADC":1,"AES":1,"CAN":1,"COMP":2,"CRC":1,"DAC":1,"DCMI":1,"DFSDM":1,"DMA2D":1,"FATFS":1,"FMC":1,"FREERTOS":1,"HASH":1,"I2C":4,"IRTIM":1,"IWDG":1,"LPTIM":2,"LPUART":1,"OCTOSPI":2,"OCTOSPIM":1,"OPAMP":2,"RCC":1,"RNG":1,"RTC":1,"SAI":2,"SDMMC":1,"SPI":3,"SYS":1,"TIM":11,"TOUCHSENSING":1,"TSC":1,"UART":2,"USART":3,"USB_DEVICE":1,"USB_HOST":1,"USB_OTG_FS":1,"WWDG":1,"GPIO":1,"DMA":1,"NVIC":1}}};
+const P = D.pins || [];
+const CHIP = D.name;
+
+const KIND = {
+  gpio:{t:'GPIO',c:'#58a6ff',bg:'#16263d'},
+  power:{t:'电源',c:'#8b949e',bg:'#21262d'},
+  ground:{t:'地',c:'#6e7681',bg:'#1c2128'},
+  reset:{t:'复位',c:'#d29922',bg:'#2d2416'},
+  special:{t:'特殊',c:'#6e7681',bg:'#161b22'}
+};
+// 各外设"常用信号"清单，用于区分主次配色
+const CORE_SIG = {
+  USART:['TX','RX'], UART:['TX','RX'], LPUART:['TX','RX'],
+  SPI:['SCK','MISO','MOSI','NSS'],
+  I2C:['SCL','SDA'],
+  FDCAN:['TX','RX'],
+  UCPD:['CC1','CC2'],
+  TIM:['CH1','CH2','CH3','CH4'],
+  LPTIM:['OUT','IN1','IN2','ETR'],
+  SAI:['SD_A','SD_B','SCK_A','SCK_B','FS_A','FS_B','MCLK_A'],
+  USB:['D+','D-','DP','DM'],
+};
+function isCoreSig(per, sig){
+  for(const k in CORE_SIG){
+    if(per.indexOf(k)===0) return CORE_SIG[k].indexOf(sig)>=0;
+  }
+  return true;   // ADC/DAC/COMP/OPAMP/RCC/SYS 等不区分主次
+}
+function afClass(p, sig){
+  return _afBase(p) + (isCoreSig(p, sig) ? '' : ' ext');
+}
+function _afBase(p){
+  if(/^TIM|^LPTIM|^HRTIM/.test(p))return 'c-tim';
+  if(/^USART|^UART|^LPUART/.test(p))return 'c-uart';
+  if(/^SPI|^I2S|^SAI/.test(p))return 'c-spi';
+  if(/^I2C/.test(p))return 'c-i2c';
+  if(/^ADC|^DAC|^OPAMP|^COMP/.test(p))return 'c-ana';
+  if(/^USB|^UCPD/.test(p))return 'c-usb';
+  if(/^FDCAN|^ETH|^SDMMC|^SDIO|^QUADSPI|^OCTOSPI/.test(p))return 'c-bus';
+  if(/^SYS|^RCC|^DEBUG/.test(p))return 'c-sys';
+  return 'c-def';
+}
+function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+
+/* ---- 顶部信息 ---- */
+(function(){
+  const S = D.spec || {};
+  const ip = S.ip || {};
+  const gpio = P.filter(p=>p.kind==='gpio').length;
+
+  document.getElementById('sub').innerHTML =
+    `基于 STM32CubeMX 器件库 · ${esc(D.family||'')} ${esc(D.line||'')} · ${esc(D.package||'')} 封装 · `+
+    `共 ${P.length} 脚${S.vmin&&S.vmax?` · 工作电压 ${esc(S.vmin)}~${esc(S.vmax)}V`:''}`+
+    `${S.tmin&&S.tmax?` · 温度 ${esc(S.tmin)}~${esc(S.tmax)}°C`:''}`;
+
+  const items=[];
+  // 内核 + 主频
+  if(S.core||S.freq){
+    let core=(S.core||'').replace(/^ARM\s*/i,'');
+    items.push(['内核', core + (S.freq?` @${S.freq}MHz`:''), 'hi']);
+  }
+  // 存储
+  if(S.flash) items.push(['Flash', S.flash+' KB', '']);
+  if(S.ram)   items.push(['SRAM', S.ram+' KB', '']);
+  // IO / 引脚
+  if(gpio) items.push(['GPIO', gpio+' 个', '']);
+  items.push(['引脚', P.length+' 脚', '']);
+  // 按外设实例数量分组（ CubeMX 真实数据 ）
+  const groups=[
+    ['串口', ['USART','UART','LPUART']],
+    ['SPI/I2S', ['SPI','I2S']],
+    ['I2C', ['I2C']],
+    ['CAN', ['FDCAN','CAN']],
+    ['USB', ['USB','UCPD']],
+    ['定时器', ['TIM','LPTIM','HRTIM']],
+    ['模拟', ['ADC','DAC','OPAMP','COMP']],
+  ];
+  groups.forEach(([label, keys])=>{
+    const seg=keys.map(k=>ip[k]?`${k} ${ip[k]}`:'').filter(Boolean).join(' / ');
+    if(seg) items.push([label, seg, '']);
+  });
+  document.getElementById('badges').innerHTML = items.map(([k,v,c])=>
+    `<div class="bdg ${c}">${esc(k)}<b>${esc(v)}</b></div>`).join('');
+})();
+
+/* ---- 引脚图 ---- */
+(function(){
+  const nums = P.map(p=>p.n);
+  const ok = nums.length>0 && nums.every(n=>Number.isInteger(n)) && P.length%4===0;
+  if(!ok){ return; }
+  document.getElementById('diecard').hidden = false;
+
+  const NS='http://www.w3.org/2000/svg';
+  const svg=document.getElementById('die');
+  const N=P.length, per=N/4;
+  const X0=150,Y0=150,S=340;
+  const STEP=S/per;
+  const LEN = per<=20?24:(per<=28?18:13);
+  const W   = per<=20?9:(per<=28?7:5);
+  const byNum=new Map(P.map(p=>[p.n,p]));
+
+  const legend=[['GPIO','#2563eb'],['电源','#8b949e'],['地','#6e7681'],['复位','#d29922']];
+  document.getElementById('legend').innerHTML=legend.map(([t,c])=>
+    `<span><i style="background:${c}"></i>${t}</span>`).join('');
+
+  function box(x,y,w,h,fill,stroke,sw,rx){
+    const r=document.createElementNS(NS,'rect');
+    r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',w);r.setAttribute('height',h);
+    r.setAttribute('rx',rx||1.5);r.setAttribute('fill',fill);r.setAttribute('stroke',stroke);
+    r.setAttribute('stroke-width',sw);return r;
+  }
+  function txt(x,y,s,anchor,size,color,weight,rot){
+    const t=document.createElementNS(NS,'text');
+    t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('text-anchor',anchor);
+    t.setAttribute('font-size',size);t.setAttribute('fill',color);
+    t.setAttribute('font-family','JetBrains Mono,Consolas,monospace');
+    if(weight)t.setAttribute('font-weight',weight);
+    if(rot)t.setAttribute('transform',`rotate(${rot} ${x} ${y})`);
+    t.textContent=s;return t;
+  }
+
+  svg.appendChild(box(X0,Y0,S,S,'#161b22','#30363d',1.2,10));
+  svg.appendChild(txt(X0+S/2,Y0+S/2-6,CHIP,'middle',per<=20?12.5:9,'#e6edf3','700'));
+  svg.appendChild(txt(X0+S/2,Y0+S/2+10,(D.package||'')+' · '+N+' pins','middle',per<=20?8.2:6.5,'#6e7681','400'));
+
+  for(let i=1;i<=N;i++){
+    const p=byNum.get(i); if(!p) continue;
+    const k=KIND[p.kind]||KIND.special;
+    const idx=(i-1)%per;
+    const c=X0+STEP/2+STEP*idx;
+    let rect,numX,numY,numA;
+
+    if(i<=per){
+      rect=[X0-LEN,c-W/2,LEN,W]; numX=X0-LEN-3; numY=c+2.2; numA='end';
+    }else if(i<=2*per){
+      rect=[c-W/2,Y0+S,W,LEN]; numX=c; numY=Y0+S+LEN+9; numA='middle';
+    }else if(i<=3*per){
+      const cc=Y0+S-STEP/2-STEP*(i-2*per-1);
+      rect=[X0+S,cc-W/2,LEN,W]; numX=X0+S+LEN+3; numY=cc+2.2; numA='start';
+    }else{
+      const cc=X0+S-STEP/2-STEP*(i-3*per-1);
+      rect=[cc-W/2,Y0-LEN,W,LEN]; numX=cc; numY=Y0-LEN-5; numA='middle';
+    }
+
+    const r=box(rect[0],rect[1],rect[2],rect[3],k.bg,k.c,0.9,2);
+    r.style.cursor='pointer'; r.dataset.num=i;
+    r.addEventListener('click',()=>jump(i));
+    const ti=document.createElementNS(NS,'title');
+    ti.textContent=`${i}  ${p.name}${p.kind!=='gpio'?'  ('+k.t+')':''}`; r.appendChild(ti);
+    svg.appendChild(r);
+
+    const nt=txt(numX,numY,String(i),numA,per<=20?7.0:5.2,'#8b949e','500');
+    nt.dataset.num=i; nt.dataset.size=nt.getAttribute('font-size'); svg.appendChild(nt);
+  }
+
+  // 高亮某个脚号的引脚块（供速查卡片/表格联动调用），仿 CTRL+F 橙色包裹
+  let hlRect=null, hlNum=null, hlLabel=null;
+  window.__hlPin=function(n){
+    // 先还原上一次高亮
+    if(hlRect){ hlRect.setAttribute('fill',hlRect.dataset.bg);
+      hlRect.setAttribute('stroke',hlRect.dataset.sc);
+      hlRect.setAttribute('stroke-width','0.9'); hlRect.removeAttribute('filter'); hlRect=null; }
+    if(hlNum){ hlNum.setAttribute('fill','#8b949e'); hlNum.setAttribute('font-weight','500');
+      hlNum.setAttribute('font-size',hlNum.dataset.size); hlNum=null; }
+    if(hlLabel){ hlLabel.remove(); hlLabel=null; }
+
+    const r=[...svg.querySelectorAll('rect[data-num]')].find(x=>+x.dataset.num===+n);
+    if(!r)return;
+    r.dataset.bg=r.getAttribute('fill'); r.dataset.sc=r.getAttribute('stroke');
+    r.setAttribute('fill','#d2990b'); r.setAttribute('stroke','#ffa657');
+    r.setAttribute('stroke-width','3');
+    r.setAttribute('filter','drop-shadow(0 0 5px rgba(255,166,87,1))');
+    hlRect=r;
+
+    // 脚号数字同步放大变橙，一眼能看到
+    const nt=svg.querySelector(`text[data-num="${n}"]`);
+    if(nt){ hlNum=nt; nt.setAttribute('fill','#ffa657'); nt.setAttribute('font-weight','700');
+      nt.setAttribute('font-size',per<=20?11:8.5); }
+
+    // 在高亮脚旁标注引脚名
+    const p=byNum.get(n);
+    if(p){
+      const x=+r.getAttribute('x'), y=+r.getAttribute('y');
+      const w=+r.getAttribute('width'), h=+r.getAttribute('height');
+      let lx,ly,anchor;
+      if(x<X0){ lx=x-4; ly=y+h/2+3; anchor='end'; }
+      else if(x>X0+S){ lx=x+w+4; ly=y+h/2+3; anchor='start'; }
+      else if(y<Y0){ lx=x+w/2; ly=y-5; anchor='middle'; }
+      else { lx=x+w/2; ly=y+h+11; anchor='middle'; }
+      hlLabel=txt(lx,ly,p.name,anchor,per<=20?9:7,'#ffa657','700');
+      hlLabel.setAttribute('paint-order','stroke');
+      hlLabel.setAttribute('stroke','#0d1117'); hlLabel.setAttribute('stroke-width','3');
+      svg.appendChild(hlLabel);
+    }
+  };
+})();
+
+/* ---- 表格 ---- */
+const ROWS = P.map(p=>{
+  const k=KIND[p.kind]||KIND.special;
+  // 从 raw（如 PF0-OSC_IN / PG10-NRST / PB8-BOOT0）提取功能后缀直接标在引脚旁
+  const dash = (p.raw||'').indexOf('-');
+  const suf = dash >= 0 ? p.raw.slice(dash+1) : '';
+  const sufCls = /OSC/i.test(suf) ? 'osc' : (/NRST/i.test(suf) ? 'rst' : (/BOOT/i.test(suf) ? 'boot' : (/WKUP|WAKE/i.test(suf) ? 'wkup' : '')));
+  p.sufHtml = suf ? `<span class="psuf ${sufCls}">${esc(suf)}</span>` : '';
+  const afs=p.af.map(a=>{
+    const ana=/^(ADC|DAC|OPAMP|COMP)/.test(a.p);
+    const no=a.af===null?(ana?'A':''):a.af;
+    return `<span class="af ${afClass(a.p, a.s)}"><em>${no}</em>${esc(a.sig)}</span>`;
+  });
+  const more=afs.length>5?`<span class="more">+${afs.length-5}</span>`:'';
+  const notes=(p.notes||[]).map(n=>`<div class="note">${esc(n)}</div>`).join('');
+  const search=[p.n,p.name,p.raw,p.af.map(a=>a.sig).join(' '),p.type].join(' ').toLowerCase();
+  const ana=p.af.some(a=>/^(ADC|DAC|OPAMP|COMP)/.test(a.p));
+  return `<tr class="row" data-num="${p.n??''}" data-name="${esc(p.name)}"
+      data-kind="${p.kind}" data-analog="${ana?1:0}" data-search="${esc(search)}">
+    <td class="c-num">${p.n??'—'}</td>
+    <td class="c-name"><span class="pname">${esc(p.name)}</span>${p.sufHtml||''}${ana?'<i class="adot" title="具备模拟功能"></i>':''}</td>
+    <td class="c-kind"><span class="tag t-${p.kind}">${k.t}</span></td>
+    <td class="c-af"><div class="afbox">${afs.join('')}${more}</div></td>
+    <td class="c-note">${notes}</td>
+  </tr>`;
+});
+document.getElementById('tbody').innerHTML=ROWS.join('');
+
+/* ---- 筛选 ---- */
+const FILTERS=[['all','全部',()=>true],
+  ['analog','模拟',p=>p.analog],
+  ['debug','调试',p=>p.af.some(a=>a.p==='SYS')],
+  ['clock','时钟',p=>p.af.some(a=>a.p==='RCC')]];
+let curF='all',curQ='';
+const tbody=document.getElementById('tbody');
+const trs=[...tbody.querySelectorAll('tr')];
+document.getElementById('filters').innerHTML=FILTERS.map(([k,t])=>
+  `<button data-f="${k}" class="${k==='all'?'on':''}">${t}</button>`).join('');
+
+function apply(){
+  const f=FILTERS.find(x=>x[0]===curF)[2]; let n=0;
+  trs.forEach(tr=>{
+    const d={analog:tr.dataset.analog==='1',kind:tr.dataset.kind,name:tr.dataset.name};
+    const ok=f(d)&&(!curQ||tr.dataset.search.includes(curQ));
+    tr.hidden=!ok; if(ok)n++;
+  });
+  document.getElementById('count').textContent=`（显示 ${n} / ${P.length}）`;
+  document.getElementById('empty').hidden=n>0;
+}
+document.getElementById('filters').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  document.querySelectorAll('#filters button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); curF=b.dataset.f; apply();
+});
+document.getElementById('q').addEventListener('input',e=>{
+  curQ=e.target.value.trim().toLowerCase(); apply();
+});
+tbody.addEventListener('click',e=>{
+  const tr=e.target.closest('tr'); if(!tr)return;
+  tr.classList.toggle('expanded');
+});
+apply();
+
+// 定位到引脚功能总表的指定引脚行（兼容有数字脚号的 QFP/LQFP 与无脚号的 BGA）
+// 支持按 name（引脚名，全封装通用）或 num（脚号）定位
+let hlRow=null;
+function focusPin(name, num){
+  // 优先按引脚名匹配 data-name；BGA 芯片脚号为 null，只能靠名字
+  let tr = name ? trs.find(t=>t.dataset.name===name) : null;
+  if(!tr && num!=null) tr = trs.find(t=>t.dataset.num==String(num));
+  if(!tr)return false;
+  curF='all'; curQ='';
+  document.getElementById('q').value='';
+  document.querySelectorAll('#filters button').forEach(b=>b.classList.toggle('on',b.dataset.f==='all'));
+  apply();
+  if(hlRow){ hlRow.classList.remove('hl','flash'); }
+  tr.classList.add('hl','flash'); hlRow=tr;
+  setTimeout(()=>tr.classList.remove('flash'),1500);
+  tr.classList.add('expanded');
+  setTimeout(function(){
+    tr.scrollIntoView({block:'center',inline:'nearest'});
+    var card=tr.closest('.card');
+    if(card){
+      var top=card.getBoundingClientRect().top;
+      if(top>40 || top<-40){ window.scrollBy({top:top-70,behavior:'auto'}); }
+    }
+  }, 0);
+  return true;
+}
+// 点击引脚分布图上的脚号
+function jump(num){
+  const p=P.find(x=>x.n===num);
+  if(focusPin(p?p.name:null, num) && window.__hlPin) window.__hlPin(num);
+}
+// 速查卡片点击引脚名 -> 定位到引脚功能总表对应行（按名字，BGA 也能用）
+function jumpByName(name){
+  const p=P.find(x=>x.name===name);
+  focusPin(name, p?p.n:null);
+}
+
+/* ---- 外设速查 ---- */
+(function(){
+  const map={};
+  P.forEach(p=>p.af.forEach(a=>{
+    if(!a.p)return;
+    if(!map[a.p])map[a.p]={};
+    if(!map[a.p][a.s])map[a.p][a.s]=[];
+    map[a.p][a.s].push({n:p.name,af:a.af});
+  }));
+  const GROUPS=[
+    ['串口 / 通信',['USART1','USART2','USART3','USART4','USART5','USART6','UART4','UART5','UART7','UART8','LPUART1','SPI1','SPI2','SPI3','SPI4','SPI5','SPI6','I2C1','I2C2','I2C3','I2C4','SAI1','SAI2','FDCAN1','FDCAN2','FDCAN3','USB','USB_OTG_FS','USB_OTG_HS','UCPD1','ETH','SDMMC1','SDMMC2','QUADSPI','OCTOSPI1']],
+    ['定时器 / PWM',['TIM1','TIM2','TIM3','TIM4','TIM5','TIM8','TIM9','TIM10','TIM11','TIM12','TIM13','TIM14','TIM15','TIM16','TIM17','TIM6','TIM7','LPTIM1','LPTIM2','HRTIM1']],
+    ['模拟',['ADC1','ADC2','ADC3','DAC1','DAC2','OPAMP1','OPAMP2','OPAMP3','OPAMP4','COMP1','COMP2','COMP3','COMP4','COMP5','COMP6','COMP7']],
+    ['系统 / 时钟',['SYS','RCC','DEBUG']]
+  ];
+  const out=[];
+  GROUPS.forEach(([gname,list])=>{
+    const have=list.filter(n=>map[n]);
+    if(!have.length)return;
+    let html=`<div class="qgrp">${esc(gname)}</div>`;
+    have.forEach(n=>{
+      const sigs=Object.keys(map[n]).sort((a,b)=>{
+        const ca=isCoreSig(n,a)?0:1, cb=isCoreSig(n,b)?0:1;
+        return ca-cb || a.localeCompare(b);
+      });
+      const rows=sigs.map(s=>{
+        const ext=isCoreSig(n,s)?'':' ext';
+        const pins=map[n][s].map(o=>
+          `<span class="qpin" data-pin="${esc(o.n)}">${esc(o.n)}<b>${o.af===null?'':'AF'+o.af}</b></span>`).join('');
+        const cls=afClass(n, s);
+        const base=cls.replace(' ext','');
+        const col={'c-tim':'#7ee787','c-uart':'#79c0ff','c-spi':'#76e3ea','c-i2c':'#ffb77c',
+                   'c-ana':'#ff9bce','c-usb':'#d2b0ff','c-bus':'#bfe0ff','c-sys':'#8b949e','c-def':'#c9d1d9'}[base]||'#c9d1d9';
+        const sigCol=isCoreSig(n,s)?col:'#5a6672';
+        return `<div class="sigrow${ext}"><span class="sig" style="color:${sigCol}">${esc(s)}</span><span class="plist">${pins}</span></div>`;
+      }).join('');
+      const grp=Math.max(...Object.keys(map[n]).map(k=>map[n][k].length));
+      const grpTxt=grp>1?` · ${grp} 组引脚`:'';
+      html+=`<div class="pg"><div class="pg-h">${esc(n)}<span>${sigs.length} 信号${grpTxt}</span></div><div class="pg-b">${rows}</div></div>`;
+    });
+    out.push(html);
+  });
+  if(out.length){
+    document.getElementById('quickcard').hidden=false;
+    document.getElementById('quick').innerHTML=out.join('');
+    document.getElementById('quick').addEventListener('click',e=>{
+      const s=e.target.closest('.qpin'); if(!s)return;
+      // 点击即时反馈：被点的标签闪一下，确认交互生效
+      s.classList.add('hit'); setTimeout(()=>s.classList.remove('hit'),650);
+      jumpByName(s.dataset.pin);
+    });
+  }
+})();
+
+/* ---- 同系列 ---- */
+(function(){
+  const sibs=window.__SIBLINGS__||[];
+  if(sibs.length<2)return;
+  document.getElementById('sibcard').hidden=false;
+  document.getElementById('siblings').innerHTML=sibs.map(s=>
+    `<a class="sib ${s.cur?'cur':''}" href="${esc(s.file)}">${esc(s.name)}</a>`).join('');
+})();
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&document.activeElement!==document.getElementById('q')){
+    e.preventDefault();document.getElementById('q').focus();
+  }
+  if(e.key==='Escape'){const q=document.getElementById('q');q.value='';curQ='';apply();q.blur();}
+});
+</script>
+</body>
+</html>
