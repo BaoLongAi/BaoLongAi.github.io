@@ -1,0 +1,26 @@
+{
+  "name": "焊接分组",
+  "short_name": "焊接分组",
+  "description": "导入嘉立创 EDA 工程，按阻值 / 容值 / 封装自动分组，生成可点选的焊接板图。全程本机解析。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#14161a",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

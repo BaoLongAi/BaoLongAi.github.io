@@ -1,87 +1,2346 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#a39ee8"><meta name="description" content="星谱数字商品商店，简洁、便捷的选购体验。">
-<title>星谱 · 数字商品商店</title>
-<style>
-*{box-sizing:border-box} :root{--ink:#242935;--muted:#858799;--panel:rgba(245,245,255,.71);--edge:rgba(255,255,255,.92);--card:rgba(255,255,255,.66);--pill:rgba(255,255,255,.62);--accent:#ff416a;--shadow:0 15px 48px #4e3b9a13}body{margin:0;min-height:100vh;color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;background:#a39ce6}button,input{font:inherit}button,a,input{-webkit-tap-highlight-color:transparent}button{cursor:pointer;color:inherit}button{border:0}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #7979e8;outline-offset:4px}a{color:inherit;text-decoration:none}button:disabled{cursor:not-allowed;opacity:.5}.background{position:fixed;inset:0;z-index:-2;overflow:hidden;background:radial-gradient(ellipse at 9% 90%,#ffc4c9 0,transparent 47%),radial-gradient(ellipse at 88% 43%,#75afff 0,transparent 55%),linear-gradient(125deg,#a29cde,#aa93e1 52%,#adbefb)}.background svg{height:100%;width:100%;min-height:850px;position:absolute;inset:0;filter:saturate(.98)}.wrap{width:min(1180px,calc(100% - 48px));margin:auto}.nav{height:62px;display:flex;align-items:center;gap:8px;margin-top:22px;padding:8px 9px 8px 15px;border:1.5px solid var(--edge);border-radius:36px;background:var(--panel);backdrop-filter:blur(24px);box-shadow:var(--shadow)}.brand{display:flex;align-items:center;gap:9px;margin-right:7px;white-space:nowrap;font-size:17px;font-weight:750}.brand-mark{display:grid;place-items:center;width:31px;height:31px;border:4px solid white;border-radius:11px;background:#0089e8;color:white;box-shadow:0 1px 3px #6773ab25}.icon{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:middle}.nav-button,.pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:24px;padding:10px 15px;white-space:nowrap;background:transparent;font-size:13px;transition:background .18s,transform .18s}.nav-button:hover,.pill:hover{background:#ffffff7a}.nav-button.active,.pill.active,.primary{color:white;background:#222934;box-shadow:0 5px 12px #20263222}.nav-button.active:hover,.pill.active:hover,.primary:hover{background:#343d4d}.search{display:flex;align-items:center;gap:8px;background:#ffffffa0;border:1px solid #ffffff70;border-radius:30px;width:322px;margin-left:auto;margin-right:8px;padding:8px 13px;color:#7d8190}.search input{border:0;outline:none!important;background:transparent;min-width:0;width:100%;font-size:13px;color:var(--ink)}.search input::placeholder{color:#9394a4}.icon-button{display:grid;place-items:center;flex-shrink:0;width:35px;height:35px;border-radius:50%;background:transparent;color:#686d7d}.icon-button:hover{background:#ffffff6e}.outline{border:1px solid #ffffffa8}.nav .primary{font-weight:600}.content{padding:27px 12px 48px}.panel{border:1.5px solid var(--edge);border-top-width:2px;border-radius:21px;background:var(--panel);backdrop-filter:blur(24px);box-shadow:var(--shadow);padding:15px 19px 20px}.notice{min-height:161px;margin-bottom:17px}.section-title{display:flex;align-items:center;gap:10px;font-weight:650;font-size:15px;margin:0 0 16px}.section-icon{display:grid;place-items:center;width:31px;height:31px;border-radius:11px;background:#67627e21}.notice-lines{font-size:13px;color:#626576;line-height:1.9}.notice-lines p{margin:0}.notice-lines a:hover{text-decoration:underline}.store{min-height:592px}.store .section-title{margin-bottom:15px}.tabs{display:flex;gap:8px;margin:0 0 16px}.pill{background:var(--pill);border:1px solid #ffffff80;padding:8px 14px;font-size:12px}.pill .icon{width:18px;height:18px}.coin{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#45bca5;color:white;font-weight:700;font-size:13px}.grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}.product{border:1px solid #ffffff8a;padding:0;text-align:left;overflow:hidden;border-radius:17px;background:var(--card);box-shadow:0 6px 20px #81709308;transition:transform .2s,box-shadow .2s;min-width:0}.product:hover{transform:translateY(-5px);box-shadow:0 12px 25px #5a448521}.product-image{height:96px;display:flex;align-items:center;justify-content:center;background:#ffffffbe;overflow:hidden}.openai{width:140px;height:140px;color:#050505;flex-shrink:0}.product:nth-child(3) .product-image,.product:nth-child(4) .product-image,.product:nth-child(5) .product-image{background:#ffffff22}.product-info{padding:7px 10px 9px}.badge{display:inline-block;border-radius:12px;background:#42bc9d2b;color:#00ae84;font-size:10px;padding:2px 8px;line-height:16px;margin-bottom:4px}.product-name{font-size:13px;font-weight:550;line-height:17px;height:34px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}.price{font-size:16px;font-weight:750;color:var(--accent);line-height:25px}.price small{font-size:12px}.meta{display:flex;justify-content:space-between;gap:4px;color:var(--muted);font-size:10px;margin-top:5px}.empty{grid-column:1/-1;text-align:center;padding:72px 20px;color:var(--muted)}.empty .icon{height:38px;width:38px;margin-bottom:12px}.empty p{margin:0 0 15px}.reset{background:#fff9;padding:9px 18px;border-radius:20px}.footer{text-align:center;font-size:11px;color:#ffffffb8;margin-top:21px;letter-spacing:1px}.modal{border:1px solid #fff;border-radius:23px;background:#f4f2fc;color:#242935;padding:26px;box-shadow:0 25px 100px #25204350;width:min(430px,calc(100% - 32px));max-height:90vh;overflow:auto}.modal::backdrop{background:#27213f55;backdrop-filter:blur(8px)}.modal h2{font-size:20px;margin:0 35px 17px 0}.close{position:absolute;right:16px;top:16px}.modal p{color:#7a7c8c;line-height:1.8}.modal label{display:block;font-size:12px;color:#777b8c;margin-bottom:7px}.modal input{width:100%;padding:12px 13px;border-radius:12px;border:1px solid #dcdae7;background:#fff;margin-bottom:16px;color:#242935}.modal .submit{border-radius:12px;padding:12px;width:100%;margin-top:5px}.modal .detail-title{font-size:15px;margin-bottom:10px;line-height:1.6}.modal .detail-price{font-size:27px;font-weight:700;color:var(--accent)}.modal .hint{font-size:12px}.quantity{display:flex;align-items:center;justify-content:space-between;margin:20px 0}.stepper{display:flex;align-items:center;background:#e8e5f4;border-radius:9px;padding:3px;gap:15px}.stepper button{width:31px;height:29px;background:#fff;border-radius:7px;font-size:19px}.toast{position:fixed;left:50%;bottom:32px;transform:translate(-50%,20px);border:1px solid #ffffff70;max-width:calc(100% - 32px);padding:12px 22px;border-radius:14px;background:#242935ec;color:white;box-shadow:0 8px 30px #0002;opacity:0;transition:.2s;pointer-events:none;z-index:10;text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}body.dark{--ink:#f0eff7;--muted:#aaa6bd;--panel:rgba(35,32,57,.8);--edge:rgba(255,255,255,.23);--card:rgba(60,55,81,.76);--pill:rgba(255,255,255,.1)}body.dark .notice-lines{color:#c5bfd5}body.dark .background{filter:brightness(.5)}body.dark .search{background:#ffffff1b}body.dark .product-image{background:#ffffffb5}
-@media(min-width:1700px){.nav{margin-top:14px}.content{padding-top:27px}}@media(max-width:1100px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.nav{gap:4px}.search{width:230px}.nav-button{padding:10px 12px}.store{min-height:592px}}@media(max-width:800px){.wrap{width:calc(100% - 28px)}.nav{flex-wrap:wrap;height:auto;border-radius:23px;padding:10px;gap:5px}.search{order:2;width:100%;margin:3px 0 0}.nav-spacer{margin-left:auto}.nav-button{padding:9px 10px}.nav .order-button{font-size:0;gap:0}.nav .order-button .icon{width:18px}.nav .language{display:none}.content{padding:18px 0 30px}.panel{padding:15px}.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.store{min-height:0}.notice{min-height:155px}.product-image{height:105px}}@media(max-width:480px){.brand{font-size:16px;gap:6px;margin-right:3px}.brand-mark{width:29px;height:29px}.nav .nav-button{padding:9px}.nav .signup{font-size:12px;gap:4px}.nav .signup .icon{display:none}.nav .theme{width:30px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.product-image{height:106px}.product-info{padding:8px 10px 10px}.tabs{gap:6px}.pill{padding:8px 11px}.panel{border-radius:19px}.footer{font-size:10px}.modal{padding:23px}.background svg{width:180%;left:-40%}}@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+<meta charset="utf-8">
+<!-- 手机端必须：没有这行会被当成 980px 宽的桌面页渲染，下面的窄屏样式永远不生效 -->
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14161a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>焊接分组 · 嘉立创工程焊接辅助</title>
+<style data-app>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font: 13px/1.45 "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+    color: #14161a; background: #fff; overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  #app { display: flex; height: 100%; }
 
-[hidden]{display:none!important}.product{display:block}.item-content{padding-top:27px}.breadcrumb{display:flex;align-items:center;gap:10px;font-size:12px;color:#626576;margin:0 0 16px;padding-left:3px}.breadcrumb a:hover{color:var(--ink)}.breadcrumb span:last-child{color:var(--ink)}.item-panel{padding:22px}.item-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:27px;align-items:stretch}.item-cover{min-height:470px;background:rgba(255,255,255,.5);border:1px solid #ffffffa8;border-radius:17px;display:flex;align-items:center;justify-content:center;overflow:hidden}.item-cover .openai{width:82%;height:auto;max-width:450px;aspect-ratio:1;filter:drop-shadow(0 9px 0 #00000003)}.item-buy h1{font-size:19px;font-weight:700;line-height:1.65;margin:0 0 10px}.item-badges{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.item-badges .badge{margin:0;font-size:11px;padding:2px 9px}.badge-blue{background:#646ae31a;color:#6268cd}.share-button{width:27px;height:25px;display:grid;place-items:center;background:#628cdd19;color:#6b85bd;border-radius:8px}.share-button .icon{width:15px;height:15px}.item-price{color:var(--accent);font-size:25px;font-weight:750;line-height:1.4}.item-price small{font-size:15px;margin-right:2px}.price-note{font-size:11px;color:var(--muted);font-weight:400;margin-left:8px}.buy-divider{height:1px;background:#ffffff85;margin:13px 0 17px}.purchase-form{display:flex;flex-direction:column;gap:15px}.field label,.pay-field legend{display:block;font-size:12px;margin-bottom:6px}.field input{width:100%;height:40px;padding:9px 12px;background:#ffffff7a;border:1px solid #ffffffb5;border-radius:10px;color:var(--ink);outline:none}.field input::placeholder{color:#9696a6}.quantity-control{width:192px;display:flex;align-items:center;border:1px solid #ffffffa0;border-radius:10px;background:#ffffff55;overflow:hidden}.quantity-control button{width:43px;align-self:stretch;background:#ffffff55;font-size:19px;flex-shrink:0}.quantity-control input{width:100%;border:0;border-radius:0;background:transparent;text-align:center;appearance:textfield;-moz-appearance:textfield}.quantity-control input::-webkit-inner-spin-button,.quantity-control input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.captcha-group{display:flex;width:min(280px,100%);gap:8px}.captcha-group input{min-width:0}.captcha-image{padding:0;width:108px;flex-shrink:0;overflow:hidden;border:1px solid #ffffffb5;border-radius:10px;background:#f3f1ff;height:40px}.captcha-image svg{width:106px;height:38px;display:block}.field-help{font-size:11px;color:var(--muted);margin:6px 0 0}.pay-field{margin:0;border:0;padding:0;min-width:0}.pay-options{display:flex;gap:9px}.payment-option{display:flex;align-items:center;gap:7px;cursor:pointer;border:1px solid #ffffffae;background:#ffffff4f;border-radius:10px;padding:10px 12px;flex:1;font-size:12px}.payment-option:has(input:checked){border-color:#8985c6;background:#ffffffa1;box-shadow:0 0 0 1px #8985c61a}.payment-option input{margin:0;accent-color:#7670b8;width:13px;height:13px}.pay-logo{display:grid;place-items:center;width:23px;height:23px;border-radius:7px;color:white;font-weight:700;font-size:14px}.pay-logo.wx{background:#21ba66}.pay-logo.ali{background:#1699eb}.purchase-submit{border-radius:11px;min-height:43px;display:flex;justify-content:center;align-items:center;gap:8px;width:100%;font-size:13px;font-weight:600}.purchase-status{margin:0;font-size:11px;color:var(--muted);line-height:1.6}.form-feedback{font-size:12px;color:#d83e60;margin:0;padding:10px 12px;background:#ffeff270;border-radius:9px}.detail-panel{margin-top:18px;padding:0;overflow:hidden}.detail-panel .section-title{padding:15px 19px;border-bottom:1px solid #ffffff80;margin:0}.detail-body{padding:22px 24px;line-height:1.95;font-size:13px}.detail-body h3{font-size:14px;margin:22px 0 8px;font-weight:650}.detail-body h3:first-child{margin-top:0}.detail-body p{margin:0 0 8px;color:#5e6174}.detail-body ul,.detail-body ol{margin:0;padding-left:22px;color:#5e6174}.detail-body li{margin:3px 0}.detail-callout{background:#ffffff4a;border:1px solid #ffffff80;border-radius:12px;padding:12px 15px;margin-bottom:20px;color:#66657c;font-size:12px}.detail-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:45px;row-gap:24px}.detail-grid h3{margin-top:0}.back-link{margin-top:22px;display:inline-flex;gap:7px;align-items:center;font-size:12px;color:#737188}.detail-panel .back-link:hover{color:var(--ink)}body.dark .breadcrumb,body.dark .detail-body p,body.dark .detail-body li,body.dark .detail-callout{color:#c7c2d7}body.dark .item-cover{background:#ffffffb8}body.dark .field input,body.dark .quantity-control,body.dark .quantity-control button,body.dark .payment-option{background:#ffffff16;border-color:#ffffff30}body.dark .payment-option:has(input:checked){background:#ffffff25}body.dark .detail-callout{background:#ffffff0b;border-color:#ffffff25}body.dark .detail-panel .section-title{border-color:#ffffff25}body.dark .badge-blue{color:#b6b4f6}
-@media(max-width:800px){.item-layout{gap:20px}.item-panel{padding:17px}.item-cover{min-height:390px}.item-cover .openai{width:87%}.item-buy h1{font-size:17px}.item-content{padding-top:18px}.detail-grid{column-gap:24px}}@media(max-width:640px){.item-layout{grid-template-columns:1fr;gap:22px}.item-cover{min-height:0;aspect-ratio:1.25}.item-cover .openai{width:65%;max-width:280px}.item-buy h1{font-size:18px}.detail-grid{grid-template-columns:1fr;row-gap:20px}.detail-body{padding:19px}.breadcrumb{margin-bottom:12px}.item-panel{padding:16px}.quantity-control{width:180px}.pay-options{gap:8px}.item-badges{gap:6px}.price-note{display:inline-block}.item-price{font-size:26px}}
+  /* ---------------- 左侧 ---------------- */
+  #side {
+    width: 252px; flex: 0 0 252px; display: flex; flex-direction: column;
+    background: #fbfbfc; border-right: 1px solid #e3e5e8;
+  }
+  #cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 9px 9px 8px; border-bottom: 1px solid #e3e5e8; }
+  #cats button {
+    width: 100%; min-width: 0; font: inherit; font-size: 11.5px; padding: 5px 1px;
+    cursor: pointer; white-space: nowrap; overflow: hidden;
+    background: #fff; border: 1px solid #dcdfe3; border-radius: 5px; color: #4a5058;
+  }
+  #cats button:hover { background: #f2f3f5; }
+  #cats button.on { background: #14161a; border-color: #14161a; color: #fff; font-weight: 700; }
+  #cats button .n { font-size: 10.5px; opacity: .65; margin-left: 2px; }
+  #cats button:disabled { opacity: .38; }
 
+  #list { flex: 1; overflow-y: auto; padding: 6px 8px 12px; }
+  .grp {
+    display: block; width: 100%; text-align: left; cursor: pointer; font: inherit; color: inherit;
+    background: transparent; border: 1px solid transparent; border-left: 3px solid transparent;
+    border-radius: 5px; padding: 7px 8px 6px; margin-bottom: 1px;
+  }
+  .grp:hover { background: #f0f1f3; }
+  .grp.on { background: #fff; border-color: #d8dbdf; border-left-color: #14161a; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+  .grp .l1 { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+  .grp .nm { font-weight: 700; font-size: 13.5px; letter-spacing: .2px; white-space: nowrap; flex: 0 0 auto; }
+  .grp .fp {
+    font-size: 10px; color: #6b7280; border: 1px solid #dcdfe3; border-radius: 3px;
+    padding: 0 3px; line-height: 14px; white-space: nowrap;
+    max-width: 112px; overflow: hidden; text-overflow: ellipsis;
+    flex: 0 1 auto; min-width: 0;
+  }
+  .grp .ct { margin-left: auto; font-size: 11px; color: #6b7280; font-variant-numeric: tabular-nums; }
+  /* 有极性标记：黑底白字的小方牌，靠明暗而不是颜色，色弱也看得出 */
+  .grp .pl {
+    font-size: 9.5px; line-height: 13px; padding: 0 3px; border-radius: 3px;
+    background: #14161a; color: #fff; white-space: nowrap; letter-spacing: .3px;
+    align-self: center; flex: 0 0 auto;
+  }
+  .grp .pl.part { background: #fff; color: #14161a; border: 1px solid #14161a; }
+  .chip .pd { font-size: 9px; line-height: 1; padding: 1px 2px; border-radius: 2px; background: #14161a; color: #fff; }
+  .grp .bar { height: 3px; background: #e6e8eb; border-radius: 2px; margin-top: 5px; overflow: hidden; }
+  .grp .bar i { display: block; height: 100%; width: 0; background: #14161a; }
+  .grp.done .nm::after { content: " ✓"; font-size: 11px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; padding: 1px 4px 8px 12px; }
+  .chip {
+    font: inherit; font-size: 11px; cursor: pointer; background: #fff; color: #14161a;
+    border: 1px solid #d8dbdf; border-radius: 4px; padding: 1px 5px 1px 2px;
+    display: inline-flex; align-items: center; gap: 3px;
+  }
+  .chip b {
+    min-width: 12px; text-align: center; background: #14161a; color: #fff;
+    border-radius: 2px; font-size: 10px; font-weight: 700; padding: 0 2px;
+  }
+  .chip:hover { border-color: #9aa0a6; background: #f6f7f8; }
+  .chip.m { color: #9aa0a6; border-style: dashed; }
+  .chip.m b { background: #a8acb2; }
+  .chip.m span { text-decoration: line-through; }
+  #empty { padding: 18px 14px; color: #8a9099; font-size: 12px; line-height: 1.8; }
 
-#item-title:focus{outline:none}@media(max-width:480px){.nav{gap:3px;padding:9px}.nav .brand{font-size:15px;gap:5px;margin-right:0}.nav .brand-mark{width:26px;height:26px}.nav .nav-button{padding:8px 7px;font-size:12px;gap:4px}.nav .nav-button .icon{width:16px;height:16px}.nav .order-button{font-size:0;width:28px;padding:7px 0}.nav .theme{width:26px}.nav .outline .icon{display:none}.nav .signup{font-size:11px}.nav .search{margin-top:5px}}@media(max-width:350px){.nav .theme{display:none}}
+  /* ---------------- 右侧 ---------------- */
+  main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header { padding: 10px 16px 9px; border-bottom: 1px solid #e3e5e8; display: flex; align-items: center; gap: 14px; }
+  header .tt { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: .2px; display: flex; align-items: baseline; gap: 8px; }
+  header h1 .fp { font-size: 11px; font-weight: 400; color: #6b7280; border: 1px solid #dcdfe3; border-radius: 3px; padding: 0 4px; }
+  header h1 .cnt { font-weight: 400; color: #4a5058; font-size: 13px; }
+  header p { margin: 3px 0 0; font-size: 11.5px; color: #8a9099; }
+  header p b { color: #14161a; font-variant-numeric: tabular-nums; }
+  /* 极性提醒：黑底白字独占一行，焊之前一定会看见 */
+  header p .pwarn {
+    display: block; margin-top: 5px; padding: 4px 9px; border-radius: 4px;
+    background: #14161a; color: #fff; font-size: 11.5px; line-height: 1.55;
+  }
+  header p .pwarn b { color: #fff; text-decoration: underline; }
+  .acts { display: flex; gap: 6px; flex: 0 0 auto; }
+  button.b {
+    font: inherit; font-size: 12px; color: #14161a; background: #fff;
+    border: 1px solid #dcdfe3; border-radius: 5px; padding: 5px 11px; cursor: pointer;
+  }
+  button.b:hover { background: #f2f3f5; border-color: #c5cad0; }
+  button.b:disabled { opacity: .42; cursor: default; }
+  button.b.pri { background: #14161a; border-color: #14161a; color: #fff; font-weight: 700; }
+  button.b.pri:hover { background: #2a2f37; border-color: #2a2f37; }
+  button.b.pri:disabled { background: #fff; color: #14161a; }
+
+  #stage {
+    flex: 1; position: relative; min-height: 0; background: #fff; overflow: hidden;
+    /* 关键：交给 JS 自己处理手指，否则浏览器会抢走单指滚动和双指缩放 */
+    touch-action: none; -webkit-user-select: none; user-select: none;
+  }
+  #cvBase, #cvFx { position: absolute; left: 0; top: 0; }
+  #cvFx { pointer-events: none; }
+  #hint {
+    position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
+    background: rgba(20,22,26,.92); color: #fff; font-size: 11.5px; padding: 6px 12px;
+    border-radius: 14px; pointer-events: none; opacity: 0; transition: opacity .25s;
+    white-space: nowrap;
+  }
+  #hint.show { opacity: 1; }
+
+  /* ---------- 缩放按钮（右下角浮层，手机上手指够得着） ---------- */
+  #zoom {
+    position: absolute; right: 10px; bottom: 16px; z-index: 5;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  #zoom button {
+    width: 34px; height: 34px; padding: 0; border-radius: 50%;
+    display: grid; place-items: center;
+    background: rgba(255,255,255,.94); border: 1px solid #d8dade; color: #14161a;
+    font: 600 17px/1 "Microsoft YaHei",sans-serif; cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,.10);
+    -webkit-tap-highlight-color: transparent;
+  }
+  #zoom button:active { background: #14161a; color: #fff; }
+  #zoom button:disabled { opacity: .3; }
+
+  /* ---------- 底部抽屉把手（窄屏才出现） ---------- */
+  #grab {
+    display: none; align-items: center; justify-content: center; gap: 7px;
+    height: 26px; flex: 0 0 auto; cursor: pointer; user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #grab i { display: block; width: 30px; height: 4px; border-radius: 2px; background: #d2d5da; }
+  #grab span { font-size: 10.5px; color: #8a9099; }
+
+  /* ======================================================================
+   *  手机 / 窄屏：横屏工位模式
+   *  焊接时板子摊在桌上，手机只能立在旁边，屏幕净高就 300 出头，
+   *  所以顶栏不再占一行：左上角只留一颗「导入工程」，当前分组的信息搬进
+   *  底部抽屉的头一行，板图铺满整屏；分组列表收在抽屉里，能拖、能滚，
+   *  点法和电脑上完全一样。竖着拿手机时整页会转 90°（见 body.rot）。
+   * ====================================================================== */
+/* 手机布局的触发条件，三个里命中任意一个即可：
+     pointer: coarse  桌面浏览器不满足，触屏设备满足
+     max-width: 760px 竖屏手机、窄窗口
+     max-height: 520  ← 关键。横屏手机视口高度只有 390 左右，宽度却是 844，
+                       只按宽度判断会掉回桌面布局（侧栏 252px 把板图挤没）。
+                       桌面窗口极少矮到这个程度，所以不会误伤。
+   宁可多命中，也不能让「横屏手机 + 定制 WebView 不报 coarse」变成桌面版。 */
+@media (pointer: coarse), (max-width: 760px), (max-height: 520px) {
+    #app {
+      flex-direction: column-reverse;
+      width: 100%; max-width: 100%; overflow: hidden;
+    }
+    main { position: relative; flex: 1 1 auto; min-height: 0; }
+
+    /* 顶栏在手机上只剩左上角那颗「导入工程」，整幅板图让出来 */
+    header {
+      position: absolute; left: 0; top: 0; z-index: 9;
+      padding: 6px; border: 0; background: none; pointer-events: none;
+    }
+    header > * { pointer-events: auto; }
+    #btnOpen {
+      flex: 0 0 auto; padding: 7px 12px; font-size: 11.5px; font-weight: 700;
+      background: #14161a; border-color: #14161a; color: #fff;
+      box-shadow: 0 1px 4px rgba(20,22,26,.22);
+    }
+    /* 手机上除了导入，其余都是「在电脑前干的事」，收起来不碍事 */
+    .acts { display: none; }
+
+    /* ---------------- 底部抽屉 ---------------- */
+    #side {
+      position: relative; z-index: 8;
+      width: 100%; max-width: 100%; min-width: 0; flex: 0 0 auto;
+      display: flex; flex-direction: column; overflow: hidden;
+      height: 50%;
+      background: #fbfbfc; border-right: 0; border-top: 1px solid #e3e5e8;
+      box-shadow: 0 -6px 16px rgba(20,22,26,.07);
+      transition: height .19s cubic-bezier(.22,.7,.28,1);
+    }
+    #side.drag { transition: none; }
+
+    /* 抽屉顶那一条：左边是拖动把手，中间是「当前分组」，右边提示怎么拉。
+       当前分组的信息是 JS 从顶栏搬过来的（不是浮在板图上），不会挡住元件。 */
+    #grab {
+      display: flex; align-items: center; gap: 8px; flex: 0 0 auto;
+      height: auto; min-height: 30px; padding: 4px 10px;
+      cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent;
+    }
+    #grab i {
+      display: block; flex: 0 0 auto; width: 3px; height: 20px; border-radius: 2px;
+      background: #d2d5da;
+    }
+    body.drawerOpen #grab i { background: #14161a; }
+    #ttSlot { flex: 1 1 auto; min-width: 0; }
+    #grabTxt { flex: 0 0 auto; font-size: 9.5px; color: #9aa0a6; letter-spacing: .2px; }
+
+    /* 搬进抽屉的标题块：去掉桌面上的卡片外观，当普通文字用 */
+    #grab .tt { padding: 0; background: none; border: 0; box-shadow: none; }
+    #grab .tt h1 { font-size: 12.5px; gap: 5px; display: flex; align-items: baseline; }
+    #grab .tt h1 > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #grab .tt h1 .fp {
+      font-size: 9.5px; padding: 0 3px; max-width: 110px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    #grab .tt h1 .cnt { font-size: 11px; }
+    #grab .tt p { margin: 1px 0 0; font-size: 10px; line-height: 1.35; }
+    #grab .tt p .pwarn {
+      display: block; margin-top: 3px; padding: 3px 7px; border-radius: 4px;
+      background: #14161a; color: #fff; font-size: 9.5px; line-height: 1.45;
+    }
+    #grab .tt p .pwarn b { color: #fff; text-decoration: underline; }
+
+    #cats { flex: 0 0 auto; padding: 0 6px 6px; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    #cats button { width: 100%; min-width: 0; padding: 6px 0; font-size: 11px; white-space: nowrap; overflow: hidden; }
+    #cats button .n { font-size: 9.5px; }
+
+    /* 列表本体：手指直接滚，行高按手指给足 */
+    #list {
+      flex: 1 1 auto; min-height: 0; overflow-y: auto;
+      -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+      padding: 4px 6px 14px;
+    }
+    .grp { padding: 8px 8px 7px; }
+    .grp .nm { font-size: 13px; }
+    .grp .fp { max-width: 96px; }
+    .grp .pl { font-size: 9px; }
+    .chips { padding: 2px 4px 8px 10px; gap: 5px; }
+    .chip { font-size: 11.5px; padding: 4px 8px 4px 3px; }
+
+    /* 手指点不准 34px 的圆钮，放大到 42；横着排 —— 横屏时高度不够竖着放三个 */
+    #zoom { right: 8px; bottom: 8px; flex-direction: row; gap: 7px; }
+    #zoom button { width: 42px; height: 42px; font-size: 20px; }
+    #hint { bottom: 56px; font-size: 11px; max-width: calc(100% - 84px); }
+  }
+
+  /* ---------- 竖着拿手机：整页转 90° 当横屏用 ----------
+     手机上浏览器不许网页锁方向（iOS 根本不支持），
+     所以干脆自己把整页转过来 —— 反正手要转，界面先转好等着。
+     宽高由 JS 按视口写完（见 applyOrient），这里只留定位和裁剪。 */
+  body.rot { overflow: hidden; background: #fff; }
+  body.rot #app {
+    position: fixed; left: 0; top: 0; transform-origin: 0 0;
+    /* 转过来以后「宽」用的是竖屏的高，比窗口宽得多，不能被 max-width 夹住 */
+    max-width: none; box-shadow: none;
+  }
+  body.rot #side, body.rot main { max-width: none; }
 </style>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="description" content="导入嘉立创 EDA 工程，自动按阻值/容值/封装分组，生成可点选的焊接板图。纯本机解析，不上传。">
 </head>
 <body>
-<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><defs>
-<symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 3h2l3 12h10l3-9H6M9 19h.01M18 19h.01"/><circle cx="9" cy="19" r="1"/><circle cx="18" cy="19" r="1"/></symbol>
-<symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></symbol>
-<symbol id="i-order" viewBox="0 0 24 24"><rect x="7" y="6" width="14" height="14" rx="3"/><path d="M17 6V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h3"/></symbol>
-<symbol id="i-notice" viewBox="0 0 24 24"><path d="m14 6 6-3v17l-6-3H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h9ZM7 17l1 4h4l-1-4M14 6v11"/></symbol>
-<symbol id="i-login" viewBox="0 0 24 24"><path d="M13 4h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6M3 12h12m-4-4 4 4-4 4"/></symbol>
-<symbol id="i-user" viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3H3m16-13v8m-4-4h8"/></symbol>
-<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></symbol>
-<symbol id="i-theme" viewBox="0 0 24 24"><path d="m12 2 3 4 5 1v5l2 3-4 3-1 4-5-2-5 2-1-4-4-3 2-3V7l5-1 3-4Z"/><path d="m8 15 4-8 4 8m-6-3h4"/></symbol>
-<symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
-<symbol id="i-star" viewBox="0 0 24 24"><path d="m5 4 14 16M19 4 5 20M3 10l3-6 6 1m9 9-3 6-6-1"/></symbol>
-<!-- OpenAI mark: Simple Icons, https://github.com/simple-icons/simple-icons (CC0) --><symbol id="openai" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M22.282 9.821a6 6 0 0 0-.516-4.91a6.05 6.05 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a6 6 0 0 0-3.998 2.9a6.05 6.05 0 0 0 .743 7.097a5.98 5.98 0 0 0 .51 4.911a6.05 6.05 0 0 0 6.515 2.9A6 6 0 0 0 13.26 24a6.06 6.06 0 0 0 5.772-4.206a6 6 0 0 0 3.997-2.9a6.06 6.06 0 0 0-.747-7.073M13.26 22.43a4.48 4.48 0 0 1-2.876-1.04l.141-.081l4.779-2.758a.8.8 0 0 0 .392-.681v-6.737l2.02 1.168a.07.07 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494M3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085l4.783 2.759a.77.77 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646M2.34 7.896a4.5 4.5 0 0 1 2.366-1.973V11.6a.77.77 0 0 0 .388.677l5.815 3.354l-2.02 1.168a.08.08 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.833-3.387L15.119 7.2a.08.08 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667m2.01-3.023l-.141-.085l-4.774-2.782a.78.78 0 0 0-.785 0L9.409 9.23V6.897a.07.07 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.8.8 0 0 0-.393.681zm1.097-2.365l2.602-1.5l2.607 1.5v2.999l-2.597 1.5l-2.607-1.5Z"/></symbol>
-</defs></svg>
-<div class="background" aria-hidden="true"><svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="ribbon" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#d1b8f5"/><stop offset=".34" stop-color="#f8acd6"/><stop offset=".52" stop-color="#ffd0bb"/><stop offset=".63" stop-color="#e985d8"/><stop offset="1" stop-color="#9c8ce7"/></linearGradient><linearGradient id="blue" x1="0" y1="0" x2="1" y2=".6"><stop stop-color="#b4c3ff"/><stop offset=".38" stop-color="#81a6f4"/><stop offset=".67" stop-color="#a2a5f4"/><stop offset=".84" stop-color="#ffc4da"/><stop offset="1" stop-color="#b0bafa"/></linearGradient><linearGradient id="shine"><stop stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff4e4" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity=".1"/></linearGradient><filter id="soft"><feGaussianBlur stdDeviation="14"/></filter></defs><path d="M-240 260C350 145 508 680 925 846S1420 1210 1760 1110" fill="none" stroke="url(#ribbon)" stroke-width="230"/><path d="M-190 418C340 212 480 710 952 909S1435 1163 1802 1108" fill="none" stroke="#ffd2db" stroke-width="6" opacity=".65"/><path d="M-210 867C259 451 570 809 827 1003S1277 1160 1393 1102" fill="none" stroke="url(#ribbon)" stroke-width="225"/><path d="M-186 910C258 564 570 819 841 1050S1248 1200 1440 1120" fill="none" stroke="url(#shine)" stroke-width="8"/><path d="M1100-230C1164 161 1773 126 1763 567S1470 892 1980 989" fill="none" stroke="url(#blue)" stroke-width="260"/><path d="M1150-130C1230 180 1843 163 1834 560S1600 970 2015 1005" fill="none" stroke="url(#shine)" stroke-width="7"/><path d="M1430-150C1293 142 1980 349 1774 731S1727 1007 2041 1158" fill="none" stroke="url(#blue)" stroke-width="105" opacity=".65"/><path d="M1245-75C1428 273 1996 222 1825 761S1706 1003 2015 1130" fill="none" stroke="#e1dcff" stroke-width="4" opacity=".8"/><path d="M-200 585C158 338 473 612 628 778" fill="none" stroke="#ffbcdd" stroke-width="120" filter="url(#soft)" opacity=".45"/></svg></div>
-<header class="nav wrap"><a href="index.html" data-home class="brand" aria-label="星谱首页"><span class="brand-mark"><svg class="icon"><use href="#i-star"/></svg></span>星谱</a><button class="nav-button active" id="shop-button"><svg class="icon"><use href="#i-cart"/></svg>购物</button><button class="nav-button order-button" data-action="orders" aria-label="订单查询"><svg class="icon"><use href="#i-order"/></svg>订单查询</button><label class="search"><svg class="icon"><use href="#i-search"/></svg><input type="search" id="search" aria-label="搜索商品" placeholder="搜索商品关键词…" autocomplete="off"></label><button class="icon-button nav-spacer theme" id="theme" aria-label="切换深浅主题"><svg class="icon"><use href="#i-theme"/></svg></button><button class="icon-button language" id="language" aria-label="语言：简体中文"><svg class="icon"><use href="#i-globe"/></svg></button><button class="nav-button outline" data-action="login"><svg class="icon"><use href="#i-login"/></svg>登录</button><button class="nav-button primary signup" data-action="signup"><svg class="icon"><use href="#i-user"/></svg>创建账号</button></header>
-<main class="wrap content" id="home-view"><section class="panel notice"><h1 class="section-title"><span class="section-icon"><svg class="icon"><use href="#i-notice"/></svg></span>公告</h1><div class="notice-lines"><p>更新已成功！测试已通过！</p></div></section><section class="panel store" id="store"><h2 class="section-title"><span class="section-icon"><svg class="icon"><use href="#i-cart"/></svg></span>购买</h2><div class="tabs" role="tablist" aria-label="商品分类"><button class="pill active" id="tab-gpt" role="tab" aria-selected="true" aria-controls="products" data-category="gpt"><svg class="icon" style="fill:currentColor;stroke:none"><use href="#openai"/></svg>Chat GPT</button><button class="pill" id="tab-code" role="tab" aria-selected="false" aria-controls="products" data-category="code"><svg class="icon" style="stroke-width:1.4"><use href="#openai"/></svg>接码</button><button class="pill" id="tutorial"><span class="coin">₮</span>USDT充值教程</button></div><div class="grid" id="products" role="tabpanel" aria-labelledby="tab-gpt" aria-live="polite"></div></section><footer class="footer">星谱 · 让数字生活更简单</footer></main>
-<main class="wrap content item-content" id="item-view" hidden>
-<nav class="breadcrumb" aria-label="当前位置"><a href="index.html" data-home>首页</a><span aria-hidden="true">›</span><span>Chat GPT</span><span aria-hidden="true">›</span><span>商品详情</span></nav>
-<section class="panel item-panel" aria-labelledby="item-title"><div class="item-layout"><div class="item-cover"><svg class="openai" role="img" aria-label="ChatGPT 商品图片"><use href="#openai"/></svg></div><div class="item-buy"><h1 id="item-title" tabindex="-1"></h1><div class="item-badges"><span class="badge" id="item-delivery">人工核款</span><span class="badge badge-blue" id="item-sold"></span><span class="badge" id="item-stock"></span><button class="share-button" id="share-item" aria-label="分享店铺链接" title="分享店铺链接"><svg class="icon" viewBox="0 0 24 24"><path d="M15 4h5v5m-9 4 9-9M10 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg></button></div><div class="item-price"><small>¥</small><span id="item-total"></span><span class="price-note" id="item-unit"></span></div><div class="buy-divider"></div>
-<form class="purchase-form" id="purchase-form"><div class="field"><label for="purchase-email">邮箱地址</label><input id="purchase-email" name="email" type="email" autocomplete="email" placeholder="请输入您的邮箱地址" required maxlength="254"><p class="field-help">用于接收订单与商品交付信息。</p></div><div class="field"><label for="purchase-quantity">购买数量</label><div class="quantity-control"><button type="button" id="quantity-minus" aria-label="减少购买数量">−</button><input id="purchase-quantity" name="quantity" type="number" value="1" min="1" step="1" inputmode="numeric" aria-label="购买数量" required><button type="button" id="quantity-plus" aria-label="增加购买数量">+</button></div></div><div class="field"><label for="purchase-captcha">图形验证码（演示）</label><div class="captcha-group"><input id="purchase-captcha" name="captcha" placeholder="图形验证码" autocomplete="off" spellcheck="false" maxlength="4" required><button class="captcha-image" id="refresh-captcha" type="button" aria-label="刷新图形验证码" title="点击更换验证码"></button></div></div><fieldset class="pay-field"><legend>付款方式</legend><div class="pay-options"><label class="payment-option"><input type="radio" name="payment" value="wechat" checked><span class="pay-logo wx">微</span>微信支付</label><label class="payment-option"><input type="radio" name="payment" value="alipay"><span class="pay-logo ali">支</span>支付宝</label></div></fieldset><p id="purchase-feedback" class="form-feedback" role="status" hidden></p><button type="submit" class="primary purchase-submit"><svg class="icon"><use href="#i-cart"/></svg>立即购买</button><p class="purchase-status">支付服务暂未开通，当前仅供页面体验，不会扣款或实际发货。</p></form>
-</div></div></section>
-<section class="panel detail-panel" aria-labelledby="detail-heading"><h2 class="section-title" id="detail-heading"><span class="section-icon"><svg class="icon"><use href="#i-order"/></svg></span>宝贝详情</h2><div class="detail-body"><div class="detail-callout">购买前请核对商品、金额和数量。充值方式、交付时间及售后规则，请先与卖家确认。</div><div class="detail-grid"><section><h3>【服务内容】</h3><p id="service-description"></p><p>会员权益与功能以 ChatGPT 账号内实际显示为准。</p></section><section><h3>【交付方式】</h3><p>GPT Plus 月费商品采用微信扫码收款，付款后需联系卖家人工核实到账，再安排交付。</p><p>其余商品目前仅供展示，尚未开通收款。</p></section><section><h3>【适用说明】</h3><ul><li>下单前请确认所选套餐及账号当前订阅状态。</li><li>新开与续费的适用条件，请以具体商品说明为准。</li><li>请勿在本页面填写 ChatGPT 密码或验证码。</li></ul></section><section><h3>【购买流程】</h3><ol><li>选择商品，确认套餐及金额。</li><li>GPT Plus 月费商品可进入微信收款页。</li><li>付款后保留凭证，通过与卖家沟通的渠道提交核对。</li><li>等待人工确认到账和交付。</li></ol></section><section><h3>【售后说明】</h3><p>请保留付款时间、金额及付款凭证，便于人工核对和处理售后。</p><p>服务开通后将补充质保范围和售后联系方式。</p></section><section><h3>【注意事项】</h3><p>GPT Plus 月费商品提供固定金额微信收款码。网页不会自动核验付款、通知卖家或发货，请先与卖家确认交付方式。其余商品暂未开通收款。</p></section></div><a class="back-link" href="index.html" data-home>← 返回商品列表</a></div></section><footer class="footer">星谱 · 让数字生活更简单</footer></main>
-<dialog class="modal" id="modal" aria-labelledby="modal-title"><button class="icon-button close" id="close-modal" aria-label="关闭弹窗"><svg class="icon"><use href="#i-close"/></svg></button><div id="modal-content"></div></dialog><div class="toast" id="toast" role="status"></div>
-<script>
-if ('scrollRestoration' in history) history.scrollRestoration='manual';
-const products=[{name:'【菲区官充】ChatGPT Plus 月卡代充 | 质保30天',price:109.98,stock:240,sold:887},{name:'【菲区官充】ChatGPT Pro5x 月卡代充 | 质保30天',price:645,stock:30,sold:77},{name:'【菲区官充】ChatGPT Pro20x 月卡代充 | 质保30天',price:1020,stock:8,sold:25},{name:'【智利区官充】ChatGPT Pro5x 月卡代充 | 质保30天',price:630,stock:28,sold:33},{name:'【智利区官充】ChatGPT Pro25x 月卡代充 | 质保30天',price:3100,stock:5,sold:1},{name:'【菲区官充】ChatGPT Pro25x 月卡代充 | 质保30天',price:3200,stock:5,sold:0},{name:'【菲区官充】ChatGPT GO 月卡代充 | 质保30天',price:30,stock:91,sold:9}];
-const grid=document.getElementById('products'),search=document.getElementById('search'),modal=document.getElementById('modal'),content=document.getElementById('modal-content');
-const homeView=document.getElementById('home-view'),itemView=document.getElementById('item-view'),purchaseForm=document.getElementById('purchase-form'),quantityInput=document.getElementById('purchase-quantity'),captchaInput=document.getElementById('purchase-captcha'),feedback=document.getElementById('purchase-feedback');
-let category='gpt',currentProduct=null,quantity=1,captchaCode='',toastTimer,homeScroll=0;
-const icon=name=>'<svg class="icon"><use href="#i-'+name+'"/></svg>';
-const money=value=>Number(value.toFixed(2)).toString();
-function toast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3200)}
-function render(){const query=search.value.trim().toLowerCase();const items=category==='gpt'?products.map((p,index)=>({...p,index})).filter(p=>p.name.toLowerCase().includes(query)):[];grid.innerHTML=items.length?items.map(p=>'<button type="button" class="product" data-product-index="'+p.index+'" aria-label="查看 '+p.name+'，人民币 '+p.price+' 元"><div class="product-image"><svg class="openai" aria-hidden="true"><use href="#openai"/></svg></div><div class="product-info"><span class="badge">'+(p.index===0?'人工核款':'展示商品')+'</span><div class="product-name" title="'+p.name+'">'+p.name+'</div><div class="price"><small>¥</small>'+p.price+'</div><div class="meta"><span>库存：'+p.stock+'</span><span>已售：'+p.sold+'</span></div></div></button>').join(''):'<div class="empty">'+icon('search')+'<p>'+(category==='code'?'接码商品即将上架，敬请期待':'没有找到相关商品，试试其他关键词')+'</p><button class="reset" id="reset-products">查看全部商品</button></div>'}
-function openModal(body){content.innerHTML=body;modal.showModal()}
-function closeModal(){modal.close()}
-function setFeedback(message){feedback.textContent=message;feedback.hidden=!message}
-function newCaptcha(){const alphabet='23456789ABCDEFGHJKLMNPQRSTUVWXYZ';const values=new Uint32Array(4);crypto.getRandomValues(values);captchaCode=Array.from(values,n=>alphabet[n%alphabet.length]).join('');const letters=Array.from(captchaCode,(letter,index)=>'<text x="'+(14+index*23)+'" y="27" transform="rotate('+(index%2===0?-9:8)+' '+(14+index*23)+' 22)" fill="'+['#7164a9','#5e87b9','#b2749f','#656eaa'][index]+'">'+letter+'</text>').join('');document.getElementById('refresh-captcha').innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 106 38" aria-hidden="true"><path d="M0 13Q30 34 60 10T106 18M0 29Q43 4 106 30" stroke="#c4badd" stroke-width="1.5" fill="none"/><g font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="24">'+letters+'</g></svg>';captchaInput.value='';captchaInput.setCustomValidity('')}
-function updateQuantity(){if(!currentProduct)return;const raw=Number(quantityInput.value);quantity=Number.isFinite(raw)?Math.min(currentProduct===products[0]?1:currentProduct.stock,Math.max(1,Math.floor(raw))):1;quantityInput.value=quantity;document.getElementById('item-total').textContent=money(currentProduct.price*quantity);document.getElementById('quantity-minus').disabled=quantity<=1;document.getElementById('quantity-plus').disabled=quantity>=(currentProduct===products[0]?1:currentProduct.stock);setFeedback('')}
-function showProduct(index){if(Number.isInteger(index)&&products[index]){if(!homeView.hidden)homeScroll=window.scrollY;currentProduct=products[index];const manual=index===0;homeView.hidden=true;itemView.hidden=false;purchaseForm.reset();quantityInput.max=manual?1:currentProduct.stock;quantityInput.value=1;quantityInput.readOnly=manual;const email=document.getElementById('purchase-email');email.closest('.field').hidden=manual;email.disabled=manual;email.required=!manual;captchaInput.closest('.field').hidden=manual;captchaInput.disabled=manual;captchaInput.required=!manual;const alipay=document.querySelector('input[name="payment"][value="alipay"]');alipay.disabled=manual;alipay.closest('.payment-option').hidden=manual;document.getElementById('item-delivery').textContent=manual?'人工核款':'展示商品';const fullName=currentProduct.name.replace(' | ','｜')+(manual?'｜微信扫码 · 人工核款':'｜新开/续费均可｜页面展示');document.getElementById('item-title').textContent=fullName;document.getElementById('item-sold').textContent='已售 '+currentProduct.sold;document.getElementById('item-stock').textContent='库存 '+currentProduct.stock;document.getElementById('item-unit').textContent='单价 ¥'+money(currentProduct.price)+' / 件';document.getElementById('service-description').textContent='当前商品：'+currentProduct.name+'。请确认套餐后再下单。';document.querySelector('.purchase-status').textContent=manual?'此收款码金额固定为 ¥109.98，每次支持购买 1 件。付款后由卖家人工核实到账。':'支付服务暂未开通，当前仅供页面体验，不会扣款或实际发货。';document.querySelector('.purchase-submit').innerHTML=icon('cart')+(manual?'前往微信收款页':'立即购买');document.title=currentProduct.name+' - 星谱';updateQuantity();if(!manual)newCaptcha();window.scrollTo(0,0);document.getElementById('item-title').focus({preventScroll:true})}else{showHome();toast('该商品不存在，已返回商品列表')}}
-function showHome(restoreFocus=true){const previousIndex=products.indexOf(currentProduct),wasDetail=!itemView.hidden;itemView.hidden=true;homeView.hidden=false;currentProduct=null;document.title='星谱 · 数字商品商店';if(wasDetail){window.scrollTo(0,homeScroll);const previousProduct=grid.querySelector('[data-product-index="'+previousIndex+'"]')||grid.querySelector('.product');if(previousProduct&&restoreFocus)previousProduct.focus({preventScroll:true})}}
-function auth(mode){const signup=mode==='signup';openModal('<h2 id="modal-title">'+(signup?'创建账号':'欢迎回来')+'</h2><p>'+(signup?'创建你的星谱账号，开启数字生活。':'登录星谱，查看你的订单。')+'</p><form id="auth-form"><label for="email">邮箱</label><input id="email" type="email" placeholder="请输入邮箱地址" autocomplete="email" required><label for="password">密码</label><input id="password" type="password" placeholder="请输入至少 6 位密码" minlength="6" autocomplete="'+(signup?'new-password':'current-password')+'" required><button class="primary submit" type="submit">'+(signup?'创建账号':'登录')+'</button></form><p class="hint">演示页面，账号服务尚未开放，请勿填写真实密码。</p>')}
-search.addEventListener('input',()=>{render();if(homeView.hidden)showHome(false)});
-document.querySelectorAll('[data-category]').forEach(button=>button.addEventListener('click',()=>{category=button.dataset.category;document.querySelectorAll('[data-category]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-selected',String(b===button))});grid.setAttribute('aria-labelledby',button.id);render()}));
-grid.addEventListener('click',e=>{const product=e.target.closest('[data-product-index]');if(product){showProduct(Number(product.dataset.productIndex));return}if(e.target.closest('#reset-products')){search.value='';document.getElementById('tab-gpt').click()}});
-document.querySelectorAll('[data-home]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();showHome()}));
-document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.action==='orders')openModal('<h2 id="modal-title">订单查询</h2><p>输入订单号，查询订单进度。</p><form id="order-form"><label for="order-number">订单号</label><input id="order-number" placeholder="请输入订单号" required><button type="submit" class="primary submit">查询订单</button></form><p class="hint">演示页面，暂未接入订单服务。</p>');else auth(b.dataset.action)}));
-document.getElementById('tutorial').addEventListener('click',()=>openModal('<h2 id="modal-title">USDT充值教程</h2><p>充值服务暂未开放。</p><p>此处预留充值教程入口。接入正式服务后，可在这里展示支持的网络、充值步骤及到账说明。</p><button class="primary submit" id="understood">我知道了</button>'));
-content.addEventListener('click',e=>{if(e.target.id==='understood')closeModal()});content.addEventListener('submit',e=>{e.preventDefault();toast(e.target.id==='order-form'?'订单服务暂未开放':'账号服务暂未开放');if(e.target.id==='auth-form')e.target.reset()});
-document.getElementById('close-modal').addEventListener('click',closeModal);modal.addEventListener('click',e=>{if(e.target===modal){const r=modal.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal()}});
-document.getElementById('theme').addEventListener('click',()=>document.body.classList.toggle('dark'));document.getElementById('language').addEventListener('click',()=>toast('当前语言：简体中文'));document.getElementById('shop-button').addEventListener('click',()=>{search.value='';document.getElementById('tab-gpt').click();showHome();window.scrollTo({top:0,behavior:'smooth'})});
-document.getElementById('quantity-minus').addEventListener('click',()=>{quantityInput.value=quantity-1;updateQuantity()});document.getElementById('quantity-plus').addEventListener('click',()=>{quantityInput.value=quantity+1;updateQuantity()});quantityInput.addEventListener('input',()=>{if(quantityInput.validity.valid)updateQuantity()});quantityInput.addEventListener('change',updateQuantity);
-document.getElementById('refresh-captcha').addEventListener('click',newCaptcha);captchaInput.addEventListener('input',()=>{captchaInput.setCustomValidity('');setFeedback('')});
-purchaseForm.addEventListener('submit',e=>{e.preventDefault();updateQuantity();if(currentProduct===products[0]){window.location.assign('pay.html');return}if(captchaInput.value.trim().toUpperCase()!==captchaCode){setFeedback('验证码不正确，请重新输入。');newCaptcha();captchaInput.focus();return}setFeedback('支付服务暂未开通，当前不会创建真实订单或扣款。');toast('页面体验完成，支付接口待接入')});
-document.getElementById('share-item').addEventListener('click',async()=>{try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(location.href);toast('店铺链接已复制')}else{openModal('<h2 id="modal-title">分享店铺</h2><label for="share-url">店铺链接</label><input id="share-url" readonly><button class="primary submit" id="understood">关闭</button>');document.getElementById('share-url').value=location.href;document.getElementById('share-url').select()}}catch(e){toast('复制未完成，请从地址栏分享店铺链接')}});
-// 商品详情仅在当前页面切换；旧商品链接仍可打开，并清理地址栏中的旧标记。
-function openInitialView(){
-  const legacy=location.hash.match(/^#\/item\/(\d+)$/);
-  let returnIndex=null;
-  try{const saved=sessionStorage.getItem('xingpu:returnProduct');sessionStorage.removeItem('xingpu:returnProduct');if(saved!==null&&/^\d+$/.test(saved))returnIndex=Number(saved)}catch(error){}
-  if(location.hash==='#/'||legacy){try{history.replaceState(null,'',location.pathname+location.search)}catch(error){}}
-  render();
-  if(legacy)showProduct(Number(legacy[1])-2);
-  else if(returnIndex!==null)showProduct(returnIndex);
-  else showHome();
+<style>
+#drop { position: fixed; inset: 0; z-index: 90; background: rgba(250,250,248,.97);
+  display: none; place-items: center; padding: 24px; }
+#drop.on { display: grid; }
+#drop .dz { border: 2px dashed #c9ccd1; border-radius: 14px; background: #fff;
+  padding: 34px 40px; text-align: center; max-width: 560px; transition: border-color .12s, background .12s; }
+#drop.hot .dz { border-color: #14161A; background: #F4F4F1; }
+#drop .t1 { font-size: 16px; font-weight: 500; color: #1f2328; margin-bottom: 6px; }
+#drop .t2 { font-size: 12.5px; color: #6b7280; line-height: 1.7; }
+#drop .t2 code { background: #f2f3f5; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+#drop .t3 { margin-top: 16px; font-size: 11.5px; color: #9aa0a6; }
+#drop .err { margin-top: 12px; font-size: 12.5px; color: #A32D2D; display: none; }
+#drop .err.on { display: block; }
+
+/* 手机上没有「拖」这回事，只留一颗「选择文件」按钮，手指够得着 */
+@media (pointer: coarse), (max-width: 760px), (max-height: 520px) {
+  #drop { padding: 12px; }
+  #drop .dz { padding: 20px 14px; max-width: 100%; border-radius: 12px; }
+  #drop .t1 { font-size: 15px; }
+  #drop .t2 { font-size: 11.5px; line-height: 1.6; }
+  #drop .t3 { margin-top: 10px; font-size: 10.5px; }
+  /* 按钮按手指大小给：高度 40 左右，间距拉开 */
+  #drop .dz button { padding: 10px 22px !important; font-size: 13.5px; }
+  #btnPick { font-weight: 700; }
 }
-openInitialView();
+</style>
+<!-- 拖拽 / 选文件层。放在 #app 里面：手机竖着拿时整页会转 90°，
+     留在外面它就不跟着转，会横躺着盖在屏幕上。 -->
+<div id="app">
+  <aside id="side">
+    <div id="grab"><i></i><div id="ttSlot"></div><span id="grabTxt">分组列表</span></div>
+    <div id="cats"></div>
+    <div id="list"><div id="empty">读取中…</div></div>
+  </aside>
+
+  <main>
+    <header>
+      <!-- 手机上这一颗固定在左上角，是唯一的入口；电脑上就排在标题左边 -->
+      <button class="b" id="btnOpen">导入工程</button>
+      <div class="tt" id="ttBox">
+        <h1 id="h1">焊接分组</h1>
+        <p id="sub">点左侧分组，板上同阻值同封装的元件会变黑并跳动</p>
+      </div>
+      <div class="acts">
+        <button class="b" id="btnSel" disabled>在 PCB 中选中</button>
+        <button class="b pri" id="btnHtml" disabled>导出交互网页</button>
+        <button class="b" id="btnPng" disabled>导出 PNG</button>
+        <button class="b" id="btnPrint" disabled>打印</button>
+      </div>
+    </header>
+    <div id="stage">
+      <canvas id="cvBase"></canvas>
+      <canvas id="cvFx"></canvas>
+      <div id="hint"></div>
+      <div id="zoom">
+        <button id="zIn" title="放大">＋</button>
+        <button id="zOut" title="缩小">－</button>
+        <button id="zFit" title="回到适应窗口" aria-label="回到适应窗口"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M2.2 6V2.2H6M14 6V2.2H10M2.2 10v3.8H6M14 10v3.8H10"/></svg></button>
+      </div>
+    </div>
+  </main>
+
+  <div id="drop">
+    <div class="dz">
+      <div class="t1">把嘉立创工程文件拖进来</div>
+      <div class="t2">支持 <code>.epro2</code>（EDA 里「文件 → 导出 → 嘉立创EDA 工程」得到的那个包）<br>
+        拖入后自动读出器件、位号、阻值容值、封装和板框</div>
+      <div style="margin-top:16px;display:flex;gap:8px;justify-content:center">
+        <button class="b" id="btnPick" style="padding:6px 18px">选择文件…</button>
+        <button class="b" id="btnCancel" style="padding:6px 14px">取消</button>
+      </div>
+      <input type="file" id="fileIn" accept=".epro2,.zip,application/zip,application/x-zip-compressed,application/octet-stream" hidden>
+      <div class="t3">全部在本机解析，不上传、不联网、不花钱</div>
+      <div class="err" id="dropErr"></div>
+    </div>
+  </div>
+</div>
+
+<script data-app>
+/* =========================================================================
+ *  焊接分组 · 点选视图  —  嘉立创EDA 专业版扩展
+ *  纯本地脚本 API（eda.*）：不联网、不调 AI、无调用成本
+ *  编码方式：只用「明暗 + 形状 + 动画」，不依赖颜色（色弱可用）
+ *  另外可导出「单文件交互网页」：双击用浏览器打开，同样可点选
+ * ========================================================================= */
+const MIL = 0.0254;
+
+/* 脚本刚执行时先拍一张静态外壳的快照。
+   导出交互网页时用它 —— 导出的页面跟这里同一个模子，
+   又不会把运行时生成的列表、序号 chips 一起塞进去。 */
+const SHELL = (function () {
+  const el = document.getElementById('app');
+  return el ? el.outerHTML : '';
+})();
+
+const CATS = [
+  { id: 'R', label: '电阻', re: /^R\d/i },
+  { id: 'C', label: '电容', re: /^C\d/i },
+  { id: 'L', label: '电感', re: /^L\d/i },
+  /* 芯片 · 二极管 · 三极管/MOS：位号 U / Q / D / LED / Y / X 都归这里。
+     以前只收 Q/D，U 开头的（MCU、驱动、LDO、MOS 模块）整批看不见 —— 补上。 */
+  { id: 'U', label: '芯片·管', re: /^(U|Q|D|LED|Y|X|VD|VT)\d/i },
+  /* 接插件 · 结构件：排针、座子、开关、保险丝、测试点 */
+  { id: 'O', label: '接插件', re: /^(H|J|CN|SW|F|B|K|TP|P|S)\d/i },
+];
+
+/* 封装一看就是连接器 / 结构件：排针、座子、按键、开关。
+   这类东西经常被画成 U 位号（比如本板的 U5/U9/U11/U13 就是 8P 排针），
+   只按位号归类会把它们塞进「芯片·管」，焊接时翻半天找不到。 */
+const CONN_FP = /HDR|HEADER|PIN-?HDR|CONN|SOCKET|TERMINAL|USB|RJ45|FPC|FFC|HOUSING|KEY-|SW-?SMD|SWITCH|PAD|TEST-?POINT|MOUNT/i;
+
+/* 一个器件到底属于哪一类：先看封装（最不会骗人），再看位号前缀 */
+function catOf(c) {
+  const d = String((c && c.d) || '');
+  const fp = String((c && c.fp) || '');
+  if (CONN_FP.test(fp)) return 'O';
+  for (const k of CATS) if (k.re.test(d)) return k.id;
+  return '';
+}
+
+/* ------------------------- 有极性 / 有方向 的器件 ------------------------- *
+ * 电阻、陶瓷电容（0603/0805/1206）、普通电感都没有方向，随便焊；
+ * 下面这几类焊反了轻则不工作，重则鼓包/冒烟，必须提醒：
+ *   贴片铝电解 CAP-SMD_BD5.0 / BD10.0、插件电解 RADIAL、钽电容 TANT/CASE-
+ *   二极管 SMA / SMB / SMC / SOD / DO-214
+ *   LED
+ * 只看封装名判断 —— Value 经常是空的，封装名反而最可靠。
+ * ------------------------------------------------------------------------ */
+const POLAR_TANT = /TANT|(?:^|[_-])CASE-[A-D](?:[_-]|$)|钽/i;
+const POLAR_ELEC = /CAP-SMD_BD|(?:^|[_-])CP[_-]|(?:^|[_-])(?:RADIAL|ELEC|SMD-?CP)|铝电解/i;
+const POLAR_DIODE = /(?:^|[_-])(?:SMA|SMB|SMC)(?:[_-]|$)|(?:^|[_-])SOD-?\d|DO-214|DO-4[01]|DO-201/i;
+const POLAR_ARRAY = /RES-?ARRAY|RES-?NET|RA[_-]?\d|排阻/i;
+
+function polarOf(c) {
+  const fp = String((c && c.fp) || '');
+  const d = String((c && c.d) || '');
+  if (/^LED/i.test(d) || /^LED[_-]/i.test(fp)) return 'LED';
+  if (POLAR_TANT.test(fp)) return '钽电容';
+  if (POLAR_ELEC.test(fp)) return '电解电容';
+  if (POLAR_ARRAY.test(fp)) return '排阻';
+  if (POLAR_DIODE.test(fp)) return '二极管';
+  return '';
+}
+
+/* 焊的时候具体看哪儿 —— 电解和钽的色带含义正好相反，写错会害人 */
+const POLAR_TIP = {
+  '电解电容': '外壳上带色带 / 斜切 / 黑边的那一端是<b>负极</b>，另一端（圆角或印 + 号）是正极',
+  '钽电容': '带色带（或 + 号）的那一端是<b>正极</b>，和电解电容正好相反，别按电解的习惯装',
+  '排阻': '公共端（<b>1 脚</b>）有圆点 / 缺口标记，装反了整组电阻都错',
+  '二极管': '器件上的<b>色带端 = 阴极（负极）</b>，对应封装丝印的粗线端',
+  'LED': '封装背面的 T 形 / 缺角标记在<b>阴极</b>一侧，焊反了不亮',
+};
+
+/* 一组里是否有极性件；返回 {kind, n} 或 null */
+function polarOfGroup(g) {
+  const kinds = {};
+  let n = 0;
+  for (const c of (g && g.items) || []) {
+    const k = polarOf(c);
+    if (k) { kinds[k] = (kinds[k] || 0) + 1; n++; }
+  }
+  const kind = Object.keys(kinds)[0] || '';
+  return kind ? { kind, n, all: n === g.items.length } : null;
+}
+
+/* 顶部那行提醒的措辞：单颗 / 全部 / 只有一部分，说法不一样 */
+function polarLine(total, pol) {
+  if (!pol) return '';
+  const who = pol.all
+    ? (total === 1 ? '这 1 颗是' : '这 ' + total + ' 颗全是')
+    : '这 ' + total + ' 颗里有 ' + pol.n + ' 颗是';
+  return '<span class="pwarn">⚑ ' + who + pol.kind +
+    '，有方向　' + (POLAR_TIP[pol.kind] || '焊前确认方向') + '</span>';
+}
+
+let EDA = null;
+let COMPS = [];          // 全部器件
+let BOARD = null;        // 板框（mil）
+let PROJ = 'noproj';
+let PROJNAME = '';       // 工程名（导出文件名 / 离线页标题）
+let SOLO = false;        // 是否运行在导出的单文件网页里
+let USING_DEFAULT = false; // 当前显示的是预置示例（还没拖入自己的工程）
+
+let cat = 'R';           // 当前类别
+let groups = [];         // 当前类别的分组
+let active = null;       // 选中的分组对象
+let marks = {};          // 已焊标记 { designator: true }
+let layout = null;       // 绘制坐标系缓存（命中测试 / 动画用）
+
+/* ---------------------- 视图缩放 / 平移（手机端必需） ---------------------- *
+ * 手机上整板视图里一颗 0603 只有几像素，手指点不中，所以必须能放大。
+ * k 是相对「适应窗口」的倍数，(dx,dy) 是屏幕像素平移。 */
+const VIEW = { k: 1, dx: 0, dy: 0 };
+const K_MAX = 10;
+
+/* 把平移限制住，不让板子被拖到画布外面去 */
+function clampView(W, H) {
+  W = W || (layout ? layout.W : stage.clientWidth);
+  H = H || (layout ? layout.H : stage.clientHeight);
+  if (VIEW.k <= 1.001) { VIEW.k = 1; VIEW.dx = 0; VIEW.dy = 0; return; }
+  const mx = (VIEW.k - 1) * W / 2, my = (VIEW.k - 1) * H / 2;
+  VIEW.dx = Math.max(-mx, Math.min(mx, VIEW.dx));
+  VIEW.dy = Math.max(-my, Math.min(my, VIEW.dy));
+}
+
+/* 以画布内 (ax,ay) 为锚点缩放到 newK —— 锚点下面的那一点保持不动，
+   双指捏合时手指夹住的位置不会跑，手感才对 */
+function zoomAt(newK, ax, ay) {
+  newK = Math.max(1, Math.min(K_MAX, newK));
+  const W = stage.clientWidth, H = stage.clientHeight;
+  const r = newK / VIEW.k;
+  VIEW.dx = (ax - W / 2) * (1 - r) + VIEW.dx * r;
+  VIEW.dy = (ay - H / 2) * (1 - r) + VIEW.dy * r;
+  VIEW.k = newK;
+  clampView(W, H);
+}
+let fxRaf = 0;
+let focus = null;        // 单颗定位十字线 {x,y,until}
+
+const cvBase = document.getElementById('cvBase');
+const cvFx = document.getElementById('cvFx');
+const stage = document.getElementById('stage');
+const hintEl = document.getElementById('hint');
+
+/* ==================== 手机横屏 / 坐标换算（手机端的地基） ==================== *
+ * 焊接的人不会坐在电脑前，手机是立在桌上的，所以：
+ *   ① 竖着拿手机 → 整页转 90° 当横屏用（浏览器不让网页锁方向，只能自己转）
+ *   ② 一旦转了，屏幕坐标和页面坐标差 90°，所有手指位置都得先换算，
+ *      否则点哪都不准 —— 换算只写在 stagePoint / localDelta 两个地方。
+ * ========================================================================== */
+const appEl = document.getElementById('app');
+let ROT = false;                 // 整页是否转了 90°
+
+/* 手指操作（手机 / 平板）—— 只有这类设备才会整页转横屏 */
+function isTouch() {
+  return !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
+}
+
+/* 用手机版布局：手指设备，或者窗口太窄（电脑上把窗口拉窄也按手机排） */
+function isMobileLayout() {
+  /* Android 外壳（APK）会在 head 里注入 __APP_WRAPPER__。
+     不靠 pointer:coarse —— 定制 WebView 上它不一定报 true，报错了就成了桌面版布局。 */
+  if (window.__APP_WRAPPER__) return true;
+  if (isTouch() || document.documentElement.clientWidth <= 760) return true;
+  /* 和 CSS 里那条 max-height: 520px 对齐：横屏手机视口就是 390 高。
+     两个判断必须一致，否则会出现「CSS 认为是手机、JS 认为是桌面」的半截样式。 */
+  return document.documentElement.clientHeight <= 520;
+}
+
+/* 跑在 APK 外壳里吗？原生那边会注入 AndroidBridge。
+   只在「选择文件」这一处用得上：外面能弹一个「微信 / QQ 收到的文件」的入口，
+   浏览器和 EDA 插件里没有这回事，照旧走 <input type=file>。 */
+const IN_APK = (() => {
+  try {
+    return !!(window.AndroidBridge && AndroidBridge.isShell && AndroidBridge.isShell());
+  } catch (_) { return false; }
+})();
+
+function applyOrient() {
+  const dw = document.documentElement.clientWidth;
+  const dh = document.documentElement.clientHeight;
+  const want = isTouch() && dh > dw + 24;            // 竖着拿手机
+  if (want !== ROT) { ROT = want; VIEW.k = 1; VIEW.dx = 0; VIEW.dy = 0; }
+  document.body.classList.toggle('rot', ROT);
+  if (ROT) {
+    appEl.style.width = dh + 'px';                 // 宽高互换，再顺时针转 90°
+    appEl.style.height = dw + 'px';
+    appEl.style.transform = 'translateX(' + dw + 'px) rotate(90deg)';
+  } else {
+    appEl.style.width = '';
+    appEl.style.height = '';
+    appEl.style.transform = '';
+  }
+  /* 顺序有讲究：先把信息块搬进抽屉，再量抽屉 —— 不然量到的把手还没有那两行字 */
+  placeInfo(ROT || isMobileLayout());
+  fitDrawer();
+  if (COMPS.length) drawBase();
+}
+
+/* 当前分组的信息块在电脑上属于顶栏，在手机上搬到抽屉顶上 ——
+   同一个节点搬来搬去，只有一份内容，不会两边说法不一致。 */
+function placeInfo(mobile) {
+  const tt = document.getElementById('ttBox');
+  const slot = document.getElementById('ttSlot');
+  const hd = document.querySelector('header');
+  if (!tt || !slot || !hd) return;
+  if (mobile) {
+    if (tt.parentNode !== slot) slot.appendChild(tt);
+  } else if (tt.parentNode !== hd) {
+    hd.insertBefore(tt, document.querySelector('.acts'));
+  }
+}
+
+/* 屏幕坐标 → #app 里的坐标（转过就把旋转反算回去） */
+function appPoint(cx, cy) {
+  const r = appEl.getBoundingClientRect();
+  return ROT
+    ? { x: cy - r.top, y: r.right - cx }
+    : { x: cx - r.left, y: cy - r.top };
+}
+
+/* 屏幕坐标 → 画布（#stage）坐标 */
+function stagePoint(cx, cy) {
+  const p = appPoint(cx, cy);
+  let n = stage, ox = 0, oy = 0;
+  while (n && n !== appEl) { ox += n.offsetLeft; oy += n.offsetTop; n = n.offsetParent; }
+  return { x: p.x - ox, y: p.y - oy };
+}
+
+/* 手指在屏幕上划的位移 → 页面里的位移（同样要反算 90°） */
+function localDelta(dx, dy) {
+  return ROT ? { dx: dy, dy: -dx } : { dx: dx, dy: dy };
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------------------------------- 数据 --------------------------------- */
+async function getEda() {
+  for (let i = 0; i < 120; i++) {
+    const e = window.eda || (window.parent && window.parent !== window ? window.parent.eda : null);
+    if (e && e.pcb_PrimitiveComponent) return e;
+    await sleep(50);
+  }
+  return null;
+}
+
+async function loadFromEda(e) {
+  const all = await e.pcb_PrimitiveComponent.getAll();
+  const out = [];
+  for (const c of all) {
+    let pins = [];
+    try {
+      const ps = await e.pcb_PrimitiveComponent.getAllPinsByPrimitiveId(c.getState_PrimitiveId());
+      pins = ps.map(p => [p.getState_X(), p.getState_Y(), p.getState_Net(), p.getState_PadNumber()]);
+    } catch (_) { }
+    const op = c.getState_OtherProperty() || {};
+    out.push({
+      pid: c.getState_PrimitiveId(),
+      d: c.getState_Designator(),
+      v: op['Value'] || '',
+      fp: c.getState_Footprint() || '',
+      layer: c.getState_Layer(),
+      x: c.getState_X(),
+      y: c.getState_Y(),
+      pins,
+      syn: false,          // 焊盘来自 EDA 真实坐标，别用封装名推算覆盖掉
+    });
+  }
+  return out;
+}
+
+async function loadBoard(e) {
+  try {
+    const pls = await e.pcb_PrimitivePolyline.getAll();
+    const pl = pls.find(p => p.getState_Layer() === 11);
+    if (!pl) return null;
+    const poly = (pl.getState_Polygon() || {}).polygon;
+    if (!poly || !poly.length) return null;
+    if (poly[0] === 'R') return { x: poly[1], y: poly[2], w: poly[3], h: poly[4] };
+    const nums = poly.filter(n => typeof n === 'number');
+    if (nums.length < 4) return null;
+    const xs = [], ys = [];
+    for (let i = 0; i + 1 < nums.length; i += 2) { xs.push(nums[i]); ys.push(nums[i + 1]); }
+    return { x: Math.min(...xs), y: Math.max(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
+  } catch (_) { return null; }
+}
+
+window.__DEFAULT__ = {"name":"mcu修改版plus","board":{"x":35,"y":-35,"w":3570,"h":2470},"comps":[{"d":"C1","v":"100nF","fp":"C0603","layer":1,"x":1750.0,"y":-715.0,"angle":90.0,"pins":[[1765.748,-746.4961,"",""],[1765.748,-683.5039,"",""],[1734.252,-683.5039,"",""],[1734.252,-746.4961,"",""]]},{"d":"C2","v":"100nF","fp":"C0603","layer":1,"x":2300.0,"y":-2080.0,"angle":270.0,"pins":[[2284.252,-2048.5039,"",""],[2284.252,-2111.4961,"",""],[2315.748,-2111.4961,"",""],[2315.748,-2048.5039,"",""]]},{"d":"C3","v":"100nF","fp":"C0603","layer":1,"x":985.0,"y":-720.0,"angle":90.0,"pins":[[1000.748,-751.4961,"",""],[1000.748,-688.5039,"",""],[969.252,-688.5039,"",""],[969.252,-751.4961,"",""]]},{"d":"C4","v":"10nF","fp":"C0603","layer":1,"x":1281.5,"y":-856.0,"angle":180.0,"pins":[[1312.9961,-840.252,"",""],[1250.0039,-840.252,"",""],[1250.0039,-871.748,"",""],[1312.9961,-871.748,"",""]]},{"d":"C5","v":"330uF","fp":"CAP-SMD_BD10.0-L10.3-W10.3-FD","layer":1,"x":320.0,"y":-1410.0,"angle":90.0,"pins":[[382.9921,-1472.9921,"",""],[382.9921,-1347.0079,"",""],[257.0079,-1347.0079,"",""],[257.0079,-1472.9921,"",""]]},{"d":"C6","v":"4.7uF","fp":"CAP-SMD_BD5.0-L5.3-W5.3-FD","layer":1,"x":425.0,"y":-980.0,"angle":180.0,"pins":[[531.2992,-873.7008,"",""],[318.7008,-873.7008,"",""],[318.7008,-1086.2992,"",""],[531.2992,-1086.2992,"",""]]},{"d":"C7","v":"100nF","fp":"C0603","layer":1,"x":730.0,"y":-1355.0,"angle":270.0,"pins":[[714.252,-1323.5039,"",""],[714.252,-1386.4961,"",""],[745.748,-1386.4961,"",""],[745.748,-1323.5039,"",""]]},{"d":"C8","v":"4.7uF","fp":"CAP-SMD_BD5.0-L5.3-W5.3-FD","layer":1,"x":720.0,"y":-985.0,"angle":0.0,"pins":[[613.7008,-1091.2992,"",""],[826.2992,-1091.2992,"",""],[826.2992,-878.7008,"",""],[613.7008,-878.7008,"",""]]},{"d":"C9","v":"100nF","fp":"C0603","layer":1,"x":725.0,"y":-1900.0,"angle":90.0,"pins":[[740.748,-1931.4961,"",""],[740.748,-1868.5039,"",""],[709.252,-1868.5039,"",""],[709.252,-1931.4961,"",""]]},{"d":"C10","v":"10uF","fp":"C0805","layer":1,"x":580.0,"y":-1895.0,"angle":90.0,"pins":[[604.6063,-1934.3701,"",""],[604.6063,-1855.6299,"",""],[555.3937,-1855.6299,"",""],[555.3937,-1934.3701,"",""]]},{"d":"C11","v":"100nF","fp":"C0603","layer":1,"x":250.12,"y":-2125.0,"angle":180.0,"pins":[[281.6161,-2109.252,"",""],[218.6239,-2109.252,"",""],[218.6239,-2140.748,"",""],[281.6161,-2140.748,"",""]]},{"d":"C12","v":"10uF","fp":"C0805","layer":1,"x":263.11,"y":-2234.37,"angle":180.0,"pins":[[302.4801,-2209.7637,"",""],[223.7399,-2209.7637,"",""],[223.7399,-2258.9763,"",""],[302.4801,-2258.9763,"",""]]},{"d":"C13","v":"100nF","fp":"C0603","layer":1,"x":1849.88,"y":-1530.0,"angle":180.0,"pins":[[1881.3761,-1514.252,"",""],[1818.3839,-1514.252,"",""],[1818.3839,-1545.748,"",""],[1881.3761,-1545.748,"",""]]},{"d":"C14","v":"100nF","fp":"C0603","layer":1,"x":2489.888,"y":-1486.5325,"angle":180.0,"pins":[[2521.3841,-1470.7845,"",""],[2458.3919,-1470.7845,"",""],[2458.3919,-1502.2805,"",""],[2521.3841,-1502.2805,"",""]]},{"d":"C15","v":"100nF","fp":"C0603","layer":1,"x":1839.996,"y":-1410.003,"angle":0.0,"pins":[[1808.4999,-1425.751,"",""],[1871.4921,-1425.751,"",""],[1871.4921,-1394.255,"",""],[1808.4999,-1394.255,"",""]]},{"d":"C16","v":"100nF","fp":"C0603","layer":1,"x":2430.0,"y":-1010.0,"angle":270.0,"pins":[[2414.252,-978.5039,"",""],[2414.252,-1041.4961,"",""],[2445.748,-1041.4961,"",""],[2445.748,-978.5039,"",""]]},{"d":"C17","v":"4.7uF","fp":"C0805","layer":1,"x":1700.0,"y":-1458.74,"angle":90.0,"pins":[[1724.6063,-1498.1101,"",""],[1724.6063,-1419.3699,"",""],[1675.3937,-1419.3699,"",""],[1675.3937,-1498.1101,"",""]]},{"d":"C18","v":"100nF","fp":"C0603","layer":1,"x":2027.3205,"y":-914.212,"angle":270.0,"pins":[[2011.5725,-882.7159,"",""],[2011.5725,-945.7081,"",""],[2043.0685,-945.7081,"",""],[2043.0685,-882.7159,"",""]]},{"d":"C19","v":"100nF","fp":"C0603","layer":1,"x":2570.0,"y":-1170.0,"angle":180.0,"pins":[[2601.4961,-1154.252,"",""],[2538.5039,-1154.252,"",""],[2538.5039,-1185.748,"",""],[2601.4961,-1185.748,"",""]]},{"d":"C20","v":"20pF","fp":"C0603","layer":1,"x":2272.5565,"y":-1682.4395,"angle":270.0,"pins":[[2256.8085,-1650.9434,"",""],[2256.8085,-1713.9356,"",""],[2288.3045,-1713.9356,"",""],[2288.3045,-1650.9434,"",""]]},{"d":"C21","v":"20pF","fp":"C0603","layer":1,"x":1942.5565,"y":-1682.4395,"angle":270.0,"pins":[[1926.8085,-1650.9434,"",""],[1926.8085,-1713.9356,"",""],[1958.3045,-1713.9356,"",""],[1958.3045,-1650.9434,"",""]]},{"d":"C22","v":"1uF","fp":"C0603","layer":1,"x":2575.0,"y":-1255.0,"angle":180.0,"pins":[[2606.4961,-1239.252,"",""],[2543.5039,-1239.252,"",""],[2543.5039,-1270.748,"",""],[2606.4961,-1270.748,"",""]]},{"d":"C23","v":"100nF","fp":"C0603","layer":1,"x":2580.0,"y":-995.0,"angle":180.0,"pins":[[2611.4961,-979.252,"",""],[2548.5039,-979.252,"",""],[2548.5039,-1010.748,"",""],[2611.4961,-1010.748,"",""]]},{"d":"C24","v":"1uF","fp":"C0603","layer":1,"x":2570.0,"y":-1085.0,"angle":180.0,"pins":[[2601.4961,-1069.252,"",""],[2538.5039,-1069.252,"",""],[2538.5039,-1100.748,"",""],[2601.4961,-1100.748,"",""]]},{"d":"C29","v":"4.7uF","fp":"C0805","layer":1,"x":785.61,"y":-720.37,"angle":270.0,"pins":[[761.0037,-680.9999,"",""],[761.0037,-759.7401,"",""],[810.2163,-759.7401,"",""],[810.2163,-680.9999,"",""]]},{"d":"CN1","v":"","fp":"CONN-SMD_7P-P1.25_JS_GH125-S07CCA-00","layer":1,"x":3120.0,"y":-1590.0,"angle":90.0,"pins":[[3182.9921,-1652.9921,"",""],[3182.9921,-1527.0079,"",""],[3057.0079,-1527.0079,"",""],[3057.0079,-1652.9921,"",""]]},{"d":"CN2","v":"","fp":"CONN-TH_2P-P3.81_MX128L-3.81-GN01-02P-CU-Y-A","layer":1,"x":435.0,"y":-215.0,"angle":180.0,"pins":[[497.9921,-152.0079,"",""],[372.0079,-152.0079,"",""],[372.0079,-277.9921,"",""],[497.9921,-277.9921,"",""]]},{"d":"F1","v":"","fp":"F1206","layer":1,"x":460.0,"y":-535.0,"angle":0.0,"pins":[[397.0079,-566.4961,"",""],[522.9921,-566.4961,"",""],[522.9921,-503.5039,"",""],[397.0079,-503.5039,"",""]]},{"d":"H1","v":"","fp":"HDR-TH_5P-P2.54-V-M","layer":1,"x":1720.0,"y":-930.0,"angle":180.0,"pins":[[1782.9921,-867.0079,"",""],[1657.0079,-867.0079,"",""],[1657.0079,-992.9921,"",""],[1782.9921,-992.9921,"",""]]},{"d":"H2","v":"","fp":"HDR-TH_4P-P2.54-V-M","layer":1,"x":2305.0,"y":-100.0,"angle":0.0,"pins":[[2242.0079,-162.9921,"",""],[2367.9921,-162.9921,"",""],[2367.9921,-37.0079,"",""],[2242.0079,-37.0079,"",""]]},{"d":"H3","v":"","fp":"HDR-TH_4P-P2.54-V-M","layer":1,"x":2740.0,"y":-105.0,"angle":0.0,"pins":[[2677.0079,-167.9921,"",""],[2802.9921,-167.9921,"",""],[2802.9921,-42.0079,"",""],[2677.0079,-42.0079,"",""]]},{"d":"H4","v":"","fp":"HDR-TH_4P-P2.54-V-M","layer":1,"x":3170.0,"y":-110.0,"angle":0.0,"pins":[[3107.0079,-172.9921,"",""],[3232.9921,-172.9921,"",""],[3232.9921,-47.0079,"",""],[3107.0079,-47.0079,"",""]]},{"d":"L2","v":"","fp":"IND-SMD_L7.1-W6.6_SMMS0650-150M","layer":1,"x":1060.0,"y":-1300.0,"angle":180.0,"pins":[[1122.9921,-1237.0079,"",""],[997.0079,-1237.0079,"",""],[997.0079,-1362.9921,"",""],[1122.9921,-1362.9921,"",""]]},{"d":"LED1","v":"","fp":"LED_0603","layer":1,"x":260.0,"y":-2335.0,"angle":180.0,"pins":[[291.4961,-2319.252,"",""],[228.5039,-2319.252,"",""],[228.5039,-2350.748,"",""],[291.4961,-2350.748,"",""]]},{"d":"R1","v":"100K","fp":"R0603","layer":1,"x":2675.0,"y":-1660.0,"angle":270.0,"pins":[[2659.252,-1628.5039,"",""],[2659.252,-1691.4961,"",""],[2690.748,-1691.4961,"",""],[2690.748,-1628.5039,"",""]]},{"d":"R2","v":"33","fp":"R0603","layer":1,"x":2845.0,"y":-1635.0,"angle":180.0,"pins":[[2876.4961,-1619.252,"",""],[2813.5039,-1619.252,"",""],[2813.5039,-1650.748,"",""],[2876.4961,-1650.748,"",""]]},{"d":"R3","v":"33","fp":"R0603","layer":1,"x":2845.0,"y":-1540.0,"angle":180.0,"pins":[[2876.4961,-1524.252,"",""],[2813.5039,-1524.252,"",""],[2813.5039,-1555.748,"",""],[2876.4961,-1555.748,"",""]]},{"d":"R4","v":"100K","fp":"R0603","layer":1,"x":2840.7315,"y":-1349.8385,"angle":180.0,"pins":[[2872.2276,-1334.0905,"",""],[2809.2354,-1334.0905,"",""],[2809.2354,-1365.5865,"",""],[2872.2276,-1365.5865,"",""]]},{"d":"R5","v":"33","fp":"R0603","layer":1,"x":2845.0,"y":-1445.0,"angle":180.0,"pins":[[2876.4961,-1429.252,"",""],[2813.5039,-1429.252,"",""],[2813.5039,-1460.748,"",""],[2876.4961,-1460.748,"",""]]},{"d":"R6","v":"1K","fp":"R0603","layer":1,"x":1470.0,"y":-330.0,"angle":90.0,"pins":[[1485.748,-361.4961,"",""],[1485.748,-298.5039,"",""],[1454.252,-298.5039,"",""],[1454.252,-361.4961,"",""]]},{"d":"R7","v":"10K","fp":"R0603","layer":1,"x":2220.0,"y":-2080.0,"angle":90.0,"pins":[[2235.748,-2111.4961,"",""],[2235.748,-2048.5039,"",""],[2204.252,-2048.5039,"",""],[2204.252,-2111.4961,"",""]]},{"d":"R8","v":"10K","fp":"R0603","layer":1,"x":1555.0,"y":-770.0,"angle":0.0,"pins":[[1523.5039,-785.748,"",""],[1586.4961,-785.748,"",""],[1586.4961,-754.252,"",""],[1523.5039,-754.252,"",""]]},{"d":"R9","v":"3.16K","fp":"R0603","layer":1,"x":1555.0,"y":-635.0,"angle":0.0,"pins":[[1523.5039,-650.748,"",""],[1586.4961,-650.748,"",""],[1586.4961,-619.252,"",""],[1523.5039,-619.252,"",""]]},{"d":"R10","v":"2K","fp":"R0603","layer":1,"x":418.98,"y":-2300.34,"angle":270.0,"pins":[[403.232,-2268.8439,"",""],[403.232,-2331.8361,"",""],[434.728,-2331.8361,"",""],[434.728,-2268.8439,"",""]]},{"d":"R11","v":"33","fp":"R0603","layer":1,"x":2405.0,"y":-288.492,"angle":180.0,"pins":[[2436.4961,-272.744,"",""],[2373.5039,-272.744,"",""],[2373.5039,-304.24,"",""],[2436.4961,-304.24,"",""]]},{"d":"R12","v":"33","fp":"R0603","layer":1,"x":2835.0,"y":-288.492,"angle":180.0,"pins":[[2866.4961,-272.744,"",""],[2803.5039,-272.744,"",""],[2803.5039,-304.24,"",""],[2866.4961,-304.24,"",""]]},{"d":"R13","v":"33","fp":"R0603","layer":1,"x":3250.0,"y":-290.0,"angle":180.0,"pins":[[3281.4961,-274.252,"",""],[3218.5039,-274.252,"",""],[3218.5039,-305.748,"",""],[3281.4961,-305.748,"",""]]},{"d":"R14","v":"33","fp":"R0603","layer":1,"x":1885.0,"y":-315.0,"angle":90.0,"pins":[[1900.748,-346.4961,"",""],[1900.748,-283.5039,"",""],[1869.252,-283.5039,"",""],[1869.252,-346.4961,"",""]]},{"d":"R15","v":"33","fp":"R0603","layer":1,"x":1680.0,"y":-325.0,"angle":90.0,"pins":[[1695.748,-356.4961,"",""],[1695.748,-293.5039,"",""],[1664.252,-293.5039,"",""],[1664.252,-356.4961,"",""]]},{"d":"R16","v":"0","fp":"R0603","layer":1,"x":890.0,"y":-1930.0,"angle":0.0,"pins":[[858.5039,-1945.748,"",""],[921.4961,-1945.748,"",""],[921.4961,-1914.252,"",""],[858.5039,-1914.252,"",""]]},{"d":"R17","v":"33","fp":"R0603","layer":1,"x":2915.0,"y":-1950.0,"angle":90.0,"pins":[[2930.748,-1981.4961,"",""],[2930.748,-1918.5039,"",""],[2899.252,-1918.5039,"",""],[2899.252,-1981.4961,"",""]]},{"d":"R18","v":"33","fp":"R0603","layer":1,"x":2590.0,"y":-1950.0,"angle":90.0,"pins":[[2605.748,-1981.4961,"",""],[2605.748,-1918.5039,"",""],[2574.252,-1918.5039,"",""],[2574.252,-1981.4961,"",""]]},{"d":"R19","v":"33","fp":"R0603","layer":1,"x":2720.0,"y":-1955.34,"angle":90.0,"pins":[[2735.748,-1986.8361,"",""],[2735.748,-1923.8439,"",""],[2704.252,-1923.8439,"",""],[2704.252,-1986.8361,"",""]]},{"d":"R20","v":"100","fp":"R0603","layer":1,"x":2485.0,"y":-1945.68,"angle":90.0,"pins":[[2500.748,-1977.1761,"",""],[2500.748,-1914.1839,"",""],[2469.252,-1914.1839,"",""],[2469.252,-1977.1761,"",""]]},{"d":"R21","v":"10K","fp":"R0603","layer":1,"x":1835.0,"y":-1300.0,"angle":270.0,"pins":[[1819.252,-1268.5039,"",""],[1819.252,-1331.4961,"",""],[1850.748,-1331.4961,"",""],[1850.748,-1268.5039,"",""]]},{"d":"R22","v":"33","fp":"R0603","layer":1,"x":3050.0,"y":-285.0,"angle":180.0,"pins":[[3081.4961,-269.252,"",""],[3018.5039,-269.252,"",""],[3018.5039,-300.748,"",""],[3081.4961,-300.748,"",""]]},{"d":"R23","v":"33","fp":"R0603","layer":1,"x":2620.0,"y":-285.0,"angle":180.0,"pins":[[2651.4961,-269.252,"",""],[2588.5039,-269.252,"",""],[2588.5039,-300.748,"",""],[2651.4961,-300.748,"",""]]},{"d":"R24","v":"33","fp":"R0603","layer":1,"x":2203.492,"y":-288.492,"angle":180.0,"pins":[[2234.9881,-272.744,"",""],[2171.9959,-272.744,"",""],[2171.9959,-304.24,"",""],[2234.9881,-304.24,"",""]]},{"d":"SW1","v":"","fp":"KEY-SMD_L6.1-W3.8-LS8.0","layer":1,"x":1990.0,"y":-2050.0,"angle":0.0,"pins":[[1927.0079,-2112.9921,"",""],[2052.9921,-2112.9921,"",""],[2052.9921,-1987.0079,"",""],[1927.0079,-1987.0079,"",""]]},{"d":"U1","v":"","fp":"LQFP-64_L10.0-W10.0-P0.50-LS12.0-BL","layer":1,"x":2190.0,"y":-1255.0,"angle":0.0,"pins":[[1953.7795,-1491.2205,"",""],[2426.2205,-1491.2205,"",""],[2426.2205,-1018.7795,"",""],[1953.7795,-1018.7795,"",""]]},{"d":"U2","v":"","fp":"SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL-EP","layer":1,"x":1287.0,"y":-690.0,"angle":90.0,"pins":[[1363.7717,-786.4567,"",""],[1363.7717,-593.5433,"",""],[1210.2283,-593.5433,"",""],[1210.2283,-786.4567,"",""]]},{"d":"U3","v":"","fp":"SMA_L4.2-W2.6-LS5.1-RD","layer":1,"x":1075.0,"y":-990.0,"angle":180.0,"pins":[[1159.6457,-938.8189,"",""],[990.3543,-938.8189,"",""],[990.3543,-1041.1811,"",""],[1159.6457,-1041.1811,"",""]]},{"d":"U4","v":"","fp":"SMA_L4.2-W2.6-LS5.1-RD","layer":1,"x":445.0,"y":-720.0,"angle":180.0,"pins":[[529.6457,-668.8189,"",""],[360.3543,-668.8189,"",""],[360.3543,-771.1811,"",""],[529.6457,-771.1811,"",""]]},{"d":"U5","v":"","fp":"HDR-TH_8P-P2.54-V-F_ESW-108-44-G-D","layer":1,"x":3280.0,"y":-885.0,"angle":90.0,"pins":[[3342.9921,-947.9921,"",""],[3342.9921,-822.0079,"",""],[3217.0079,-822.0079,"",""],[3217.0079,-947.9921,"",""]]},{"d":"U6","v":"","fp":"SOT-223-3_L6.5-W3.4-P2.30-LS7.0-BR","layer":1,"x":245.0,"y":-1925.0,"angle":0.0,"pins":[[182.0079,-1987.9921,"",""],[307.9921,-1987.9921,"",""],[307.9921,-1862.0079,"",""],[182.0079,-1862.0079,"",""]]},{"d":"U9","v":"","fp":"HDR-TH_8P-P2.54-V-F_ESW-108-44-G-D","layer":1,"x":1525.0,"y":-100.0,"angle":180.0,"pins":[[1587.9921,-37.0079,"",""],[1462.0079,-37.0079,"",""],[1462.0079,-162.9921,"",""],[1587.9921,-162.9921,"",""]]},{"d":"U10","v":"","fp":"SW-SMD_YSSP2AG00","layer":1,"x":1085.0,"y":-355.0,"angle":0.0,"pins":[[1022.0079,-417.9921,"",""],[1147.9921,-417.9921,"",""],[1147.9921,-292.0079,"",""],[1022.0079,-292.0079,"",""]]},{"d":"U11","v":"","fp":"HDR-TH_8P-P2.54-V-F_ESW-108-44-G-D","layer":1,"x":2750.0,"y":-2400.0,"angle":180.0,"pins":[[2812.9921,-2337.0079,"",""],[2687.0079,-2337.0079,"",""],[2687.0079,-2462.9921,"",""],[2812.9921,-2462.9921,"",""]]},{"d":"U13","v":"","fp":"HDR-TH_8P-P2.54-V-F_ESW-108-44-G-D","layer":1,"x":1365.0,"y":-1370.0,"angle":270.0,"pins":[[1302.0079,-1307.0079,"",""],[1302.0079,-1432.9921,"",""],[1427.9921,-1432.9921,"",""],[1427.9921,-1307.0079,"",""]]},{"d":"X1","v":"8MHz","fp":"CRYSTAL-SMD_4P-L3.2-W2.5-BL_SIT8008BI","layer":1,"x":2115.0,"y":-1680.0,"angle":180.0,"pins":[[2177.9921,-1617.0079,"",""],[2052.0079,-1617.0079,"",""],[2052.0079,-1742.9921,"",""],[2177.9921,-1742.9921,"",""]]}]};
+
+/* ========================= 工程文件解析（纯本地） ========================= */
+/* .epro2 是 zip：project2.json + 一个 .epru（按行存的 {header}||{body} 文本流） */
+
+/* 优先用浏览器原生解压；老浏览器（Chrome<103 / Firefox<113 / Safari<16.4）没有
+ * DecompressionStream，就用下面这段纯 JS 的 inflate 兜底 —— 这样把文件拷给谁都能用。 */
+async function inflateRaw(bytes) {
+  if (typeof DecompressionStream === 'function') {
+    try {
+      const ds = new DecompressionStream('deflate-raw');
+      const st = new Blob([bytes]).stream().pipeThrough(ds);
+      return new Uint8Array(await new Response(st).arrayBuffer());
+    } catch (_) { /* 不支持 deflate-raw，落到纯 JS */ }
+  }
+  return inflateRawJS(bytes);
+}
+
+/* 纯 JS 的 raw DEFLATE 解码（RFC 1951）。无依赖、无网络。 */
+function inflateRawJS(u8) {
+  let pos = 0, bb = 0, bc = 0;
+  const out = [];
+  const bits = n => {
+    if (!n) return 0;
+    while (bc < n) { bb |= (u8[pos++] | 0) << bc; bc += 8; }
+    const v = bb & ((1 << n) - 1); bb >>>= n; bc -= n; return v;
+  };
+  const LB = [3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258];
+  const LE = [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0];
+  const DB = [1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577];
+  const DE = [0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13];
+  const ORD = [16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15];
+
+  const mkTree = lens => {
+    let max = 0;
+    for (const l of lens) if (l > max) max = l;
+    const cnt = new Array(max + 1).fill(0);
+    for (const l of lens) if (l) cnt[l]++;
+    const next = new Array(max + 1).fill(0);
+    let code = 0;
+    for (let b = 1; b <= max; b++) { code = (code + cnt[b - 1]) << 1; next[b] = code; }
+    const map = new Map();
+    for (let s = 0; s < lens.length; s++) {
+      const l = lens[s]; if (!l) continue;
+      map.set((l << 16) | next[l], s); next[l]++;
+    }
+    return { max, map };
+  };
+  const readSym = t => {
+    let code = 0, len = 0;
+    for (;;) {
+      code = (code << 1) | bits(1); len++;
+      const s = t.map.get((len << 16) | code);
+      if (s !== undefined) return s;
+      if (len > t.max) throw new Error('压缩数据有误');
+    }
+  };
+
+  let fL = null, fD = null;
+  const fixed = () => {
+    if (fL) return;
+    const l = new Array(288);
+    for (let i = 0; i < 144; i++) l[i] = 8;
+    for (let i = 144; i < 256; i++) l[i] = 9;
+    for (let i = 256; i < 280; i++) l[i] = 7;
+    for (let i = 280; i < 288; i++) l[i] = 8;
+    fL = mkTree(l); fD = mkTree(new Array(30).fill(5));
+  };
+
+  let last = 0;
+  while (!last) {
+    last = bits(1);
+    const type = bits(2);
+
+    if (type === 0) {                       // 不压缩块：弃掉剩余位，回到字节边界
+      bb = 0; bc = 0;
+      const len = u8[pos] | (u8[pos + 1] << 8); pos += 4;
+      for (let i = 0; i < len; i++) out.push(u8[pos++]);
+      continue;
+    }
+
+    let lt, dt;
+    if (type === 1) { fixed(); lt = fL; dt = fD; }
+    else if (type === 2) {                  // 动态霍夫曼
+      const hlit = bits(5) + 257, hdist = bits(5) + 1, hclen = bits(4) + 4;
+      const cl = new Array(19).fill(0);
+      for (let i = 0; i < hclen; i++) cl[ORD[i]] = bits(3);
+      const ct = mkTree(cl);
+      const lens = [];
+      while (lens.length < hlit + hdist) {
+        const s = readSym(ct);
+        if (s < 16) lens.push(s);
+        else if (s === 16) { const r = 3 + bits(2), p = lens[lens.length - 1]; for (let i = 0; i < r; i++) lens.push(p); }
+        else if (s === 17) { const r = 3 + bits(3); for (let i = 0; i < r; i++) lens.push(0); }
+        else { const r = 11 + bits(7); for (let i = 0; i < r; i++) lens.push(0); }
+      }
+      lt = mkTree(lens.slice(0, hlit));
+      dt = mkTree(lens.slice(hlit, hlit + hdist));
+    } else throw new Error('压缩块类型异常');
+
+    for (;;) {
+      const s = readSym(lt);
+      if (s < 256) { out.push(s); continue; }
+      if (s === 256) break;
+      const li = s - 257;
+      const len = LB[li] + bits(LE[li]);
+      const ds = readSym(dt);
+      const dist = DB[ds] + bits(DE[ds]);
+      const start = out.length - dist;
+      if (start < 0) throw new Error('压缩数据有误');
+      for (let i = 0; i < len; i++) out.push(out[start + i]);
+    }
+  }
+  return Uint8Array.from(out);
+}
+
+async function unzip(buf) {
+  const dv = new DataView(buf);
+  const u8 = new Uint8Array(buf);
+  let eocd = -1;
+  const stop = Math.max(0, buf.byteLength - 66000);
+  for (let i = buf.byteLength - 22; i >= stop; i--) {
+    if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error('不是有效的工程包（zip 结构没找到）');
+  const n = dv.getUint16(eocd + 10, true);
+  let off = dv.getUint32(eocd + 16, true);
+  const out = {};
+  for (let i = 0; i < n; i++) {
+    if (dv.getUint32(off, true) !== 0x02014b50) break;
+    const method = dv.getUint16(off + 10, true);
+    const csize = dv.getUint32(off + 20, true);
+    const nlen = dv.getUint16(off + 28, true);
+    const elen = dv.getUint16(off + 30, true);
+    const clen = dv.getUint16(off + 32, true);
+    const lho = dv.getUint32(off + 42, true);
+    const name = new TextDecoder().decode(u8.subarray(off + 46, off + 46 + nlen));
+    const lnlen = dv.getUint16(lho + 26, true);
+    const lelen = dv.getUint16(lho + 28, true);
+    out[name] = { method, csize, dstart: lho + 30 + lnlen + lelen };
+    off += 46 + nlen + elen + clen;
+  }
+  return { u8, out };
+}
+
+async function entryText(z, name) {
+  const e = z.out[name];
+  if (!e) return null;
+  const raw = z.u8.subarray(e.dstart, e.dstart + e.csize);
+  const bytes = e.method === 0 ? raw : await inflateRaw(raw);
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
+const tryJson = s => { try { return JSON.parse(s); } catch (_) { return null; } };
+
+/* 解析 .epru 文本流：每行 {header}||{body}，按 DOCHEAD 切文档 */
+function parseEpru(text) {
+  const comps = [], attrs = new Map(), devs = new Map(), fps = new Map();
+  let cur = null, curUuid = null, board = null;
+
+  for (const line of text.split('\n')) {
+    const t = line.trim();
+    if (!t) continue;
+    const p = t.indexOf('||');
+    let hs, bs;
+    if (p < 0) {
+      const q = t.indexOf('|');
+      if (q < 0) continue;
+      hs = t.slice(0, q); bs = t.slice(q + 1);
+    } else { hs = t.slice(0, p); bs = t.slice(p + 2); }
+    bs = bs.replace(/\|+$/, '');
+    const h = tryJson(hs);
+    if (!h) continue;
+    const b = bs ? tryJson(bs) : null;
+
+    if (h.type === 'DOCHEAD') {
+      cur = (b && b.docType) || null;
+      curUuid = (b && b.uuid) || null;
+      continue;
+    }
+    if (!b || typeof b !== 'object') continue;
+
+    if (cur === 'DEVICE' && h.type === 'META') {
+      /* 器件库条目的标题也要留下：很多 MOS / 稳压器 Value 是空的，
+         只有库标题写着「N-MOSFET 30V 5.8A」，这是唯一能拿到的型号线索 */
+      devs.set(curUuid, { a: b.attributes || {}, t: String(b.title || '') });
+      continue;
+    }
+    if (cur === 'FOOTPRINT' && h.type === 'META') { if (b.title) fps.set(curUuid, b.title); continue; }
+    if (cur !== 'PCB') continue;
+
+    if (h.type === 'COMPONENT') { b.__id = h.id; comps.push(b); }
+    else if (h.type === 'ATTR') {
+      if (!attrs.has(b.parentId)) attrs.set(b.parentId, {});
+      attrs.get(b.parentId)[b.key] = b.value;
+    } else if ((h.type === 'POLY' || h.type === 'LINE') && b.layerId === 11 && Array.isArray(b.path) && !board) {
+      if (b.path[0] === 'R') {
+        board = { x: b.path[1], y: b.path[2], w: b.path[3], h: b.path[4] };
+      } else {
+        const nums = b.path.filter(v => typeof v === 'number');
+        const xs = [], ys = [];
+        for (let i = 0; i + 1 < nums.length; i += 2) { xs.push(nums[i]); ys.push(nums[i + 1]); }
+        if (xs.length > 2) {
+          board = {
+            x: Math.min(...xs), y: Math.max(...ys),
+            w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys),
+          };
+        }
+      }
+    }
+  }
+  return { comps: buildComps(comps, attrs, devs, fps), board };
+}
+
+/* 器件名 → 本体尺寸（mm），只用于画个像样的方块 */
+function estimateSize(fp) {
+  const s = String(fp || '');
+  if (/0402/.test(s)) return [1.0, 0.5];
+  if (/0603/.test(s)) return [1.6, 0.8];
+  if (/0805/.test(s)) return [2.0, 1.25];
+  if (/1206/.test(s)) return [3.2, 1.6];
+  if (/SOT-?23|SOT23/.test(s)) return [2.9, 1.3];
+  if (/SOD-?123/.test(s)) return [1.7, 0.9];
+  if (/SOP-?8|SOIC-?8/.test(s)) return [4.9, 3.9];
+  if (/LQFP-?48|TQFP-?48/.test(s)) return [9, 9];
+  if (/LQFP-?64/.test(s)) return [12, 12];
+  if (/LQFP-?100/.test(s)) return [14, 14];
+  if (/QFN|DFN/.test(s)) return [5, 5];
+  if (/SMA|SMB/.test(s)) return [4.3, 2.6];
+  if (/BD5|BD6/.test(s)) return [5.4, 5.4];
+  if (/0603|0805|1206/.test(s)) return [2.0, 1.25];
+  return [3.2, 3.2];
+}
+
+/* 器件库名长得像「型号」才算数：AO3400A / SI2302 是型号，
+   Res_0603 / MOSFET-N_P-Channel 只是库里的通用名，拿来做阻值会误导人。 */
+function looksLikePartNo(s) {
+  const t = String(s || '').trim();
+  if (!t || t.length > 28) return false;
+  if (/^(RES|CAP|IND|LED|DIODE|CRYSTAL|XTAL|HDR|CONN|SW|FUSE|MOSFET|BJT|TRANS|IC|CHIP|TEST|TP|LOGO)[-_ ]/i.test(t)) return false;
+  return /[A-Za-z]/.test(t) && /\d/.test(t);
+}
+
+/* ===== 从封装名反推「焊盘排布 + 本体尺寸」 =================================
+ * 封装名本身就带着几何信息，没必要猜：
+ *   HDR-TH_7P-P2.54-V-M       → 7 脚、间距 2.54mm、排成一行、长 17.78mm
+ *   SOIC-8_L4.9-W3.9-P1.27    → 8 脚、两排、本体 4.9×3.9、脚距 1.27
+ *   LQFP-64_L10.0-W10.0-P0.50 → 64 脚、四边、本体 10×10
+ *   SMA_L4.2-W2.6-LS5.1-RD    → 2 脚、本体 4.2×2.6
+ * 以前只查一张尺寸表，认不出排针就退回 3.2mm 方块 —— 所以排针画成一个小方框。
+ * ========================================================================= */
+const MM2MIL = 1 / 0.0254;
+
+function fpGeom(fp) {
+  const s = String(fp || '');
+  const grab = re => { const m = re.exec(s); return m ? parseFloat(m[1]) : 0; };
+  const L = grab(/(?:^|[_-])L([\d.]+)/);          // 长边
+  const W = grab(/(?:^|[_-])W([\d.]+)/);          // 短边
+  const pitch = grab(/(?:^|[_-])P([\d.]+)/);      // 焊盘中心距
+
+  let n = 0, m, rows = 0;
+  if ((m = /(?:^|[_-])(\d+)P[_-]/.exec(s)) || (m = /(?:^|[_-])(\d+)P$/.exec(s))) n = +m[1];
+  /* 另一种常见写法：HDR-F-2.54_1x7 / PinHeader_1x7_P2.54mm → 「行 × 列」 */
+  if (!n && (m = /(?:^|[_-])(\d+)[xX](\d+)(?=[_-]|$)/.exec(s))) { rows = +m[1]; n = rows * +m[2]; }
+  if (!n && (m = /(?:SOIC|SOP|TSSOP|MSOP|LQFP|TQFP|QFN|DFN|SON|BGA|DIP)-(\d+)/i.exec(s))) n = +m[1];
+  if (!n && /SOT-223/.test(s)) n = 3;
+  if (!n && /SOT-23/.test(s)) n = 3;
+  if (!n && /SOD-/.test(s)) n = 2;
+  if (!n && /(?:SMA|SMB|SMC)_/.test(s)) n = 2;
+
+  let kind;
+  if (/(?:LQFP|TQFP|QFP|QFN|DFN|SON|BGA)/i.test(s)) kind = 'quad';
+  else if (/(?:SOIC|SOP|TSSOP|MSOP)/i.test(s)) kind = 'dual';
+  else if (n >= 4 && L && W && !pitch) kind = 'quad';   // 4 脚晶振：四角各一个焊盘
+  else if (rows >= 2) kind = 'dual';                     // 2x5 双排排针
+  else if (n >= 2) kind = 'row';                         // 排针 / 连接器 / SOT / 二极管
+  else kind = 'two';                                     // 认不出脚数：当两端元件
+
+  return { n, pitch, L, W, kind };
+}
+
+/* 生成焊盘坐标（mil，已按 angle 旋转）+ 本体尺寸（mm）+ 焊盘半径（mm） */
+function makePads(g, est, x, y, angle) {
+  const rad = (Number(angle) || 0) * Math.PI / 180;
+  const cs = Math.cos(rad), sn = Math.sin(rad);
+  const put = (px, py) => [x + px * cs - py * sn, y + px * sn + py * cs, '', ''];
+  const list = [];
+  const n = g.n | 0;
+  let L = g.L || est[0];
+  let W = g.W || est[1];
+  let sp = 0;                 // 相邻焊盘间距，用来定焊盘半径
+  const P = g.pitch || 0;
+
+  if (g.kind === 'row' && n >= 2) {
+    /* 排针：N 个孔等间距排在一条线上。名字里没写长度就按「N 个间距」算，
+       这正是 7P/2.54 排针 17.78mm 的来历 */
+    const p = P || (g.L ? Math.max(0.4, (g.L - 0.8) / Math.max(1, n - 1)) : 2.54);
+    let span = (n - 1) * p;
+    if (g.L) span = Math.min(span, Math.max(0, g.L - 0.8));   // 有真实长宽就别超出本体
+    else L = Math.max(L, (n - 1) * p + p);
+    if (!g.W) W = Math.max(1.8, p);          // 排针本体高 ≈ 一个间距，1.25 间距的连接器给个下限
+    const step = n > 1 ? span / (n - 1) : 0;
+    sp = step;
+    for (let i = 0; i < n; i++) list.push(put((i - (n - 1) / 2) * step * MM2MIL, 0));
+
+  } else if (g.kind === 'dual' && n >= 2) {
+    const per = Math.max(1, Math.round(n / 2));
+    const p = P || (g.L ? Math.max(0.4, (g.L - 1.0) / Math.max(1, per - 1)) : 1.27);
+    let span = (per - 1) * p;
+    if (g.L) span = Math.min(span, Math.max(0.4, g.L - 1.0));
+    const yy = g.W ? Math.max(0.4, g.W / 2 - 0.5) : Math.max(0.6, p * 0.6);
+    if (!g.W) W = Math.max(W, 2 * yy + 1.0);
+    if (!g.L) L = Math.max(L, span + 1.2);
+    const step = per > 1 ? span / (per - 1) : 0;
+    sp = step;
+    for (let i = 0; i < per; i++) {
+      const px = (i - (per - 1) / 2) * step * MM2MIL;
+      list.push(put(px, -yy * MM2MIL), put(px, yy * MM2MIL));
+    }
+
+  } else if (g.kind === 'quad' && n >= 4) {
+    const per = Math.max(1, Math.round(n / 4));
+    const p = P || (g.L ? Math.max(0.25, (g.L - 1.0) / (per + 1)) : 0.5);
+    const ex = Math.max(0.4, L / 2 - 0.45);
+    const ey = Math.max(0.4, W / 2 - 0.45);
+    sp = p;
+    for (let i = 0; i < per; i++) {
+      const d = (i - (per - 1) / 2) * p * MM2MIL;
+      list.push(put(d, -ey * MM2MIL), put(d, ey * MM2MIL));
+      list.push(put(-ex * MM2MIL, d), put(ex * MM2MIL, d));
+    }
+
+  } else {
+    /* 两端各一个焊盘：0603 / 0805 / SMA / 0805 保险丝都走这里 */
+    const dx = Math.max(0.3, L / 2 - 0.45);
+    sp = 2 * dx;
+    list.push(put(-dx * MM2MIL, 0), put(dx * MM2MIL, 0));
+  }
+
+  /* 焊盘半径跟着脚距走：2.54 排针画出来是明显的圆孔，0603 还是一个小点 */
+  const padR = sp ? Math.min(1.0, Math.max(0.2, sp * 0.33)) : 0.12;
+  return { pads: list, box: [L, W], padR };
+}
+
+function buildComps(raw, attrs, devs, fps) {
+  const out = [];
+  for (const c of raw) {
+    const a = attrs.get(c.__id) || {};
+    const d = String(a.Designator || '').trim();
+    if (!d) continue;
+    const dev = tryJson((c.attrs || {}).DeviceName) || {};
+    const devE = devs.get(a.Device || dev.uuid || '') || { a: {}, t: '' };
+    const devA = devE.a || {};
+    const fpuuid = a.Footprint || devA.Footprint || '';
+    const fp = fps.get(fpuuid) || dev.name || devE.t || '';
+    const libName = String(dev.name || '');
+    /* 值的回落顺序：实例值 → 器件默认值 → 器件库名（仅当像型号）→ 器件库标题。
+       型号比描述有用：能拿到 SI2302 就不要显示「N-MOSFET 20V 2.5A」。
+       后几级专治 MOS / 二极管 / 芯片这类「Value 经常留空」的器件。 */
+    let v = (c.attrs || {}).Value || (a && a.Value) || devA.Value || '';
+    if (!v && looksLikePartNo(libName)) v = libName;
+    if (!v && devE.t) v = devE.t;
+
+    /* 旋转角度：PCB 的 COMPONENT 记录里字段叫 rotation（0/90/180/270），
+       不是 angle。早先读错字段，所有器件都被当成 0° 横放 —— 竖着摆的电阻、
+       排针就全画横了。这里两个名字都认，并归一到 [0,360)。 */
+    const x = Number(c.x) || 0, y = Number(c.y) || 0;
+    let ang = Number(c.rotation);
+    if (!isFinite(ang)) ang = Number(c.angle);
+    if (!isFinite(ang)) ang = 0;
+    ang = ((ang % 360) + 360) % 360;
+    const geo = makePads(fpGeom(fp), estimateSize(fp), x, y, ang);
+    out.push({
+      d, v: String(v || ''), fp, dev: libName,
+      layer: Number(c.layerId) || 1,
+      x, y, angle: ang,
+      pins: geo.pads,
+      box: geo.box,
+      padR: geo.padR,
+      syn: true,                 // 焊盘是推算的，不是 EDA 给的真坐标
+    });
+  }
+  return out;
+}
+
+/* -------------------------- 工程缓存（本机） -------------------------- */
+/* v2：加了旋转角度，v1 的缓存里所有器件都是 0°，留着会一直横着显示 */
+const LSKEY = 'soldermap.proj.v2';
+function saveProj(o) { try { localStorage.setItem(LSKEY, JSON.stringify(o)); } catch (_) { } }
+function readSaved() {
+  try {
+    const s = localStorage.getItem(LSKEY);
+    return s ? JSON.parse(s) : null;
+  } catch (_) { return null; }
+}
+
+/* 手机上没有拖拽，文案得跟着改，否则一直提示「拖进来」，用户无从下手 */
+if (isMobileLayout()) {
+  const t1 = document.querySelector('#drop .t1');
+  const t2 = document.querySelector('#drop .t2');
+  if (t1) t1.textContent = '选择嘉立创工程文件';
+  if (t2) t2.innerHTML = '支持 <code>.epro2</code>（EDA 里「文件 → 导出 → 嘉立创EDA 工程」得到的那个包）<br>选好后自动读出器件、位号、阻值容值、封装和板框';
+}
+/* APK 里「选择文件」是原生弹出的两个入口，还能接微信的「用其他应用打开」，
+   这几句得写在手机版文案之后覆盖掉，否则用户不知道有这条路 */
+if (IN_APK) {
+  const t2 = document.querySelector('#drop .t2');
+  if (t2) t2.innerHTML = '支持 <code>.epro2</code>（EDA 里「文件 → 导出 → 嘉立创EDA 工程」）<br>'
+    + '点「选择文件」能直接翻 <b>微信 / QQ 收到的文件</b><br>'
+    + '也可以在微信里长按文件 →「用其他应用打开」→ 焊接分组';
+  const t3 = document.querySelector('#drop .t3');
+  if (t3) t3.textContent = '全部在本机解析，不上传、不联网、不花钱';
+}
+
+function showDrop(err) {
+  const el = document.getElementById('drop');
+  if (!el) return;                 // 导出的交互网页没有拖拽层
+  el.classList.add('on');
+  /* 已经有板子在显示时，这一层是「再导入一个」，得留条退路，不然只能被困在这儿 */
+  const bc = document.getElementById('btnCancel');
+  if (bc) bc.style.display = COMPS.length ? '' : 'none';
+  const e2 = document.getElementById('dropErr');
+  if (err) { e2.textContent = err; e2.classList.add('on'); }
+  else { e2.classList.remove('on'); }
+}
+
+function hideDrop() {
+  const el = document.getElementById('drop');
+  if (el) el.classList.remove('on');
+}
+
+async function openProject(file) {
+  if (!file) return;
+  showDrop('');
+  const e2 = document.getElementById('dropErr');
+  if (/\.eprj2$/i.test(file.name)) {
+    e2.style.color = '#A32D2D';
+    e2.textContent = '.eprj2 是 EDA 的本地数据库，读不了。请在 EDA 里「文件 → 导出 → 嘉立创EDA 工程」，拿到 .epro2 再拖进来。';
+    e2.classList.add('on');
+    return;
+  }
+  e2.textContent = '正在解析 ' + file.name + ' …';
+  e2.style.color = '#6b7280';
+  e2.classList.add('on');
+  try {
+    const z = await unzip(await file.arrayBuffer());
+    const epruName = Object.keys(z.out).find(n => /\.epru$/i.test(n));
+    if (!epruName) throw new Error('这个包里没有 .epru，可能不是嘉立创工程包');
+    const r = parseEpru(await entryText(z, epruName));
+    if (!r.comps.length) throw new Error('解析到了文档，但没有元件位号');
+
+    let name = file.name.replace(/\.(epro2|zip)$/i, '');
+    const pj = await entryText(z, 'project2.json');
+    if (pj) { const o = tryJson(pj); if (o && o.title) name = o.title; }
+
+    PROJNAME = name;
+    SOLO = true;
+    USING_DEFAULT = false;
+    document.body.classList.add('solo');
+    document.title = '焊接分组 · ' + name;
+    const bs = document.getElementById('btnSel');
+    if (bs) bs.style.display = 'none';
+
+    saveProj({ name, comps: r.comps, board: r.board, ts: Date.now() });
+    document.getElementById('drop').classList.remove('on');
+    applyData(r.comps, r.board, {});
+  } catch (e) {
+    e2.style.color = '#A32D2D';
+    e2.textContent = '解析失败：' + (e.message || e);
+    e2.classList.add('on');
+  }
+}
+
+/* -------------------------------- 分组逻辑 -------------------------------- */
+const normVal = v => String(v || '').trim().toUpperCase();
+
+/* 显示用：保留元件原来的大小写（4.7uF 不要变成 4.7UF） */
+const SEMI_FP = /SOIC|SOP|SOT|TSSOP|MSOP|QFN|DFN|LQFP|TQFP|QFP|BGA|SMA|SMB|SMC|SOD|TO-?\d|DPAK|PAK|SON|WSON|LED/i;
+
+function fmtVal(g, catId) {
+  const raw = String((g && g.raw != null) ? g.raw : (g && g.v) || '').trim();
+  if (!raw) {
+    /* 连接器/排针没值很正常，只对半导体封装（MOS、二极管、芯片）亮提示：
+       这几个才是「没读到型号就可能拿错料」的角色 */
+    return SEMI_FP.test(String((g && (g.fpRaw || g.fp)) || '')) ? '⚠ 值缺失' : '(无值)';
+  }
+  if (/^\d+(\.\d+)?$/.test(raw)) return raw + (catId === 'C' ? 'pF' : catId === 'L' ? 'nH' : 'Ω');
+  return raw;
+}
+/* 封装短名：R0603→0603，C0402→0402；CAP-SMD_BD5.0-L5.3… → BD5.0 */
+function shortFp(fp) {
+  const s = String(fp || '').trim();
+  if (!s) return '—';
+  if (/^[RCQLD]\d{3,4}$/i.test(s)) return s.slice(1);
+  let t = s.replace(/^(CAP|RES|IND|LED|DIODE|XTAL)-SMD_/i, '');
+  if (t.length > 16) {
+    const m = /^([A-Za-z]{1,6}\d+(?:\.\d+)?)/.exec(t);
+    if (m) t = m[1];
+  }
+  return t.length > 17 ? t.slice(0, 16) + '…' : t;
+}
+function dnum(d) { return parseInt(String(d).replace(/\D+/g, ''), 10) || 0; }
+
+/* 按“从上到下、从左到右”排号：图上找件有顺序感，chips 与图上序号一一对应 */
+function orderItems(items) {
+  return items.slice().sort((a, b) => {
+    const ra = bodyRect(a), rb = bodyRect(b);
+    const ba = Math.floor(-ra.y / 8), bb = Math.floor(-rb.y / 8);
+    return (ba - bb) || (ra.x - rb.x) || (dnum(a.d) - dnum(b.d));
+  });
+}
+
+function buildGroups(catId) {
+  const map = new Map();
+  for (const comp of COMPS) {
+    if (catOf(comp) !== catId) continue;
+    /* 关键：阻值 + 封装 一起做分组键，同阻值不同封装不会被混在一起。
+       但值读不到时不能只按封装合并 —— 那样 AO3400 和 SI2302 会被并成一行，
+       焊接时按这行拿料就会拿错。所以空值再拼上器件库名/位号，宁可多几行。 */
+    const vv = normVal(comp.v);
+    const fpp = String(comp.fp || '');
+    const key = vv
+      ? vv + '|' + fpp
+      : '∅|' + fpp + '|' + (String(comp.dev || '').trim() || String(comp.d || ''));
+    if (!map.has(key)) {
+      map.set(key, {
+        key, v: vv,
+        raw: String(comp.v || '').trim(),
+        fp: shortFp(comp.fp), fpRaw: fpp, items: [],
+      });
+    }
+    map.get(key).items.push(comp);
+  }
+  const arr = [...map.values()];
+  for (const g of arr) g.items.sort((a, b) => dnum(a.d) - dnum(b.d));
+  arr.sort((a, b) => b.items.length - a.items.length || String(a.v).localeCompare(String(b.v)));
+  return arr;
+}
+
+/* -------------------------------- 已焊标记 -------------------------------- */
+const markKey = g => 'solder:' + PROJ + ':' + cat + ':' + g.key;
+function loadMarks(g) {
+  try { marks = JSON.parse(localStorage.getItem(markKey(g)) || '{}'); } catch (_) { marks = {}; }
+}
+function saveMarks(g) {
+  try { localStorage.setItem(markKey(g), JSON.stringify(marks)); } catch (_) { }
+}
+function countMarked(g) { return g.items.filter(c => marks[c.d]).length; }
+function peekMarked(g) {
+  try {
+    const m = JSON.parse(localStorage.getItem('solder:' + PROJ + ':' + cat + ':' + g.key) || '{}');
+    return g.items.filter(c => m[c.d]).length;
+  } catch (_) { return 0; }
+}
+
+/* --------------------------------- 几何 ---------------------------------- */
+function bodyRect(c, pad) {
+  pad = (pad == null) ? 0.15 : pad;
+
+  /* 有精确本体尺寸（从封装名解析来的）就直接用，旋转后取包围盒。
+     这样 7P 排针就是细长条、SOIC-8 就是 4.9×3.9，不再一律小方块。 */
+  const box = c.box;
+  if (box && box[0] > 0 && box[1] > 0) {
+    const hw = box[0] / 2, hh = box[1] / 2;
+    const rad = (Number(c.angle) || 0) * Math.PI / 180;
+    const cs = Math.cos(rad), sn = Math.sin(rad);
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    for (const [px, py] of [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh]]) {
+      const X = c.x + (px * cs - py * sn) * MM2MIL;
+      const Y = c.y + (px * sn + py * cs) * MM2MIL;
+      if (X < x0) x0 = X; if (X > x1) x1 = X;
+      if (Y < y0) y0 = Y; if (Y > y1) y1 = Y;
+    }
+    return {
+      x: x0 * MIL - pad, y: y0 * MIL - pad,
+      w: (x1 - x0) * MIL + 2 * pad, h: (y1 - y0) * MIL + 2 * pad,
+    };
+  }
+
+  const pins = c.pins || [];
+  if (pins.length) {
+    const xs = pins.map(p => p[0]), ys = pins.map(p => p[1]);
+    const dx = (Math.max(...xs) - Math.min(...xs)) * MIL;
+    const dy = (Math.max(...ys) - Math.min(...ys)) * MIL;
+    const cx = (Math.max(...xs) + Math.min(...xs)) / 2 * MIL;
+    const cy = (Math.max(...ys) + Math.min(...ys)) / 2 * MIL;
+    let w, h;
+    if (dy > dx * 1.5) { w = 0.9 + 2 * pad; h = dy + 0.9 + 2 * pad; }
+    else if (dx > dy * 1.5) { w = dx + 0.9 + 2 * pad; h = 0.9 + 2 * pad; }
+    else { w = dx + 2 * pad; h = dy + 2 * pad; }
+    return { x: cx - w / 2, y: cy - h / 2, w, h };
+  }
+  const x = c.x * MIL, y = c.y * MIL;
+  return { x: x - 0.8, y: y - 0.4, w: 1.6, h: 0.8 };
+}
+
+/* --------------------------------- 绘制 ---------------------------------- */
+function fitCanvas(el, w, h, dpr) {
+  el.width = Math.round(w * dpr); el.height = Math.round(h * dpr);
+  el.style.width = w + 'px'; el.style.height = h + 'px';
+}
+
+function drawBase() {
+  const W = Math.max(240, stage.clientWidth), H = Math.max(200, stage.clientHeight);
+  const DPR = Math.max(2, Math.min(3, window.devicePixelRatio || 1));
+  fitCanvas(cvBase, W, H, DPR);
+  fitCanvas(cvFx, W, H, DPR);
+  const g = cvBase.getContext('2d');
+  g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H);
+  cvFx.getContext('2d').setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  /* --- 视图范围 --- */
+  let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+  const rects = COMPS.map(c => ({ c, r: bodyRect(c, 0.3) }));
+  for (const { r } of rects) {
+    minX = Math.min(minX, r.x); minY = Math.min(minY, r.y);
+    maxX = Math.max(maxX, r.x + r.w); maxY = Math.max(maxY, r.y + r.h);
+  }
+  if (BOARD) {
+    minX = Math.min(minX, BOARD.x * MIL); maxX = Math.max(maxX, (BOARD.x + BOARD.w) * MIL);
+    minY = Math.min(minY, (BOARD.y - BOARD.h) * MIL); maxY = Math.max(maxY, BOARD.y * MIL);
+  }
+  const P = 2.0;
+  const vx0 = minX - P, vx1 = maxX + P, vy0 = minY - P, vy1 = maxY + P;
+  const pad = 18;
+  const ppm0 = Math.max(1, Math.min((W - pad * 2) / (vx1 - vx0), (H - pad * 2) / (vy1 - vy0)));
+  const ox = pad + (W - pad * 2 - (vx1 - vx0) * ppm0) / 2;
+  const oy = pad + (H - pad * 2 - (vy1 - vy0) * ppm0) / 2;
+
+  /* 用户视图：以画布中心为原点放大 k 倍，再平移 (dx,dy)。
+     S() 是唯一的坐标换算入口，命中测试 / 标签避让 / 引线因此全都自动跟着缩放走 */
+  clampView(W, H);
+  const K = VIEW.k, CCX = W / 2, CCY = H / 2;
+  const ppm = ppm0 * K;              // 有效缩放：线宽、焊盘半径、字号判断都用它
+  const S = (mx, my) => {
+    const sx = ox + (mx - vx0) * ppm0;
+    const sy = oy + (vy1 - my) * ppm0;
+    return [CCX + (sx - CCX) * K + VIEW.dx, CCY + (sy - CCY) * K + VIEW.dy];
+  };
+
+  layout = { W, H, ppm, ppm0, K, hits: [] };
+
+  // 所有元件的屏幕矩形，供标签避让使用
+  const partBoxes = rects.map(({ r }) => {
+    const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
+    return { x: p1[0], y: p1[1], w: p2[0] - p1[0], h: p2[1] - p1[1] };
+  });
+
+  /* --- 板框 --- */
+  if (BOARD) {
+    const bx0 = BOARD.x * MIL, bx1 = (BOARD.x + BOARD.w) * MIL;
+    const byTop = BOARD.y * MIL, byBot = (BOARD.y - BOARD.h) * MIL;
+    const p1 = S(bx0, byTop), p2 = S(bx1, byBot);
+    g.fillStyle = '#F6F6F4';
+    g.fillRect(p1[0], p1[1], p2[0] - p1[0], p2[1] - p1[1]);
+    g.strokeStyle = '#9A9A96'; g.lineWidth = 1.2;
+    g.strokeRect(p1[0], p1[1], p2[0] - p1[0], p2[1] - p1[1]);
+
+    g.strokeStyle = '#EDEDE9'; g.lineWidth = 1;
+    g.fillStyle = '#C2C2BC'; g.font = '9px "Microsoft YaHei",sans-serif';
+    g.textAlign = 'left'; g.textBaseline = 'top';
+    for (let gx = Math.ceil(bx0 / 10) * 10; gx <= bx1; gx += 10) {
+      const a = S(gx, byTop), b = S(gx, byBot);
+      g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
+      g.fillText(String(Math.round(gx)), a[0] + 2, b[1] - 12);
+    }
+    for (let gy = Math.ceil(byBot / 10) * 10; gy <= byTop; gy += 10) {
+      const a = S(bx0, gy), b = S(bx1, gy);
+      g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
+      g.fillText(String(Math.round(gy)), a[0] + 2, a[1] + 1);
+    }
+  }
+
+  /* --- 非目标器件：浅灰底图，让板子有“地图感”，但把对比度留给选中组 --- */
+  const target = new Set(active ? active.items.map(c => c.d) : []);
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  for (const { c, r } of rects) {
+    if (target.has(c.d)) continue;
+    const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
+    const w = p2[0] - p1[0], h = p2[1] - p1[1];
+    g.fillStyle = '#FFFFFF';
+    g.strokeStyle = active ? '#BCBCB6' : '#B0B0AA';
+    g.lineWidth = 1;
+    g.fillRect(p1[0], p1[1], w, h);
+    g.strokeRect(p1[0], p1[1], w, h);
+  }
+  if (!active && ppm > 6.5) {
+    g.fillStyle = '#9E9E98'; g.font = '8.5px "Microsoft YaHei",sans-serif';
+    for (const { c, r } of rects) {
+      const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
+      if (p2[0] - p1[0] < 15) continue;
+      g.fillText(c.d, (p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2);
+    }
+  }
+
+  /* --- 选中组：黑块 + 外置序号标签（只用明暗与形状，不靠颜色） ---
+   *  0603 在整板视图下只有几个像素，数字塞进块里必然糊；
+   *  所以序号画在块外的小方框里，用引线连回元件，方框之间自动避让。
+   */
+  if (active) {
+    // 按“从上到下、从左到右”重新编号
+    const ordered = orderItems(active.items);
+    active._ordered = ordered;
+
+    // 1) 黑块
+    ordered.forEach((c, i) => {
+      const r = bodyRect(c, 0.15);
+      const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
+      const w = Math.max(6, p2[0] - p1[0]), h = Math.max(6, p2[1] - p1[1]);
+      const isMarked = !!marks[c.d];
+
+      g.save();
+      g.shadowColor = 'rgba(0,0,0,.28)';
+      g.shadowBlur = 4; g.shadowOffsetY = 1;
+      g.fillStyle = isMarked ? '#A8ACB2' : '#14161A';
+      g.fillRect(p1[0], p1[1], w, h);
+      g.restore();
+
+      // 小到放不下焊盘点就不画，避免糊成一片
+      if (w >= 11) {
+        for (const p of (c.pins || [])) {
+          const q = S(p[0] * MIL, p[1] * MIL);
+          g.fillStyle = '#ffffff';
+          g.beginPath(); g.arc(q[0], q[1], Math.max(1.2, ppm * (c.padR || 0.12)), 0, Math.PI * 2); g.fill();
+        }
+      }
+      layout.hits.push({ i, c, x: p1[0], y: p1[1], w, h, marked: isMarked });
+    });
+
+    // 2) 标签避让（避开标签、避开元件本体、优先放上方）
+    placeLabels(layout.hits, W, H, partBoxes);
+
+    // 3) 引线
+    g.strokeStyle = 'rgba(20,22,26,.75)'; g.lineWidth = 1;
+    for (const t of layout.hits) {
+      const cx = t.x + t.w / 2, cy = t.y + t.h / 2;
+      const L = t.label;
+      g.beginPath();
+      g.moveTo(cx, cy);
+      g.lineTo(L.x + L.w / 2, L.y + L.h / 2);
+      g.stroke();
+    }
+
+    // 4) 白底黑字方框
+    for (const t of layout.hits) {
+      const L = t.label;
+      g.fillStyle = t.marked ? '#EDEEF0' : '#ffffff';
+      g.fillRect(L.x, L.y, L.w, L.h);
+      g.strokeStyle = t.marked ? '#9AA0A6' : '#14161A';
+      g.lineWidth = 1;
+      g.strokeRect(L.x + .5, L.y + .5, L.w - 1, L.h - 1);
+      g.fillStyle = t.marked ? '#7A8088' : '#14161A';
+      g.font = '700 9.5px "Microsoft YaHei",sans-serif';
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(String(t.i + 1), L.x + L.w / 2, L.y + L.h / 2 + .5);
+    }
+  }
+
+  updateHeader();
+  syncZoomBtn();
+  startFx();
+}
+
+/* --------------------------- 呼吸动画（叠加层） --------------------------- */
+function roundRect(g, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.arcTo(x + w, y, x + w, y + h, r);
+  g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r);
+  g.arcTo(x, y, x + w, y, r);
+  g.closePath();
+}
+
+/* --------------------------- 序号标签避让布局 ---------------------------- */
+/* 给每颗元件挑一个不打架的方框位置：优先上方，其次下方/斜角/左右，
+   同时避开别的标签、避开别的元件本体，代价最小的胜出 */
+function placeLabels(hits, W, H, parts) {
+  const LW = 15, LH = 13;
+  const inflate = (b, k) => ({ x: b.x - k, y: b.y - k, w: b.w + k * 2, h: b.h + k * 2 });
+  const overlap = (a, b) => !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y);
+  const placed = [];
+  for (const t of hits) {
+    const cx = t.x + t.w / 2, cy = t.y + t.h / 2;
+    const cands = [
+      [cx - LW / 2, t.y - LH - 3],              // 上
+      [cx - LW / 2, t.y + t.h + 3],             // 下
+      [t.x + t.w + 4, t.y - LH - 3],            // 右上
+      [t.x + t.w + 4, t.y + t.h + 3],           // 右下
+      [t.x - LW - 4, t.y - LH - 3],             // 左上
+      [t.x - LW - 4, t.y + t.h + 3],            // 左下
+      [t.x + t.w + 4, cy - LH / 2],             // 右
+      [t.x - LW - 4, cy - LH / 2],              // 左
+    ];
+    let best = null, bestCost = Infinity;
+    for (const [x, y] of cands) {
+      const box = { x, y, w: LW, h: LH };
+      let cost = 0;
+      const pad = inflate(box, 0.5);
+      for (const p of placed) if (overlap(pad, p)) cost += 1000;
+      if (parts) {
+        for (const pb of parts) {
+          if (!overlap(pad, pb)) continue;
+          // 压在自己身上绝对不行，压在别的元件上也尽量避免
+          cost += (Math.abs(pb.x - t.x) < 0.6 && Math.abs(pb.y - t.y) < 0.6) ? 2500 : 120;
+        }
+      }
+      if (x < 2 || y < 2 || x + LW > W - 2 || y + LH > H - 2) cost += 500;
+      cost += Math.abs(x + LW / 2 - cx) * 0.05 + Math.abs(y + LH / 2 - cy) * 0.05;
+      if (cost < bestCost) { bestCost = cost; best = box; }
+    }
+    t.label = best;
+    placed.push(best);
+  }
+}
+
+function startFx() {
+  cancelAnimationFrame(fxRaf);
+  const fx = cvFx.getContext('2d');
+  const W = layout ? layout.W : 0, H = layout ? layout.H : 0;
+  if (!layout) return;
+  if ((!active || !layout.hits.length) && !focus) { fx.clearRect(0, 0, W, H); return; }
+  const t0 = performance.now();
+
+  const tick = now => {
+    fx.clearRect(0, 0, W, H);
+    if (layout && layout.hits.length) {
+      const t = ((now - t0) % 1500) / 1500;
+      for (const r of layout.hits) {
+        for (let k = 0; k < 2; k++) {
+          const p = (t + k * 0.5) % 1;
+          const grow = 1 + p * 7;
+          fx.strokeStyle = 'rgba(20,22,26,' + ((1 - p) * 0.45).toFixed(3) + ')';
+          fx.lineWidth = 1.6;
+          roundRect(fx, r.x - grow, r.y - grow, r.w + grow * 2, r.h + grow * 2,
+                    Math.min(5, 1 + p * 3));
+          fx.stroke();
+        }
+      }
+    }
+    // 单颗定位：十字准星（点左侧序号 chip 时触发，2.2 秒后消失）
+    if (focus) {
+      const left = focus.until - now;
+      if (left <= 0) {
+        focus = null;
+      } else {
+        const a = Math.min(1, left / 400);
+        fx.setLineDash([6, 5]);
+        fx.strokeStyle = 'rgba(20,22,26,' + (0.45 * a).toFixed(3) + ')';
+        fx.lineWidth = 1;
+        fx.beginPath();
+        fx.moveTo(0, focus.y); fx.lineTo(W, focus.y);
+        fx.moveTo(focus.x, 0); fx.lineTo(focus.x, H);
+        fx.stroke();
+        fx.setLineDash([]);
+        const rr = 10 + (1 - left / 2200) * 10;
+        fx.strokeStyle = 'rgba(20,22,26,' + (0.8 * a).toFixed(3) + ')';
+        fx.lineWidth = 2;
+        fx.beginPath(); fx.arc(focus.x, focus.y, rr, 0, Math.PI * 2); fx.stroke();
+        fx.beginPath(); fx.arc(focus.x, focus.y, 3, 0, Math.PI * 2); fx.fillStyle = '#14161A'; fx.fill();
+      }
+    }
+    fxRaf = requestAnimationFrame(tick);
+  };
+  fxRaf = requestAnimationFrame(tick);
+}
+
+function focusItem(i) {
+  const t = layout && layout.hits.find(h => h.i === i);
+  if (!t) return;
+  const cx = t.x + t.w / 2, cy = t.y + t.h / 2;
+  /* 放大以后元件可能已经跑到视野外，这时点序号只会看到空白（准星画在屏幕外），
+     所以先把它挪回中间再画十字 */
+  const W = layout.W, H = layout.H, m = 56;
+  if (cx < m || cx > W - m || cy < m || cy > H - m) {
+    const dx0 = VIEW.dx, dy0 = VIEW.dy;
+    VIEW.dx += W / 2 - cx;
+    VIEW.dy += H / 2 - cy;
+    clampView(W, H);
+    /* 平移量可能被 clamp 削掉一部分，用实际偏移量算准星位置 */
+    focus = { x: cx + (VIEW.dx - dx0), y: cy + (VIEW.dy - dy0), until: performance.now() + 2200 };
+    startFx();
+    return;
+  }
+  focus = { x: cx, y: cy, until: performance.now() + 2200 };
+  startFx();
+}
+
+/* --------------------------------- 顶部栏 -------------------------------- */
+function updateHeader() {
+  const h1 = document.getElementById('h1');
+  const sub = document.getElementById('sub');
+  const btns = ['btnSel', 'btnHtml', 'btnPng', 'btnPrint'];
+  /* 手机上列表在下面，说「左侧」会让人满屏找 */
+  const where = isMobileLayout() ? '下面列表' : '左侧';
+  if (!active) {
+    h1.textContent = PROJNAME || '选一个分组';
+    sub.textContent = USING_DEFAULT
+      ? '这是预置示例（mcu修改版plus）· 点左上「导入工程」换成你自己的板'
+      : '点' + where + '里任意一行，板上同阻值同封装的元件会变黑、跳动、带序号';
+    btns.forEach(id => document.getElementById(id).disabled = true);
+    return;
+  }
+  const done = countMarked(active), total = active.items.length;
+  h1.innerHTML = '<span>' + fmtVal(active, cat) + '</span>' +
+    '<span class="fp">' + active.fp + '</span>' +
+    '<span class="cnt">' + total + ' 颗</span>';
+  sub.innerHTML = '已焊 <b>' + done + '/' + total + '</b>　|　点板上的黑块或' +
+    (isMobileLayout() ? '列表里的' : '左侧') + '序号 = 定位并打勾（再点取消）' +
+    /* 有极性件单独占一行，说清楚「看哪一端」，不能只丢一句「注意方向」 */
+    polarLine(total, polarOfGroup(active));
+  btns.forEach(id => document.getElementById(id).disabled = false);
+}
+
+/* --------------------------------- 侧栏 --------------------------------- */
+function renderCats() {
+  const box = document.getElementById('cats');
+  box.innerHTML = '';
+  for (const c of CATS) {
+    const n = COMPS.filter(x => catOf(x) === c.id).length;
+    const b = document.createElement('button');
+    b.className = (cat === c.id ? 'on' : '');
+    b.innerHTML = c.label + '<span class="n">' + n + '</span>';
+    b.disabled = n === 0;
+    b.onclick = () => {
+      cat = c.id; active = null; marks = {};
+      groups = buildGroups(cat);
+      renderCats(); renderList();
+      /* 抽屉收成一条时切了分类也看不见列表，顺手拉开 */
+      if (isMobileLayout() && drawerState === 'mini') setDrawer('half');
+      drawBase();
+    };
+    box.appendChild(b);
+  }
+  /* 分类条高度定了，抽屉的「只露分类」那一档才算得准 */
+  fitDrawer();
+}
+
+/* 选中一个分组（侧栏点击、键盘上下、URL 书签都走这里） */
+function selectGroup(grp, idx) {
+  active = grp;
+  loadMarks(grp);
+  renderList();
+  drawBase();
+  try { history.replaceState(null, '', '#g=' + encodeURIComponent(grp.v)); } catch (_) { }
+  if (idx != null) {
+    const rows = document.querySelectorAll('#list .grp');
+    if (rows[idx]) rows[idx].scrollIntoView({ block: 'nearest' });
+  }
+}
+
+function renderList() {
+  const box = document.getElementById('list');
+  box.innerHTML = '';
+  if (!groups.length) {
+    box.innerHTML = '<div id="empty">这一类没有元件<br>（位号规则：R / C / L / D / Q / LED / Y…）</div>';
+    return;
+  }
+  for (const grp of groups) {
+    const done = peekMarked(grp);
+    const pol = polarOfGroup(grp);
+    const b = document.createElement('button');
+    b.className = 'grp' + (active && active.key === grp.key ? ' on' : '') +
+      (done === grp.items.length ? ' done' : '');
+    b.innerHTML =
+      '<div class="l1">' +
+      '<span class="nm">' + fmtVal(grp, cat) + '</span>' +
+      (pol ? '<span class="pl' + (pol.all ? '' : ' part') + '" title="' +
+        pol.kind + '，有方向，焊前确认">' + (pol.all ? '极性' : '部分极性') + '</span>' : '') +
+      '<span class="fp">' + grp.fp + '</span>' +
+      '<span class="ct">' + done + '/' + grp.items.length + '</span>' +
+      '</div>' +
+      '<div class="bar"><i style="width:' + Math.round(done / grp.items.length * 100) + '%"></i></div>';
+    b.onclick = () => {
+      selectGroup(grp);
+      /* 手机上选完立刻把抽屉收成一条：接下去是低头焊板，屏幕要让给板图 */
+      if (isMobileLayout()) setDrawer('mini');
+    };
+    box.appendChild(b);
+
+    // 选中组下方展开序号 chips：点一下图上就打十字准星，不用靠眼色找
+    if (active && active.key === grp.key) {
+      const ordered = orderItems(grp.items);
+      const wrap = document.createElement('div');
+      wrap.className = 'chips';
+      ordered.forEach((c, i) => {
+        const chip = document.createElement('button');
+        chip.className = 'chip' + (marks[c.d] ? ' m' : '');
+        chip.innerHTML = '<b>' + (i + 1) + '</b><span>' + c.d + '</span>' +
+          (polarOf(c) ? '<i class="pd">▲</i>' : '');
+        chip.onclick = ev => {
+          ev.stopPropagation();
+          focusItem(i);
+          const d = c.d;
+          if (marks[d]) delete marks[d]; else marks[d] = true;
+          saveMarks(active);
+          renderList();
+          drawBase();
+        };
+        wrap.appendChild(chip);
+      });
+      box.appendChild(wrap);
+    }
+  }
+}
+
+/* -------------------------------- 命中测试 ------------------------------- */
+const TOUCH = matchMedia('(pointer: coarse)').matches;   // 粗指针 ≈ 手指
+let suppressClick = false;   // 刚做完缩放/拖动，紧接着的 click 不算数
+
+stage.addEventListener('click', ev => {
+  if (suppressClick) { suppressClick = false; return; }
+  if (ev.target.closest && ev.target.closest('#zoom')) return;   // 点的是缩放按钮
+  if (!active || !layout) return;
+  const p = stagePoint(ev.clientX, ev.clientY);
+  const x = p.x, y = p.y;
+  /* 手指有面积，容差给大一点；按「离哪个最近」选，不是按命中顺序，
+     否则整板视图下元件挤在一起时会选错一颗 */
+  const tol = TOUCH ? 13 : 4;
+  let hit = null, bestD = Infinity;
+  for (const r of layout.hits) {
+    const dx = Math.max(r.x - x, 0, x - (r.x + r.w));
+    const dy = Math.max(r.y - y, 0, y - (r.y + r.h));
+    const d = Math.hypot(dx, dy);
+    if (d <= tol && d < bestD) { bestD = d; hit = r; }
+  }
+  if (!hit) return;
+  const d = hit.c.d;
+  if (marks[d]) delete marks[d]; else marks[d] = true;
+  saveMarks(active);
+  renderList();
+  drawBase();
+});
+
+/* ---------------------------- 双指缩放 / 单指拖动 ---------------------------- *
+ * 全部走 Pointer Events：鼠标、触屏、触控笔一套代码。
+ * 单指拖动只在已放大时平移（k=1 时整板都在视野里，没有可移动的）。 */
+const ptrs = new Map();
+let panFrom = null, pinch = null, moved = 0, drawRaf = 0;
+
+function scheduleDraw() {
+  if (drawRaf) return;
+  drawRaf = requestAnimationFrame(() => { drawRaf = 0; drawBase(); });
+}
+
+stage.addEventListener('pointerdown', ev => {
+  if (!COMPS.length) return;
+  if (ev.target.closest && ev.target.closest('#zoom')) return;   // 别把按钮的点击当成拖图
+  ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+  try { stage.setPointerCapture(ev.pointerId); } catch (_) { }
+  if (ptrs.size === 1) {
+    panFrom = { x: ev.clientX, y: ev.clientY };
+    moved = 0;
+  } else if (ptrs.size === 2) {
+    const [a, b] = [...ptrs.values()];
+    const mid = stagePoint((a.x + b.x) / 2, (a.y + b.y) / 2);
+    pinch = {
+      d: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)),
+      k: VIEW.k,
+      lx: mid.x,
+      ly: mid.y,
+    };
+    panFrom = null;
+  }
+});
+
+stage.addEventListener('pointermove', ev => {
+  if (!ptrs.has(ev.pointerId)) return;
+  const p = ptrs.get(ev.pointerId);
+  moved += Math.hypot(ev.clientX - p.x, ev.clientY - p.y);
+  ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+
+  if (ptrs.size >= 2 && pinch) {
+    const [a, b] = [...ptrs.values()];
+    const mid = stagePoint((a.x + b.x) / 2, (a.y + b.y) / 2);
+    const mx = mid.x, my = mid.y;
+    /* 先跟着两指中点平移，再按两指的张开比例缩放 */
+    VIEW.dx += mx - pinch.lx;
+    VIEW.dy += my - pinch.ly;
+    pinch.lx = mx; pinch.ly = my;
+    const d = Math.hypot(a.x - b.x, a.y - b.y);
+    zoomAt(pinch.k * (d / pinch.d), mx, my);
+    pointerize();          // 用中点当缩放锚点，手指夹住的地方不跑
+    scheduleDraw();
+    return;
+  }
+
+  if (panFrom && VIEW.k > 1.001) {
+    const mv = localDelta(ev.clientX - panFrom.x, ev.clientY - panFrom.y);
+    VIEW.dx += mv.dx;
+    VIEW.dy += mv.dy;
+    panFrom = { x: ev.clientX, y: ev.clientY };
+    clampView();
+    scheduleDraw();
+  }
+});
+
+/* zoomAt 内部已经做过锚点补偿，这里只是把「缩放倍数基准」换到当前点，
+   避免连续 pointermove 时比例被反复累乘 */
+function pointerize() {
+  if (!pinch) return;
+  const [a, b] = [...ptrs.values()];
+  if (!a || !b) return;
+  pinch.d = Math.max(1, Math.hypot(a.x - b.x, a.y - b.y));
+  pinch.k = VIEW.k;
+}
+
+function endPointer(ev) {
+  if (!ptrs.has(ev.pointerId)) return;
+  ptrs.delete(ev.pointerId);
+  if (ptrs.size < 2) pinch = null;
+  if (ptrs.size === 0) {
+    panFrom = null;
+    if (moved > 9) suppressClick = true;   // 是拖动，不是点
+  }
+}
+stage.addEventListener('pointerup', endPointer);
+stage.addEventListener('pointercancel', endPointer);
+
+/* 桌面滚轮缩放：顺手也给电脑端加上，鼠标位置为锚点 */
+stage.addEventListener('wheel', ev => {
+  if (!COMPS.length) return;
+  ev.preventDefault();
+  const p = stagePoint(ev.clientX, ev.clientY);
+  zoomAt(VIEW.k * Math.exp(-ev.deltaY * 0.0018), p.x, p.y);
+  scheduleDraw();
+}, { passive: false });
+
+/* ------------------------------ 缩放按钮 ------------------------------ */
+const zIn = document.getElementById('zIn');
+const zOut = document.getElementById('zOut');
+const zFit = document.getElementById('zFit');
+
+function syncZoomBtn() {
+  if (!zIn) return;
+  zIn.disabled = VIEW.k >= K_MAX - 0.01;
+  zOut.disabled = VIEW.k <= 1.01;
+}
+
+function zoomCenter(mul) {
+  zoomAt(VIEW.k * mul, stage.clientWidth / 2, stage.clientHeight / 2);
+  drawBase();
+}
+if (zIn) zIn.onclick = () => zoomCenter(1.7);
+if (zOut) zOut.onclick = () => zoomCenter(1 / 1.7);
+if (zFit) zFit.onclick = () => { VIEW.k = 1; VIEW.dx = 0; VIEW.dy = 0; drawBase(); };
+
+/* ----------------------- 底部抽屉（手机：可拖、可滚） ----------------------- *
+ * 三档：mini 只露分类 ｜ half 默认 ｜ full 几乎满屏。
+ * 拖把手到哪儿就吸附到最近的一档，点一下则在 mini / half 之间来回。
+ * -------------------------------------------------------------------------- */
+const sideEl = document.getElementById('side');
+const grabEl = document.getElementById('grab');
+const grabTxt = document.getElementById('grabTxt');
+const catsEl = document.getElementById('cats');
+
+const DRAWER_FRAC = { half: 0.5, full: 0.85 };
+let drawerState = 'half';
+
+function miniH() {
+  const a = grabEl ? grabEl.offsetHeight : 25;
+  const b = catsEl ? catsEl.offsetHeight : 34;
+  return Math.max(42, a + b + 2);
+}
+
+function drawerH(state) {
+  if (state === 'mini') return miniH();
+  const H = appEl.clientHeight || window.innerHeight;
+  return Math.round(H * (DRAWER_FRAC[state] || DRAWER_FRAC.half));
+}
+
+/* 窗口转动 / 高度变化后重算，否则会停在按旧屏幕算出来的高度上 */
+function fitDrawer() {
+  if (!sideEl) return;
+  const m = isMobileLayout();
+  document.body.classList.toggle('drawerOpen', m && drawerState !== 'mini');
+  if (!m) { sideEl.style.height = ''; return; }
+  sideEl.style.height = drawerH(drawerState) + 'px';
+}
+
+function setDrawer(state) {
+  drawerState = state;
+  document.body.classList.toggle('drawerOpen', state !== 'mini');
+  if (grabTxt) {
+    grabTxt.textContent = state === 'mini'
+      ? '上拉看分组列表'
+      : (state === 'full' ? '下拉收起 · 列表' : '分组列表 · 可上下拉');
+  }
+  if (!isMobileLayout()) return;
+  sideEl.style.height = drawerH(state) + 'px';
+  /* 拉开列表时把当前这组滚到中间：否则重新打开还停在列表顶部，
+     要点序号打勾还得先翻半天找自己刚才选的那行 */
+  if (state !== 'mini' && active) {
+    clearTimeout(setDrawer._s);
+    setDrawer._s = setTimeout(() => {
+      const row = document.querySelector('#list .grp.on');
+      if (row) row.scrollIntoView({ block: 'center' });
+    }, 40);
+  }
+  /* 抽屉改了画布高度，等动画完再重画（ResizeObserver 也会补一发） */
+  clearTimeout(setDrawer._t);
+  setDrawer._t = setTimeout(() => { if (COMPS.length) drawBase(); }, 220);
+}
+
+if (grabEl) {
+  let dg = null;
+  const stop = ev => {
+    if (!dg) return;
+    sideEl.classList.remove('drag');
+    const m = dg; dg = null;
+    try { grabEl.releasePointerCapture(ev.pointerId); } catch (_) { }
+    if (m.moved < 8) {                       // 只是点了一下
+      setDrawer(drawerState === 'mini' ? 'half' : 'mini');
+      return;
+    }
+    /* 吸附到最近的一档 */
+    let best = 'mini', bd = Infinity;
+    for (const s of ['mini', 'half', 'full']) {
+      const dd = Math.abs(drawerH(s) - m.h2);
+      if (dd < bd) { bd = dd; best = s; }
+    }
+    setDrawer(best);
+  };
+  grabEl.addEventListener('pointerdown', ev => {
+    if (!isMobileLayout()) return;
+    dg = { x: ev.clientX, y: ev.clientY, h: sideEl.offsetHeight, h2: sideEl.offsetHeight, moved: 0 };
+    sideEl.classList.add('drag');
+    try { grabEl.setPointerCapture(ev.pointerId); } catch (_) { }
+    ev.preventDefault();
+  });
+  grabEl.addEventListener('pointermove', ev => {
+    if (!dg) return;
+    dg.moved = Math.max(dg.moved, Math.hypot(ev.clientX - dg.x, ev.clientY - dg.y));
+    const d = localDelta(ev.clientX - dg.x, ev.clientY - dg.y);
+    let h = dg.h - d.dy;                     // 往上拖 = 抽屉变高
+    h = Math.max(36, Math.min(appEl.clientHeight - 76, h));
+    dg.h2 = h;
+    sideEl.style.height = h + 'px';
+  });
+  grabEl.addEventListener('pointerup', stop);
+  grabEl.addEventListener('pointercancel', stop);
+}
+
+/* --------------------------------- 导出 --------------------------------- */
+function composeExport() {
+  const W = layout.W, H = layout.H;
+  const pol = polarOfGroup(active);
+  const HDR = pol ? 100 : 74;          // 有极性就多留一条黑带的空
+  const FTR = 34;
+  const DPR = Math.max(2, Math.min(3, window.devicePixelRatio || 1));
+  const c2 = document.createElement('canvas');
+  c2.width = Math.round(W * DPR);
+  c2.height = Math.round((H + HDR + FTR) * DPR);
+  const g = c2.getContext('2d');
+  g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  g.fillStyle = '#fff'; g.fillRect(0, 0, W, H + HDR + FTR);
+
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+  g.fillStyle = '#14161a';
+  g.font = '700 17px "Microsoft YaHei",sans-serif';
+  g.fillText(fmtVal(active, cat) + '　' + active.fp + '　' + active.items.length + ' 颗', 16, 30);
+  g.fillStyle = '#6b7280';
+  g.font = '11.5px "Microsoft YaHei",sans-serif';
+  g.fillText('黑块＝本组元件　数字＝序号　白点＝焊盘　已焊 ' + countMarked(active) + '/' + active.items.length, 16, 50);
+
+  /* 打印出来贴在工位上时，极性提醒比什么都重要 —— 印成黑底白字一条 */
+  if (pol) {
+    const tip = '⚑ ' + (pol.all ? '全部有方向：' : '部分有方向：') +
+      (POLAR_TIP[pol.kind] || '').replace(/<\/?b>/g, '');
+    g.fillStyle = '#14161a';
+    g.fillRect(12, 58, W - 24, 26);
+    g.fillStyle = '#fff';
+    let fs = 12.5;
+    g.font = '600 ' + fs + 'px "Microsoft YaHei",sans-serif';
+    while (g.measureText(tip).width > W - 44 && fs > 9) {
+      fs -= 0.5;
+      g.font = '600 ' + fs + 'px "Microsoft YaHei",sans-serif';
+    }
+    g.fillText(tip, 22, 76);
+  }
+
+  g.drawImage(cvBase, 0, HDR, W, H);
+
+  const ordered = active._ordered || orderItems(active.items);
+  let line = ordered.map((c, i) => (i + 1) + '.' + c.d).join('　');
+  if (line.length > 130) line = line.slice(0, 128) + ' …';
+  g.fillStyle = '#6b7280'; g.font = '11px "Microsoft YaHei",sans-serif';
+  g.fillText(line, 16, H + HDR + 20);
+  return c2;
+}
+
+async function exportPng() {
+  if (!active) return;
+  const c2 = composeExport();
+  const blob = await new Promise(r => c2.toBlob(r, 'image/png'));
+  const name = '焊接_' + cat + '_' + String(active.v || 'NA').replace(/[\\/:*?"<>|]/g, '_') + '_' + active.fp + '.png';
+  try {
+    if (!EDA) throw new Error('no eda');
+    await EDA.sys_FileSystem.saveFile(blob, name);
+  } catch (e) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  }
+}
+
+/* ------------------- 导出：单文件交互网页（离线可点） -------------------- *
+ * 思路：把本页的 <style>、#app 外壳、主脚本原样搬进一个新 HTML，
+ * 再把当前 PCB 数据以 window.__EMBED__ 的形式内嵌进去。
+ * 好处：导出页和插件里跑的是同一份代码，永远不会出现两套逻辑。
+ * ------------------------------------------------------------------------ */
+const escHtml = s => String(s == null ? '' : s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+function buildStandalone() {
+  const css = document.querySelector('style[data-app]').textContent;
+  const js = document.querySelector('script[data-app]').textContent;
+  const shell = SHELL || document.getElementById('app').outerHTML;
+  const payload = {
+    v: 2,
+    proj: PROJ,
+    name: PROJNAME || '',
+    cat: cat,
+    g: active ? (active.raw || active.v || '') : '',
+    board: BOARD,
+    comps: COMPS.map(c => ({
+      d: c.d, v: c.v, fp: c.fp, layer: c.layer, x: c.x, y: c.y,
+      angle: Number(c.angle) || 0, box: c.box || null, padR: c.padR || 0, syn: c.syn !== false,
+      pins: (c.pins || []).map(p => [p[0], p[1], 0, p[3] || 0]),
+    })),
+  };
+  const title = '焊接分组' + (PROJNAME ? ' · ' + PROJNAME : '');
+  const CLOSE = '<' + '/script>';   // 拆开写，避免把本文件自己提前闭合
+  return [
+    '<!DOCTYPE html>',
+    '<html lang="zh-CN">',
+    '<head>',
+    '<meta charset="utf-8">',
+    '<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">',
+    '<title>' + escHtml(title) + '</title>',
+    '<style>' + css + '</style>',
+    '</head>',
+    '<body>',
+    shell,
+    '<script>window.__EMBED__=' + JSON.stringify(payload) + ';' + CLOSE,
+    '<script>' + js + CLOSE,
+    '</body>',
+    '</html>',
+  ].join('\n');
+}
+
+async function exportHtmlFile() {
+  let html;
+  try { html = buildStandalone(); } catch (e) { toast('生成失败：' + e.message); return; }
+  const nm = ('焊接分组' + (PROJNAME ? '_' + PROJNAME : '') + '_交互版.html')
+    .replace(/[\\/:*?"<>|]/g, '_');
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  try {
+    if (!EDA) throw new Error('no eda');
+    await EDA.sys_FileSystem.saveFile(blob, nm);
+    toast('已导出 ' + nm + '　双击即可在浏览器里点选');
+  } catch (e) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = nm;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+    toast('已保存 ' + nm);
+  }
+}
+
+function doPrint() {
+  if (!active) return;
+  const url = composeExport().toDataURL('image/png');
+  const w = window.open('', '_blank', 'width=1000,height=780');
+  if (!w) { toast('窗口被拦截，请改用「导出 PNG」'); return; }
+  w.document.write('<html><head><meta charset="utf-8"><title>焊接分组</title>' +
+    '<style>body{margin:0;display:grid;place-items:center}img{max-width:100%}' +
+    '@media print{img{max-height:98vh}}</style></head><body>' +
+    '<img src="' + url + '" onload="setTimeout(function(){window.print()},300)"></body></html>');
+  w.document.close();
+}
+
+/* ------------------------- 在 PCB 中同步选中（可选） ---------------------- */
+async function selectInPcb() {
+  if (!active || !EDA) return;
+  try {
+    await EDA.pcb_SelectControl.clearSelected();
+    await EDA.pcb_SelectControl.doSelectPrimitives(active.items.map(c => c.pid));
+    toast('已在 PCB 中选中 ' + active.items.length + ' 个元件，关掉本窗口即可看到');
+  } catch (e) {
+    toast('选中失败：' + e.message);
+  }
+}
+
+let toastTimer = 0;
+function toast(s) {
+  hintEl.textContent = s;
+  hintEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => hintEl.classList.remove('show'), 3000);
+}
+
+/* --------------------------------- 启动 --------------------------------- */
+function fail(html) {
+  document.getElementById('list').innerHTML = '<div id="empty">' + html + '</div>';
+  document.getElementById('h1').textContent = '没有数据';
+}
+
+/* 统一入口：拿到数据后定默认类别、渲染、再按 URL / 顶栏指定选中某个分组 */
+function readHashGroup() {
+  const m = /(?:^#|&)g=([^&]*)/.exec(location.hash || '');
+  if (!m) return '';
+  try { return decodeURIComponent(m[1]); } catch (_) { return ''; }
+}
+
+/* 老数据（内嵌示例、早先导出的网页）只有四个角点的虚拟焊盘，没有本体尺寸。
+   这里按封装名补算一次，让它们也享受「排针画成细长条」的修正，不用重新导出工程。 */
+function normalizeComps(list) {
+  if (!list) return list;
+  let fixed = 0;
+  for (const c of list) {
+    if (c.box && c.box[0] > 0) continue;
+    if (c.syn === false) continue;          // EDA 给的真实焊盘，不能覆盖
+    const geo = makePads(fpGeom(c.fp), estimateSize(c.fp),
+      Number(c.x) || 0, Number(c.y) || 0, Number(c.angle) || 0);
+    c.pins = geo.pads;
+    c.box = geo.box;
+    c.padR = geo.padR;
+    c.syn = true;
+    fixed++;
+  }
+  return list;
+}
+
+function applyData(comps, board, opt) {
+  opt = opt || {};
+  COMPS = normalizeComps(comps) || [];
+  BOARD = board || null;
+  if (!COMPS.length) { fail('没有读到器件'); return; }
+
+  const q = new URLSearchParams(location.search);
+  const want = (q.get('cat') || opt.cat || '').toUpperCase();
+  const curCat = CATS.find(x => x.id === cat) || CATS[0];
+  if (CATS.some(x => x.id === want)) cat = want;
+  else if (!COMPS.some(c => catOf(c) === curCat.id)) {
+    cat = COMPS.some(c => catOf(c) === 'R') ? 'R' : (COMPS.some(c => catOf(c) === 'C') ? 'C' : 'R');
+  }
+
+  groups = buildGroups(cat);
+
+  const g = q.get('g') || readHashGroup() || opt.g;
+  if (g) {
+    /* #g=10K 按值定位；#g=R24 按位号定位到它所在的那一组。
+       位号可能不在当前分类里（比如 U13 是排针，归在接插件），
+       这时自动切到它所在的分类，不用手动点。 */
+    let t = groups.find(x => normVal(x.v) === normVal(g))
+      || groups.find(x => x.items.some(c => String(c.d).toUpperCase() === String(g).toUpperCase()));
+    if (!t) {
+      for (const k of CATS) {
+        if (k.id === cat) continue;
+        const gs = buildGroups(k.id);
+        const tt = gs.find(x => normVal(x.v) === normVal(g))
+          || gs.find(x => x.items.some(c => String(c.d).toUpperCase() === String(g).toUpperCase()));
+        if (tt) { cat = k.id; groups = gs; t = tt; break; }
+      }
+    }
+    if (t) { active = t; loadMarks(t); renderList(); renderCats(); drawBase(); return; }
+  }
+
+  renderCats(); renderList(); drawBase();
+}
+
+/* 是不是被嘉立创EDA 的窗口装着跑（插件模式）。
+   是的话就必须读正在编辑的这块 PCB，不能拿本机缓存/示例顶上去。 */
+function inEdaFrame() {
+  try {
+    const e = window.eda || (window.parent && window.parent !== window ? window.parent.eda : null);
+    return !!(e && e.pcb_PrimitiveComponent);
+  } catch (_) { return false; }
+}
+
+async function boot() {
+  /* ① 导出的单文件网页：数据已内嵌，不连 EDA、不联网 */
+  if (window.__EMBED__) {
+    const j = window.__EMBED__;
+    SOLO = true;
+    document.body.classList.add('solo');
+    PROJ = j.proj || 'standalone';
+    PROJNAME = j.name || '';
+    document.title = '焊接分组' + (PROJNAME ? ' · ' + PROJNAME : '') + '（离线交互版）';
+    /* 离线页没有 EDA、也没有拖拽层：这两个按钮点了什么都不会发生，索性藏掉 */
+    ['btnSel', 'btnOpen'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.style.display = 'none';
+    });
+    applyData(j.comps || [], j.board || null, { cat: j.cat, g: j.g });
+    return;
+  }
+
+  /* ② 浏览器直接打开 + ?demo=1：读演示数据（开发自检用） */
+  if (location.search.indexOf('demo=1') >= 0) {
+    try {
+      let r = await fetch('./demo-data.json');
+      if (!r.ok) r = await fetch('./iframe/demo-data.json');
+      const j = await r.json();
+      PROJ = 'demo'; PROJNAME = 'DEMO';
+      applyData(j.comps, j.outline, { cat: 'R' });
+      return;
+    } catch (_) { /* 落到 ③ */ }
+  }
+
+  /* ③ 工程文件模式：本机缓存 → 预置示例 → 等拖入
+     插件窗口里跳过这一步，直接去读正在编辑的 PCB */
+  if (!inEdaFrame()) {
+    const saved = readSaved();
+    const init = (saved && saved.comps && saved.comps.length) ? saved : window.__DEFAULT__;
+    if (init && init.comps && init.comps.length) {
+      SOLO = true;
+      USING_DEFAULT = !(saved && saved.comps && saved.comps.length);
+      document.body.classList.add('solo');
+      PROJNAME = init.name || '';
+      document.title = '焊接分组 · ' + (PROJNAME || '工程');
+      const bs2 = document.getElementById('btnSel');
+      if (bs2) bs2.style.display = 'none';
+      applyData(init.comps, init.board || null, {});
+      return;
+    }
+    /* 空工坊（没内嵌数据、也没缓存）：标题不能留「正在读取当前 PCB」，
+       否则对方会以为程序卡住了，一直在等一个不会出现的结果 */
+    const h1e = document.getElementById('h1'), sube = document.getElementById('sub');
+    if (h1e) h1e.textContent = '等待导入工程';
+    if (sube) sube.innerHTML = '拖入 .epro2 后自动生成分组图　|　全程本机解析，不上传、不联网';
+    showDrop('');
+    return;
+  }
+
+  /* ④ 插件模式：连嘉立创EDA，读正在编辑的这块 PCB */
+  EDA = await getEda();
+  if (!EDA) { fail('未检测到嘉立创EDA环境<br><span style="color:#9aa0a6">请在 PCB 编辑器中通过菜单打开本插件</span>'); return; }
+  /* 板子就在 EDA 里，不需要「导入工程」这颗按钮 */
+  const bo = document.getElementById('btnOpen');
+  if (bo) bo.style.display = 'none';
+  try {
+    try {
+      const info = await EDA.dmt_Project.getCurrentProjectInfo();
+      if (info && info.uuid) PROJ = info.uuid;
+      if (info && (info.name || info.title)) PROJNAME = info.name || info.title;
+    } catch (_) { }
+    COMPS = await loadFromEda(EDA);
+    BOARD = await loadBoard(EDA);
+    if (!COMPS.length) { fail('当前 PCB 里没有读到器件'); return; }
+    applyData(COMPS, BOARD);
+  } catch (e) {
+    fail('读取 PCB 失败：' + e.message);
+  }
+}
+
+/* 导出的交互网页里只有 #app 这一层（没有拖拽层），部分按钮根本不存在。
+   直接 .onclick 赋值会抛 TypeError，把后面的 boot() 一起中断掉 —— 必须容错。 */
+function on(id, fn) { const el = document.getElementById(id); if (el) el.onclick = fn; }
+on('btnHtml', exportHtmlFile);
+on('btnPng', exportPng);
+on('btnPrint', doPrint);
+on('btnSel', selectInPcb);
+
+/* 键盘切换：↑↓ 换分组，Esc 取消选中（离线页和插件里都可用） */
+window.addEventListener('keydown', ev => {
+  if (ev.target && /INPUT|TEXTAREA/.test(ev.target.tagName)) return;
+  if (ev.key === 'Escape') hideDrop();
+  if (!groups.length) return;
+  const k = ev.key;
+  if (k === 'ArrowDown' || k === 'ArrowUp') {
+    ev.preventDefault();
+    let i = active ? groups.findIndex(g => g.key === active.key) : -1;
+    i = k === 'ArrowDown'
+      ? Math.min(groups.length - 1, i + 1)
+      : Math.max(0, i < 0 ? 0 : i - 1);
+    selectGroup(groups[i], i);
+  } else if (k === 'Escape') {
+    active = null; marks = {};
+    renderList(); drawBase();
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (_) { }
+  }
+});
+
+let rt = 0;
+function onViewportChange() {
+  clearTimeout(rt);
+  rt = setTimeout(() => {
+    applyOrient();                     // 竖拿/横拿切换：转页面、重算抽屉
+    if (COMPS.length) drawBase();
+  }, 120);
+}
+window.addEventListener('resize', onViewportChange);
+/* iOS 转屏时 resize 会早于尺寸稳定，晚一点再量一次 */
+window.addEventListener('orientationchange', () => setTimeout(onViewportChange, 260));
+if (window.visualViewport) window.visualViewport.addEventListener('resize', onViewportChange);
+
+/* 画布尺寸必须跟着容器走。窗口 resize 事件管不到「抽屉展开」「手机键盘弹出」
+   这类只改容器高度的情况 —— 不监听就会画出比容器高的画布，被裁掉一半。
+   ResizeObserver 是唯一可靠的办法。 */
+if (window.ResizeObserver) {
+  let lastW = 0, lastH = 0, rzT = 0;
+  new ResizeObserver(() => {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    if (!COMPS.length || !w || !h) return;
+    if (Math.abs(w - lastW) < 2 && Math.abs(h - lastH) < 2) return;
+    lastW = w; lastH = h;
+    /* 抽屉动画期间会连触发几十次，攒 60ms 画一次就够，
+       而且不用 requestAnimationFrame —— 后台标签页里 rAF 会被暂停 */
+    clearTimeout(rzT);
+    rzT = setTimeout(() => { if (COMPS.length) drawBase(); }, 60);
+  }).observe(stage);
+}
+
+/* 拖入 / 选择工程文件 */
+let needFile = true;
+on('btnOpen', () => showDrop(''));
+on('btnCancel', hideDrop);
+on('btnPick', () => {
+  /* APK 里交给原生弹面板：多一个「微信 / QQ 收到的文件」的入口。
+     浏览器和插件里没有 AndroidBridge，照旧点那个隐藏的 input。 */
+  if (IN_APK) {
+    try { AndroidBridge.pick(); return; } catch (_) { }
+  }
+  const f = document.getElementById('fileIn'); if (f) f.click();
+});
+/* 导出交互网页里没有这个 input，取不到就别绑 */
+const fileInEl = document.getElementById('fileIn');
+if (fileInEl) {
+  fileInEl.onchange = ev => {
+    const f = ev.target.files && ev.target.files[0];
+    if (f) openProject(f);
+    ev.target.value = '';
+  };
+}
+
+/* 原生外壳递进来的文件（微信/QQ「用其他应用打开」，或面板里翻出来的那个）。
+   文件存在原生那边，这里 fetch 一次把字节拉过来 —— 不走 base64 塞 JS 桥，
+   是因为 .epro2 可能几 MB，长字符串过桥容易被截断，还会把主线程卡住。 */
+window.__onExternalFile = async function () {
+  let name = 'project.epro2';
+  try {
+    if (window.AndroidBridge && AndroidBridge.incomingName) name = AndroidBridge.incomingName();
+  } catch (_) { }
+  try {
+    const r = await fetch('/__incoming__', { cache: 'no-store' });
+    if (!r.ok) throw new Error('读不到文件（HTTP ' + r.status + '）');
+    const buf = await r.arrayBuffer();
+    if (!buf.byteLength) throw new Error('文件是空的');
+    openProject(new File([buf], name, { type: 'application/zip' }));
+  } catch (e) {
+    showDrop('读不到这个文件：' + (e.message || e));
+    const err = document.getElementById('dropErr');
+    if (err) err.style.color = '#A32D2D';
+  }
+};
+
+/* 点遮罩空白处也能退出（已经有板子在显示时） */
+const dropEl = document.getElementById('drop');
+if (dropEl) {
+  dropEl.addEventListener('click', ev => {
+    if (ev.target === dropEl && COMPS.length) hideDrop();
+  });
+}
+
+window.addEventListener('dragover', ev => {
+  const el = document.getElementById('drop');
+  if (!el) return;                 // 导出交互网页没有拖拽层
+  ev.preventDefault();
+  el.classList.add('on'); el.classList.add('hot');
+});
+
+window.addEventListener('dragleave', ev => {
+  if (ev.relatedTarget) return;
+  const el = document.getElementById('drop');
+  if (!el) return;
+  el.classList.remove('hot');
+  if (!needFile) el.classList.remove('on');
+});
+
+window.addEventListener('drop', ev => {
+  ev.preventDefault();
+  const el = document.getElementById('drop');
+  if (!el) return;
+  el.classList.remove('hot');
+  const f = ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0];
+  if (f) { needFile = false; openProject(f); }
+  else if (!COMPS.length) showDrop('选进来的是文件夹或空内容，请直接选 .epro2 文件');
+});
+
+/* 先定横屏/竖屏与抽屉高度，再进 boot：否则第一帧会按错的画布尺寸画一次 */
+applyOrient();
+boot();
+
+</script>
+<script>
+/* 断网也能开：sw.js 用 network-first，联网时永远拿最新的，断网才回落缓存。
+   Service Worker 只在安全上下文里能用 —— https，或者 localStorage 那种 localhost。
+   本地 http:// 打开、以及 file:// 双击时都注册不了，吞掉就行，不影响页面。 */
+(function () {
+  if (!('serviceWorker' in navigator)) return;
+  var h = location.hostname;
+  var secure = location.protocol === 'https:' || h === 'localhost' || h === '127.0.0.1';
+  if (!secure) return;
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function () { });
+  });
+})();
 </script>
 </body>
 </html>
