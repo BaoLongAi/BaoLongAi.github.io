@@ -1015,25 +1015,44 @@ function makePads(g, est, x, y, angle) {
     }
 
   } else if (g.round) {
-    /* 圆柱封装：两个圆形焊盘，直径跟本体走 */
-    const d = Math.min(L, W) * 0.42;
-    const dx = L * 0.3;
+    /* 圆柱封装（电解电容 / 大电感）：两个圆形焊盘。
+       早先按 0.42L 画，10mm 电容的两个焊盘直接叠在一起，整颗件看着像两个灰球。
+       真实 BD5 是焊盘 1.3mm、跨距 2.0mm —— 按 0.24L / 0.37L 取，
+       两个焊盘正好落在本体圆（半径 0.5L）里面，丝印圆才包得住。 */
+    const d = Math.min(L, W) * 0.24;
+    const dx = L * 0.37;
     sp = 2 * dx;
     list.push(put(-dx * MM2MIL, 0, d, d, 'circle'), put(dx * MM2MIL, 0, d, d, 'circle'));
 
   } else {
-    /* 两端各一个焊盘：0603 / 0805 / SMA / 0805 保险丝都走这里。
-       0603 实际焊盘 0.8×0.9、中心距 1.5 —— 0.5L / 1.12W / 0.94L 正好对得上。 */
-    const pw = L * 0.5;
-    const ph = W * 1.12;
-    const dx = L * 0.47;
+    /* 两端各一个焊盘。这里要分两档：
+     *   小贴片（0603/0805/1206/SOD）：0.5L × 1.12W、中心距 0.94L，
+     *     0603 正好落在 0.8×0.9 / 1.5，和实物一致。
+     *   大件（功率电感、SMA/SMB 二极管、保险丝）：不能再用同一套比例 ——
+     *     6.6mm 宽的电感会被画出 7.4mm 的焊盘，比本体还宽，看着像两个灰砖头。
+     *     这类件按 0.34L × 0.5W 取（SMMS0650 实测焊盘约 2.2×2.6）。
+     */
+    const big = L >= 3.4 || W >= 2.0;
+    const pw = L * (big ? 0.34 : 0.5);
+    const ph = W * (big ? 0.5 : 1.12);
+    const dx = L * (big ? 0.36 : 0.47);
     sp = 2 * dx;
     list.push(put(-dx * MM2MIL, 0, pw, ph), put(dx * MM2MIL, 0, pw, ph));
   }
 
+  /* 第 1 脚画成方焊盘：排针 / 直插连接器的规矩，焊接时一眼看出从哪头数。
+     SMD 的 SOP/QFP 不做这个 —— 真实封装里第 1 脚和其它脚形状一样，
+     方一个反而怪，靠丝印缺口/圆点标记。 */
+  const kind = g.kind || 'two';
+  if (list.length >= 3 && kind === 'row') {
+    const p0 = list[0].slice();
+    p0[6] = 'square';
+    list[0] = p0;
+  }
+
   /* 焊盘半径跟着脚距走：2.54 排针画出来是明显的圆孔，0603 还是一个小点 */
   const padR = sp ? Math.min(1.0, Math.max(0.2, sp * 0.33)) : 0.12;
-  return { pads: list, box: [L, W], padR };
+  return { pads: list, box: [L, W], padR, kind, round: !!g.round };
 }
 
 function buildComps(raw, attrs, devs, fps) {
@@ -1248,44 +1267,54 @@ function peekMarked(g) {
 }
 
 /* --------------------------------- 几何 ---------------------------------- */
-function bodyRect(c, pad) {
-  pad = (pad == null) ? 0.15 : pad;
-
-  /* 有精确本体尺寸（从封装名解析来的）就直接用，旋转后取包围盒。
-     这样 7P 排针就是细长条、SOIC-8 就是 4.9×3.9，不再一律小方块。 */
-  const box = c.box;
-  if (box && box[0] > 0 && box[1] > 0) {
-    const hw = box[0] / 2, hh = box[1] / 2;
-    const rad = (Number(c.angle) || 0) * Math.PI / 180;
-    const cs = Math.cos(rad), sn = Math.sin(rad);
-    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
-    for (const [px, py] of [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh]]) {
-      const X = c.x + (px * cs - py * sn) * MM2MIL;
-      const Y = c.y + (px * sn + py * cs) * MM2MIL;
-      if (X < x0) x0 = X; if (X > x1) x1 = X;
-      if (Y < y0) y0 = Y; if (Y > y1) y1 = Y;
-    }
-    return {
-      x: x0 * MIL - pad, y: y0 * MIL - pad,
-      w: (x1 - x0) * MIL + 2 * pad, h: (y1 - y0) * MIL + 2 * pad,
-    };
-  }
-
+/* 丝印框：把一颗件的所有焊盘圈在一起，像真实 PCB 那样「一眼就是一颗件」。
+ *
+ * 为什么按焊盘外缘反推、而不是读封装库里的真丝印：真丝印存封装库，
+ * .epro2 没把它导出来（PCB 文档里连 PAD 图元都没有），插件模式的
+ * getAllPinsByPrimitiveId 也只给焊盘。所以只能「焊盘外缘 + 外扩 clr」。
+ *
+ * clr 是外扩量（mm）。太小框会切进焊盘，太大相邻的 0603 会连成一片。
+ */
+function silkBox(c, clr) {
+  clr = (clr == null) ? 0.28 : clr;
   const pins = c.pins || [];
-  if (pins.length) {
-    const xs = pins.map(p => p[0]), ys = pins.map(p => p[1]);
-    const dx = (Math.max(...xs) - Math.min(...xs)) * MIL;
-    const dy = (Math.max(...ys) - Math.min(...ys)) * MIL;
-    const cx = (Math.max(...xs) + Math.min(...xs)) / 2 * MIL;
-    const cy = (Math.max(...ys) + Math.min(...ys)) / 2 * MIL;
-    let w, h;
-    if (dy > dx * 1.5) { w = 0.9 + 2 * pad; h = dy + 0.9 + 2 * pad; }
-    else if (dx > dy * 1.5) { w = dx + 0.9 + 2 * pad; h = 0.9 + 2 * pad; }
-    else { w = dx + 2 * pad; h = dy + 2 * pad; }
-    return { x: cx - w / 2, y: cy - h / 2, w, h };
+  if (!pins.length) {
+    const bx = (Number(c.x) || 0) * MIL, by = (Number(c.y) || 0) * MIL;
+    const b = (c.box && c.box[0] > 0) ? c.box : [1.6, 0.8];
+    return { x: bx - b[0] / 2 - clr, y: by - b[1] / 2 - clr, w: b[0] + 2 * clr, h: b[1] + 2 * clr };
   }
-  const x = c.x * MIL, y = c.y * MIL;
-  return { x: x - 0.8, y: y - 0.4, w: 1.6, h: 0.8 };
+  /* 焊盘坐标已经在 makePads 里按 angle 旋转过了，但焊盘的宽高还是「元件坐标系」
+     下的值，所以算包围盒时要把宽高按 |cos|/|sin| 摊到两个轴上 */
+  const ra = (Number(c.angle) || 0) * Math.PI / 180;
+  const ac = Math.abs(Math.cos(ra)), as = Math.abs(Math.sin(ra));
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  for (const p of pins) {
+    const px = p[0] * MIL, py = p[1] * MIL;
+    const pw = Number(p[4]) ? Number(p[4]) * MIL : (c.padR || 0.12) * 2;
+    const ph = Number(p[5]) ? Number(p[5]) * MIL : (c.padR || 0.12) * 2;
+    const hw = (pw * ac + ph * as) / 2;
+    const hh = (pw * as + ph * ac) / 2;
+    if (px - hw < x0) x0 = px - hw;
+    if (px + hw > x1) x1 = px + hw;
+    if (py - hh < y0) y0 = py - hh;
+    if (py + hh > y1) y1 = py + hh;
+  }
+  const bx = (x1 + x0) / 2, by = (y1 + y0) / 2;
+  /* 圆柱封装：丝印是整圆，所以框取正方形（边长 = 本体直径），
+     否则命中区、标签避让、视图自适应会按细长条算，和看到的圆对不上。 */
+  const rnd = (c.round != null) ? c.round : fpGeom(c.fp).round;
+  if (rnd) {
+    const bk = (c.box && c.box[0] > 0) ? Math.max(c.box[0], c.box[1]) : Math.max(x1 - x0, y1 - y0);
+    const side = bk + 2 * clr;
+    return { x: bx - side / 2, y: by - side / 2, w: side, h: side };
+  }
+  return { x: x0 - clr, y: y0 - clr, w: (x1 - x0) + 2 * clr, h: (y1 - y0) + 2 * clr };
+}
+
+/* 器件的可视化范围 == 丝印框。命中测试、标签避让、视图自适应都用它，
+   所以「看到的框」和「能点的范围」永远是同一个东西。 */
+function bodyRect(c, pad) {
+  return silkBox(c, (pad == null) ? 0.15 : pad);
 }
 
 /* 画一个器件的全部焊盘。
@@ -1309,6 +1338,8 @@ function drawPads(g, c, S, ppm, strong, marked) {
       const d = Math.max(MINPX, (c.padR || 0.12) * 2 * ppm);
       w = h = d; circle = true;
     }
+    /* 第 1 脚：方焊盘。宽高取一样，画成正方形 */
+    if (p[6] === 'square') { const d = Math.max(w, h); w = h = d; circle = false; }
     w = Math.max(MINPX, w); h = Math.max(MINPX, h);
 
     g.save();
@@ -1329,6 +1360,60 @@ function drawPads(g, c, S, ppm, strong, marked) {
     }
     g.restore();
   }
+}
+
+/* 圆角矩形路径。不用 ctx.roundRect：老安卓 WebView（< Chrome 99）没有这个方法，
+   会直接抛异常，整块板都画不出来。 */
+function silkPath(g, x, y, w, h, r) {
+  r = Math.max(0, Math.min(r, w / 2, h / 2));
+  g.beginPath();
+  if (!r) { g.rect(x, y, w, h); return; }
+  g.moveTo(x + r, y);
+  g.lineTo(x + w - r, y); g.arcTo(x + w, y, x + w, y + r, r);
+  g.lineTo(x + w, y + h - r); g.arcTo(x + w, y + h, x + w - r, y + h, r);
+  g.lineTo(x + r, y + h); g.arcTo(x, y + h, x, y + h - r, r);
+  g.lineTo(x, y + r); g.arcTo(x, y, x + r, y, r);
+  g.closePath();
+}
+
+/* 画丝印层（元件外框）。
+ *
+ *   mode='ghost'  未选中的器件：淡茶灰细线，负责把散落的焊盘圈成一颗件
+ *   mode='active' 选中组：黑色实线，和黑焊盘一起构成「这颗要焊」
+ *   marked        已打勾：整颗压淡，退到背景里
+ *
+ * 真实丝印是 0.15mm 线宽的黄/白色，这里保留「线宽跟实物比例走」，
+ * 但颜色用灰调 —— 这个工具的卖点是不靠颜色区分（色弱也能用），
+ * 丝印如果上黄色，不选中/选中的差别就变成靠色相了。
+ */
+function drawSilk(g, c, S, ppm, mode, marked) {
+  const b = silkBox(c, mode === 'active' ? 0.34 : 0.28);
+  const p1 = S(b.x, b.y + b.h), p2 = S(b.x + b.w, b.y);
+  const x = p1[0], y = p1[1], w = p2[0] - p1[0], h = p2[1] - p1[1];
+  if (w < 2.5 || h < 2.5) return;          // 太小就别画，否则整板糊成一片
+
+  g.save();
+  if (mode === 'active') {
+    g.strokeStyle = marked ? 'rgba(20,22,26,.26)' : '#14161A';
+    g.lineWidth = Math.max(1.4, Math.min(2.8, ppm * 0.16));
+  } else {
+    g.strokeStyle = marked ? '#D2D2CC' : '#B4AEA1';
+    g.lineWidth = Math.max(1, Math.min(2, ppm * 0.13));
+  }
+  g.lineJoin = 'round';
+
+  /* 圆柱形封装（电解电容、大电感）：丝印是整圆，不是方框。
+     silkBox 对这类件已经返回正方形，所以直接内切圆即可。 */
+  const round = (c.round != null) ? c.round : fpGeom(c.fp).round;
+  if (round) {
+    g.beginPath();
+    g.arc(x + w / 2, y + h / 2, Math.max(1, Math.min(w, h) / 2), 0, Math.PI * 2);
+    g.stroke();
+  } else {
+    silkPath(g, x, y, w, h, Math.min(w, h) * 0.16);
+    g.stroke();
+  }
+  g.restore();
 }
 
 /* --------------------------------- 绘制 ---------------------------------- */
@@ -1409,11 +1494,13 @@ function drawBase() {
     }
   }
 
-  /* --- 非目标器件：画成裸铜焊盘，把对比度留给选中组 --- */
+  /* --- 非目标器件：丝印框 + 裸铜焊盘，把对比度留给选中组 ---
+   * 先丝印后焊盘：真实板上丝印会被焊盘盖住，顺序反了框线会压在白焊盘上。 */
   const target = new Set(active ? active.items.map(c => c.d) : []);
   g.textAlign = 'center'; g.textBaseline = 'middle';
   for (const { c } of rects) {
     if (target.has(c.d)) continue;
+    drawSilk(g, c, S, ppm, 'ghost', false);
     drawPads(g, c, S, ppm, false, false);
   }
   if (!active && ppm > 6.5) {
@@ -1434,25 +1521,17 @@ function drawBase() {
     const ordered = orderItems(active.items);
     active._ordered = ordered;
 
-    // 1) 焊盘
+    // 1) 丝印框 + 焊盘
     ordered.forEach((c, i) => {
       const r = bodyRect(c, 0.15);
       const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
       const w = Math.max(6, p2[0] - p1[0]), h = Math.max(6, p2[1] - p1[1]);
       const isMarked = !!marks[c.d];
 
+      /* 丝印先画：它负责把两个焊盘圈成「一颗件」。整板视图下 0603 只有
+         十几个像素，光看两个黑点分不清是一颗还是两颗，靠框认。 */
+      drawSilk(g, c, S, ppm, 'active', isMarked);
       drawPads(g, c, S, ppm, true, isMarked);
-
-      /* 整板视图下 0603 的两个焊盘只有几个像素，光看黑点找不着；
-         补一圈细虚线当「丝印框」，定位靠它，填充仍留给焊盘 */
-      if (ppm > 3.2) {
-        g.save();
-        g.setLineDash([3, 2]);
-        g.strokeStyle = isMarked ? 'rgba(20,22,26,.22)' : 'rgba(20,22,26,.42)';
-        g.lineWidth = 1;
-        g.strokeRect(p1[0] - 1.5, p1[1] - 1.5, w + 3, h + 3);
-        g.restore();
-      }
 
       layout.hits.push({ i, c, x: p1[0], y: p1[1], w, h, marked: isMarked });
     });
