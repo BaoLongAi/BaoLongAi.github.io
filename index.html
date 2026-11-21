@@ -2560,14 +2560,18 @@ async function boot() {
    直接 .onclick 赋值会抛 TypeError，把后面的 boot() 一起中断掉 —— 必须容错。 */
 function on(id, fn) { const el = document.getElementById(id); if (el) el.onclick = fn; }
 
-/* 翻板按钮：只有工程里确实有底层元件时才出现，免得单面板用户困惑 */
+/* 翻板按钮：始终显示（功能可见才可发现）。单面板置灰，点了会说明原因，
+   不静默隐藏 —— 否则用户以为功能不存在，怎么找都找不到。 */
 function syncSideBtn() {
   HAS_BOTTOM = COMPS.some(c => Number(c.layer) === 2);
   const b = document.getElementById('btnSide');
   if (!b) return;
-  b.style.display = HAS_BOTTOM ? '' : 'none';
+  b.style.display = '';
+  b.style.opacity = HAS_BOTTOM ? '' : '0.4';
   b.textContent = SIDE === 'bottom' ? '底' : '顶';
-  b.title = SIDE === 'bottom' ? '翻到正面（顶层）' : '翻到背面（底层）';
+  b.title = HAS_BOTTOM
+    ? (SIDE === 'bottom' ? '翻到正面（顶层）' : '翻到背面（底层）')
+    : '这个工程的元件都在正面，没有背面元件可翻';
   const sub = document.getElementById('sub');
   if (sub && HAS_BOTTOM) {
     sub.textContent = SIDE === 'bottom'
@@ -2576,6 +2580,10 @@ function syncSideBtn() {
   }
 }
 on('btnSide', () => {
+  if (!HAS_BOTTOM) {
+    toast('这个工程 ' + COMPS.length + ' 个元件全在正面，没有背面元件');
+    return;
+  }
   SIDE = SIDE === 'top' ? 'bottom' : 'top';
   active = null; marks = {};
   VIEW.k = 1; VIEW.dx = 0; VIEW.dy = 0;   // 翻面后回到适应窗口，免得视野跑偏
