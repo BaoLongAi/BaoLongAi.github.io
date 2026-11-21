@@ -1504,7 +1504,18 @@ function drawBase() {
     drawPads(g, c, S, ppm, false, false);
   }
   if (!active && ppm > 6.5) {
-    g.fillStyle = '#9E9E98'; g.font = '8.5px "Microsoft YaHei",sans-serif';
+    /* 位号写在元件中心（放外面会和邻居撞在一起：0603 相邻才 16px，字有 22px）。
+       2 脚连接器这种焊盘又大又占地方的，字会压到焊盘上，所以先描一圈白边再填，
+       跟地图上的注记一个做法。 */
+    g.font = '8.5px "Microsoft YaHei",sans-serif';
+    g.lineWidth = 2.6; g.strokeStyle = '#FFFFFF'; g.lineJoin = 'round';
+    for (const { c, r } of rects) {
+      const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
+      if (p2[0] - p1[0] < 15) continue;
+      const tx = (p1[0] + p2[0]) / 2, ty = (p1[1] + p2[1]) / 2;
+      g.strokeText(c.d, tx, ty);
+    }
+    g.fillStyle = '#9E9E98';
     for (const { c, r } of rects) {
       const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
       if (p2[0] - p1[0] < 15) continue;
