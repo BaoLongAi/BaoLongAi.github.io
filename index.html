@@ -914,33 +914,51 @@ const MM2MIL = 1 / 0.0254;
 function fpGeom(fp) {
   const s = String(fp || '');
   const grab = re => { const m = re.exec(s); return m ? parseFloat(m[1]) : 0; };
-  const L = grab(/(?:^|[_-])L([\d.]+)/);          // 长边
-  const W = grab(/(?:^|[_-])W([\d.]+)/);          // 短边
+  const L = grab(/(?:^|[_-])L([\d.]+)/);          // 长边（引脚排列方向）
+  const W = grab(/(?:^|[_-])W([\d.]+)/);          // 短边（两排焊盘分开的方向）
   const pitch = grab(/(?:^|[_-])P([\d.]+)/);      // 焊盘中心距
+  const LS = grab(/(?:^|[_-])LS([\d.]+)/);        // 两排焊盘外缘总跨距
+  const BD = grab(/(?:^|[_-])BD([\d.]+)/);        // 圆柱本体直径
+  const DN = grab(/(?:^|[_-])(?:MH|HOLE)[_-]?([\d.]+)/i);  // 安装孔孔径，MH-3.2 → 3.2
 
   let n = 0, m, rows = 0;
   if ((m = /(?:^|[_-])(\d+)P[_-]/.exec(s)) || (m = /(?:^|[_-])(\d+)P$/.exec(s))) n = +m[1];
   /* 另一种常见写法：HDR-F-2.54_1x7 / PinHeader_1x7_P2.54mm → 「行 × 列」 */
   if (!n && (m = /(?:^|[_-])(\d+)[xX](\d+)(?=[_-]|$)/.exec(s))) { rows = +m[1]; n = rows * +m[2]; }
   if (!n && (m = /(?:SOIC|SOP|TSSOP|MSOP|LQFP|TQFP|QFN|DFN|SON|BGA|DIP)-(\d+)/i.exec(s))) n = +m[1];
-  if (!n && /SOT-223/.test(s)) n = 3;
-  if (!n && /SOT-23/.test(s)) n = 3;
+
+  /* SOT 家族：脚数写在尾巴上，SOT-23-5 是 5 脚（3+2），SOT-23-6 是 6 脚（3+3）。
+     以前 /SOT-23/ 一律给 3 —— 5 脚的 LDO / 运放被画成一排三个圆孔，
+     个数、形状、方向全错。必须先认「SOT-23-数字」再退回「SOT-23=3 脚」。 */
+  if ((m = /SOT-?23-(\d+)/i.exec(s))) n = +m[1];
+  else if (!n && /SOT-?23|SOT-?89|SOT-?223/i.test(s)) n = 3;
   if (!n && /SOD-/.test(s)) n = 2;
   if (!n && /(?:SMA|SMB|SMC)_/.test(s)) n = 2;
+  /* 只有 1 个焊盘的件：安装孔 / 测试点 / 单脚焊盘（MH-3.2、MOUNT_HOLE、TP-2.0）。
+     名字里没有「1P」，只能靠这些关键词认，否则会落进「两端元件」多画一个焊盘。 */
+  if (!n && /(?:^|[_-])(?:MH|HOLE|MOUNT|PAD|TP|TEST)(?:[_-]|$)|螺丝|安装孔|测试点/i.test(s)) n = 1;
+
+  /* 直插标记：TH / HDR / MH(安装孔) / HOLE / PTH。只用来决定单焊盘画圆还是画方 */
+  const th = /(?:^|[_-])TH(?:[_-]|$)|HDR|CONN|PTH|MH[_-]|HOLE|MOUNT|螺丝|安装孔|测试点|端子/i.test(s);
 
   let kind;
   if (/(?:LQFP|TQFP|QFP|QFN|DFN|SON|BGA)/i.test(s)) kind = 'quad';
+  else if (/SOT-?223|SOT-?89/i.test(s)) kind = 'sotTab';  // 3 细脚 + 1 个大散热盘
+  else if (/SOT-?23/i.test(s)) kind = 'sot';              // 两列不等长：3+2 / 3+3 / 2+1
   else if (/(?:SOIC|SOP|TSSOP|MSOP)/i.test(s)) kind = 'dual';
-  else if (n >= 4 && L && W && !pitch) kind = 'quad';   // 4 脚晶振：四角各一个焊盘
-  else if (rows >= 2) kind = 'dual';                     // 2x5 双排排针
-  else if (n >= 2) kind = 'row';                         // 排针 / 连接器 / SOT / 二极管
-  else kind = 'two';                                     // 认不出脚数：当两端元件
+  else if (n === 1) kind = 'one';                          // 单焊盘：安装孔 / 测试点
+  else if (n >= 4 && L && W && !pitch) kind = 'quad';      // 4 脚晶振：四角各一个焊盘
+  else if (rows >= 2) kind = 'dual';                       // 2x5 双排排针
+  else if (n >= 3) kind = 'row';                           // 排针 / 连接器 / TO-92
+  else if (n === 2) kind = th ? 'row' : 'two';             // 2 脚排针才排成一排，二极管是两端
+  else kind = 'two';                                       // 认不出脚数：当两端元件
 
   /* 圆柱形封装（电解电容、大电感）名字里带 BD=body diameter，焊盘是圆的。
-     不认出来的话 10mm 电容会被画成两个 5mm 的大方框，中间空空像个相框。 */
-  const round = /(?:^|[_-])BD[\d.]+/i.test(s) || /^CAP-SMD_BD/i.test(s);
+     不认出来的话 10mm 电容会被画成两个 5mm 的大方框，中间空空像个相框。
+     单焊盘的直插件（安装孔）同理，丝印画成圆环。 */
+  const round = (BD > 0) || (kind === 'one' && th);
 
-  return { n, pitch, L, W, kind, round };
+  return { n, pitch, L, W, LS, BD, DN, kind, round, th };
 }
 
 /* 生成焊盘：每个焊盘带自己的尺寸和形状（mil，已按 angle 旋转）
@@ -1013,6 +1031,46 @@ function makePads(g, est, x, y, angle) {
       list.push(put(d, -ey * MM2MIL, pw, pl), put(d, ey * MM2MIL, pw, pl));
       list.push(put(-ex * MM2MIL, d, pl, pw), put(ex * MM2MIL, d, pl, pw));
     }
+
+  } else if (g.kind === 'sot' && n >= 3) {
+    /* SOT-23 家族：两列、不等长（5 脚 3+2、3 脚 2+1、6 脚 3+3）。
+       焊盘是沿引脚伸出方向的长条，宽度约 0.6 个脚距 —— 实物 SOT-23-5 的
+       焊盘正好是 0.6×1.0、中心距 0.95，这里算出来对得上。 */
+    const a = Math.ceil(n / 2), b = n - a;
+    const p = P || (g.L ? Math.max(0.4, (g.L - 0.8) / Math.max(1, a - 1)) : 0.95);
+    const pw = Math.min(0.85, Math.max(0.4, p * 0.62));        // 沿排布方向
+    const ph = Math.min(1.25, Math.max(0.55, W * 0.62 + 0.15)); // 沿伸出方向
+    /* 两列的距离：名字里有 LS（lead span）就用真值，否则按本体宽 + 半个焊盘估 */
+    const cy = g.LS ? Math.max(0.6, g.LS / 2 - ph / 2 + 0.05)
+      : Math.max(0.6, W / 2 + ph * 0.4);
+    sp = p;
+    for (let i = 0; i < a; i++) list.push(put((i - (a - 1) / 2) * p * MM2MIL, -cy * MM2MIL, pw, ph));
+    for (let i = 0; i < b; i++) list.push(put((i - (b - 1) / 2) * p * MM2MIL, cy * MM2MIL, pw, ph));
+    L = Math.max(L, (a - 1) * p + pw + 0.2);
+    W = Math.max(W, 2 * cy + ph);
+
+  } else if (g.kind === 'sotTab') {
+    /* SOT-223 / SOT-89：一侧 3 个细脚，另一侧 1 个大焊盘（芯片背面散热铜）。
+       画成「4 个一样的小脚」会看不出哪边是散热面，回流焊时对不准。 */
+    const p = P || (g.L ? Math.max(1.2, (g.L - 1.0) / 3) : 2.3);
+    const pw = Math.min(0.9, Math.max(0.45, p * 0.34));
+    const ph = Math.min(1.3, Math.max(0.6, W * 0.3));
+    const cy = g.LS ? Math.max(1.0, g.LS / 2 - ph / 2 + 0.1)
+      : Math.max(1.0, W / 2 + ph * 0.35);
+    sp = p;
+    for (let i = 0; i < 3; i++) list.push(put((i - 1) * p * MM2MIL, -cy * MM2MIL, pw, ph));
+    list.push(put(0, cy * MM2MIL, Math.min(3.4, W * 0.85), ph * 1.5));
+
+  } else if (g.kind === 'one') {
+    /* 单焊盘：安装孔 / 测试点 / 单脚端子。
+       以前 n=1 会落到 'two' 分支，凭空多画一个焊盘 —— 那颗 PE 大圆盘
+       就是这么被画成「两个贴片焊盘」的。 */
+    const base = g.BD || g.DN || ((g.L && g.W) ? Math.min(g.L, g.W) : (g.L || g.W || 2.54));
+    const d = g.th ? Math.min(3.2, Math.max(1.2, base * 0.7))
+      : Math.max(0.8, base * 0.8);
+    list.push(put(0, 0, d, d, g.th ? 'circle' : 'rect'));
+    sp = d;
+    L = W = d * 1.35;          // 丝印圈比焊盘大一圈，和实物「孔外一圈黄」一致
 
   } else if (g.round) {
     /* 圆柱封装（电解电容 / 大电感）：两个圆形焊盘。
