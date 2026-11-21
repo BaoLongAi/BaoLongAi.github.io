@@ -1155,13 +1155,25 @@ function buildComps(raw, attrs, devs, fps) {
 }
 
 /* -------------------------- 工程缓存（本机） -------------------------- */
-/* v2：加了旋转角度，v1 的缓存里所有器件都是 0°，留着会一直横着显示 */
-const LSKEY = 'soldermap.proj.v2';
+/* v2：加了旋转角度，v1 的缓存里所有器件都是 0°，留着会一直横着显示
+   v3：焊盘推算改过（SOT-23-5 从 3 脚变 5 脚、单焊盘件不再多画一个）。
+       缓存里存的是**算好的焊盘**，不换键的话用户会一直看到旧形状，
+       以为「修了没效果」。 */
+const LSKEY = 'soldermap.proj.v3';
+const LSKEY_OLD = 'soldermap.proj.v2';
 function saveProj(o) { try { localStorage.setItem(LSKEY, JSON.stringify(o)); } catch (_) { } }
 function readSaved() {
   try {
     const s = localStorage.getItem(LSKEY);
-    return s ? JSON.parse(s) : null;
+    if (s) return JSON.parse(s);
+    /* 从 v2 迁移：位号/坐标/值全都留着（省得重新导入），
+       只把「推算出来的焊盘」标记成待重算 —— normalizeComps 看到 box 为空
+       就会用新算法重新算一遍；EDA 给的真焊盘（syn=false）原样不动。 */
+    const old = localStorage.getItem(LSKEY_OLD);
+    if (!old) return null;
+    const o = JSON.parse(old);
+    if (o && o.comps) for (const c of o.comps) if (c.syn !== false) c.box = null;
+    return o;
   } catch (_) { return null; }
 }
 
