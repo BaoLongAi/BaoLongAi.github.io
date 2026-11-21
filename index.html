@@ -1213,6 +1213,20 @@ function buildComps(raw, attrs, devs, fps, fpPads) {
         y + p.x * sn + p.y * cs,
         p.net, p.num, p.w, p.h, p.shape, p.pa,
       ]);
+      /* 极少数封装（多见于第三方/从别的 EDA 转来的 PCIe 长插槽）的 PAD
+         局部坐标不围绕原点，而是整体偏移几十毫米 —— 元件放板上后焊盘
+         被甩到板外。正常件的焊盘群中心离元件中心都在 4mm 内，
+         这里只对 >5mm 的异常件把整群平移回元件中心。X86 主板实测：
+         PCIEX1_1 偏 100mm、PEX16_1 偏 69mm，其余 1053 件 <4.2mm。 */
+      let mnx = Infinity, mxx = -Infinity, mny = Infinity, mxy = -Infinity;
+      for (const p of pins) {
+        if (p[0] < mnx) mnx = p[0]; if (p[0] > mxx) mxx = p[0];
+        if (p[1] < mny) mny = p[1]; if (p[1] > mxy) mxy = p[1];
+      }
+      const offx = x - (mnx + mxx) / 2, offy = y - (mny + mxy) / 2;
+      if (Math.hypot(offx, offy) * MIL > 5) {
+        for (const p of pins) { p[0] += offx; p[1] += offy; }
+      }
       const est = estimateSize(fp);
       out.push({
         d, v: String(v || ''), fp, dev: libName,
@@ -1246,9 +1260,10 @@ function buildComps(raw, attrs, devs, fps, fpPads) {
    v4：焊盘改读 .epro2 封装库真 PAD，v3 缓存里是猜的，没有封装 UUID。
    v5：修了圆角板框（ARC）解析，v4 缓存里存的是**算错的板框**
        （X86 主板被算成 15678×15918，实际 7085×8853），元件挤在角落。
-       缓存里只有解析结果、没有原始 path，补不回来 —— 必须重新导入。 */
-const LSKEY = 'soldermap.proj.v5';
-const LSKEY_OLD = 'soldermap.proj.v4';
+   v6：修了焊盘群整体偏移的封装（PCIe 长插槽 PAD 偏离原点几十 mm，
+       v5 缓存里那些焊盘还甩在板外）。同上，缓存里没原始数据，必须重新导入。 */
+const LSKEY = 'soldermap.proj.v6';
+const LSKEY_OLD = 'soldermap.proj.v5';
 let NEED_REIMPORT = false;
 function saveProj(o) { try { localStorage.setItem(LSKEY, JSON.stringify(o)); } catch (_) { } }
 function readSaved() {
