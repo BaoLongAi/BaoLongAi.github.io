@@ -815,7 +815,7 @@ const tryJson = s => { try { return JSON.parse(s); } catch (_) { return null; } 
 
 /* 解析 .epru 文本流：每行 {header}||{body}，按 DOCHEAD 切文档 */
 function parseEpru(text) {
-  const comps = [], attrs = new Map(), devs = new Map(), fps = new Map();
+  const comps = [], attrs = new Map(), devs = new Map(), fps = new Map(), fpPads = new Map();
   let cur = null, curUuid = null, board = null;
 
   for (const line of text.split('\n')) {
@@ -846,7 +846,26 @@ function parseEpru(text) {
       devs.set(curUuid, { a: b.attributes || {}, t: String(b.title || '') });
       continue;
     }
-    if (cur === 'FOOTPRINT' && h.type === 'META') { if (b.title) fps.set(curUuid, b.title); continue; }
+    if (cur === 'FOOTPRINT') {
+      /* 封装库里存着**真焊盘**：centerX/centerY（mil，封装坐标系）、padAngle、
+         defaultPad 的 width/height/padType。layerId 1=顶层、12=多层（通孔）。
+         有了这个就不用再按封装名猜排布了 —— 名字里 `SOT-23-5` 后面跟 `-BR`
+         还是 `-BL`，排布正好差 90°，光看名字永远猜不对。 */
+      if (h.type === 'META') { if (b.title) fps.set(curUuid, b.title); continue; }
+      if (h.type === 'PAD') {
+        const dp = b.defaultPad || {};
+        const w = Number(dp.width), hh = Number(dp.height);
+        if (!w || !hh) continue;
+        if (!fpPads.has(curUuid)) fpPads.set(curUuid, []);
+        fpPads.get(curUuid).push({
+          x: Number(b.centerX) || 0, y: Number(b.centerY) || 0,
+          a: Number(b.padAngle) || 0, w, h: hh,
+          t: String(dp.padType || 'RECT'), num: String(b.num == null ? '' : b.num),
+          th: Number(b.layerId) === 12 || (b.hole && Number(b.hole.width) > 0),
+        });
+      }
+      continue;
+    }
     if (cur !== 'PCB') continue;
 
     if (h.type === 'COMPONENT') { b.__id = h.id; comps.push(b); }
@@ -869,7 +888,7 @@ function parseEpru(text) {
       }
     }
   }
-  return { comps: buildComps(comps, attrs, devs, fps), board };
+  return { comps: buildComps(comps, attrs, devs, fps, fpPads), board };
 }
 
 /* 器件名 → 本体尺寸（mm），只用于画个像样的方块 */
@@ -1113,7 +1132,26 @@ function makePads(g, est, x, y, angle) {
   return { pads: list, box: [L, W], padR, kind, round: !!g.round };
 }
 
-function buildComps(raw, attrs, devs, fps) {
+/* 把封装库里的真焊盘搬到板上：先绕自己的 padAngle 都不用管，
+   直接「封装坐标 → 元件角度 → 元件位置」。底面的件 X 镜像。 */
+function realPins(list, x, y, ang, mirror) {
+  const rad = (Number(ang) || 0) * Math.PI / 180;
+  const cs = Math.cos(rad), sn = Math.sin(rad);
+  const mx = mirror ? -1 : 1;
+  const out = [];
+  for (const p of list) {
+    const lx = p.x * mx, ly = p.y;
+    out.push([
+      x + lx * cs - ly * sn, y + lx * sn + ly * cs, '', p.num,
+      p.w, p.h,
+      p.t === 'ELLIPSE' ? 'circle' : 'rect',
+      mirror ? -p.a : p.a,           // 每颗焊盘自己的旋转（第 8 位，老数据没有就按 0）
+    ]);
+  }
+  return out;
+}
+
+function buildComps(raw, attrs, devs, fps, fpPads) {
   const out = [];
   for (const c of raw) {
     const a = attrs.get(c.__id) || {};
@@ -1141,14 +1179,18 @@ function buildComps(raw, attrs, devs, fps) {
     if (!isFinite(ang)) ang = 0;
     ang = ((ang % 360) + 360) % 360;
     const geo = makePads(fpGeom(fp), estimateSize(fp), x, y, ang);
+    /* 有真焊盘就用真的（坐标、尺寸、形状都是嘉立创给的）；
+       只有封装库里没带焊盘的老包，才退回按封装名推算。 */
+    const rp = fpPads && fpPads.get(fpuuid);
+    const real = !!(rp && rp.length);
     out.push({
       d, v: String(v || ''), fp, dev: libName,
       layer: Number(c.layerId) || 1,
       x, y, angle: ang,
-      pins: geo.pads,
+      pins: real ? realPins(rp, x, y, ang, (Number(c.layerId) || 1) === 2) : geo.pads,
       box: geo.box,
       padR: geo.padR,
-      syn: true,                 // 焊盘是推算的，不是 EDA 给的真坐标
+      syn: !real,                // false = 焊盘是 EDA 给的真数据，别再推算覆盖
     });
   }
   return out;
@@ -1156,24 +1198,15 @@ function buildComps(raw, attrs, devs, fps) {
 
 /* -------------------------- 工程缓存（本机） -------------------------- */
 /* v2：加了旋转角度，v1 的缓存里所有器件都是 0°，留着会一直横着显示
-   v3：焊盘推算改过（SOT-23-5 从 3 脚变 5 脚、单焊盘件不再多画一个）。
-       缓存里存的是**算好的焊盘**，不换键的话用户会一直看到旧形状，
-       以为「修了没效果」。 */
-const LSKEY = 'soldermap.proj.v3';
-const LSKEY_OLD = 'soldermap.proj.v2';
+   v3：焊盘推算改过（SOT-23-5 从 3 脚变 5 脚）
+   v4：焊盘改成**读封装库的真值**。缓存里没有封装 uuid，拿不到真焊盘，
+       所以这一版不迁移旧缓存 —— 打开后重新选一次 .epro2 就好。 */
+const LSKEY = 'soldermap.proj.v4';
 function saveProj(o) { try { localStorage.setItem(LSKEY, JSON.stringify(o)); } catch (_) { } }
 function readSaved() {
   try {
     const s = localStorage.getItem(LSKEY);
-    if (s) return JSON.parse(s);
-    /* 从 v2 迁移：位号/坐标/值全都留着（省得重新导入），
-       只把「推算出来的焊盘」标记成待重算 —— normalizeComps 看到 box 为空
-       就会用新算法重新算一遍；EDA 给的真焊盘（syn=false）原样不动。 */
-    const old = localStorage.getItem(LSKEY_OLD);
-    if (!old) return null;
-    const o = JSON.parse(old);
-    if (o && o.comps) for (const c of o.comps) if (c.syn !== false) c.box = null;
-    return o;
+    return s ? JSON.parse(s) : null;
   } catch (_) { return null; }
 }
 
@@ -1353,12 +1386,13 @@ function silkBox(c, clr) {
     const b = (c.box && c.box[0] > 0) ? c.box : [1.6, 0.8];
     return { x: bx - b[0] / 2 - clr, y: by - b[1] / 2 - clr, w: b[0] + 2 * clr, h: b[1] + 2 * clr };
   }
-  /* 焊盘坐标已经在 makePads 里按 angle 旋转过了，但焊盘的宽高还是「元件坐标系」
-     下的值，所以算包围盒时要把宽高按 |cos|/|sin| 摊到两个轴上 */
-  const ra = (Number(c.angle) || 0) * Math.PI / 180;
-  const ac = Math.abs(Math.cos(ra)), as = Math.abs(Math.sin(ra));
+  /* 焊盘坐标已经在 makePads / realPins 里按角度旋转过了，但焊盘的宽高还是
+     「元件坐标系」下的值，所以算包围盒时要把宽高按 |cos|/|sin| 摊到两个轴上。
+     每颗焊盘还可能有自己的 padAngle，一起算进去。 */
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
   for (const p of pins) {
+    const ra = ((Number(c.angle) || 0) + (Number(p[7]) || 0)) * Math.PI / 180;
+    const ac = Math.abs(Math.cos(ra)), as = Math.abs(Math.sin(ra));
     const px = p[0] * MIL, py = p[1] * MIL;
     const pw = Number(p[4]) ? Number(p[4]) * MIL : (c.padR || 0.12) * 2;
     const ph = Number(p[5]) ? Number(p[5]) * MIL : (c.padR || 0.12) * 2;
@@ -1397,10 +1431,13 @@ function bodyRect(c, pad) {
  */
 function drawPads(g, c, S, ppm, strong, marked) {
   const pads = c.pins || [];
-  const ra = -(Number(c.angle) || 0) * Math.PI / 180;
+  const ra0 = -(Number(c.angle) || 0) * Math.PI / 180;
   const MINPX = 1.7;
   for (const p of pads) {
     const q = S(p[0] * MIL, p[1] * MIL);
+    /* 每颗焊盘可能有自己的 padAngle（第 8 位）。以前只看元件角度，
+       封装里斜过来的焊盘（比如某些连接器的 45° 脚）会画错方向。 */
+    const ra = ra0 - (Number(p[7]) || 0) * Math.PI / 180;
     let w = Number(p[4]) ? Number(p[4]) * MIL * ppm : 0;
     let h = Number(p[5]) ? Number(p[5]) * MIL * ppm : 0;
     let circle = p[6] === 'circle';
