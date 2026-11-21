@@ -320,6 +320,8 @@
         <button id="zIn" title="放大">＋</button>
         <button id="zOut" title="缩小">－</button>
         <button id="zFit" title="回到适应窗口" aria-label="回到适应窗口"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M2.2 6V2.2H6M14 6V2.2H10M2.2 10v3.8H6M14 10v3.8H10"/></svg></button>
+        <!-- 双面贴装的板子才有：点一下把板子翻过来，看/焊背面元件 -->
+        <button id="btnSide" title="翻板：切换到背面" aria-label="翻板" style="display:none;font-size:13px;font-weight:700">顶</button>
       </div>
     </div>
   </main>
@@ -450,6 +452,21 @@ let groups = [];         // 当前类别的分组
 let active = null;       // 选中的分组对象
 let marks = {};          // 已焊标记 { designator: true }
 let layout = null;       // 绘制坐标系缓存（命中测试 / 动画用）
+
+/* 看板子的哪一面：'top' 顶层 / 'bottom' 底层。
+ * 工程里的坐标是「从顶层看」的绝对坐标（已验证：底层件 U9 的坐标落在板框内，
+ * 若先镜像反而跑出板外）。所以解析时不动坐标，只在显示时把整个板子翻过来。 */
+let SIDE = 'top';
+let HAS_BOTTOM = false;  // 这个工程有没有底层元件：没有就把翻板按钮藏起来
+
+/* 当前这一面的元件。CATS 的角标计数、分组、视图范围、导出都用它。
+ * layer 字段：1=顶层、2=底层（嘉立创 LAYER 表确认）。老数据/插件没给 layer 的
+ * 一律按顶层处理，免得整板突然空白。 */
+function sideComps() {
+  const want = SIDE === 'bottom' ? 2 : 1;
+  const out = COMPS.filter(c => (Number(c.layer) || 1) === want);
+  return out.length ? out : (SIDE === 'bottom' ? [] : COMPS);
+}
 
 /* ---------------------- 视图缩放 / 平移（手机端必需） ---------------------- *
  * 手机上整板视图里一颗 0603 只有几像素，手指点不中，所以必须能放大。
@@ -1340,7 +1357,7 @@ function orderItems(items) {
 
 function buildGroups(catId) {
   const map = new Map();
-  for (const comp of COMPS) {
+  for (const comp of sideComps()) {
     if (catOf(comp) !== catId) continue;
     /* 关键：阻值 + 封装 一起做分组键，同阻值不同封装不会被混在一起。
        但值读不到时不能只按封装合并 —— 那样 AO3400 和 SI2302 会被并成一行，
@@ -1556,7 +1573,7 @@ function drawBase() {
 
   /* --- 视图范围 --- */
   let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
-  const rects = COMPS.map(c => ({ c, r: bodyRect(c, 0.3) }));
+  const rects = sideComps().map(c => ({ c, r: bodyRect(c, 0.3) }));
   for (const { r } of rects) {
     minX = Math.min(minX, r.x); minY = Math.min(minY, r.y);
     maxX = Math.max(maxX, r.x + r.w); maxY = Math.max(maxY, r.y + r.h);
@@ -1577,7 +1594,14 @@ function drawBase() {
   clampView(W, H);
   const K = VIEW.k, CCX = W / 2, CCY = H / 2;
   const ppm = ppm0 * K;              // 有效缩放：线宽、焊盘半径、字号判断都用它
+  /* 翻板：以板框水平中心为轴做镜像。坐标本身不变（EDA 存的就是从顶层看的位置），
+     只看的时候翻过来 —— 就像把实物板子掉个面，左右自然颠倒。
+     没有板框时用视图中心当轴，保证按钮在任何工程里都可用。 */
+  const mirrorX = SIDE === 'bottom'
+    ? ((BOARD ? BOARD.x * MIL + BOARD.w * MIL / 2 : (minX + maxX) / 2) * 2)
+    : null;
   const S = (mx, my) => {
+    if (mirrorX != null) mx = mirrorX - mx;
     const sx = ox + (mx - vx0) * ppm0;
     const sy = oy + (vy1 - my) * ppm0;
     return [CCX + (sx - CCX) * K + VIEW.dx, CCY + (sy - CCY) * K + VIEW.dy];
@@ -1596,10 +1620,13 @@ function drawBase() {
     const bx0 = BOARD.x * MIL, bx1 = (BOARD.x + BOARD.w) * MIL;
     const byTop = BOARD.y * MIL, byBot = (BOARD.y - BOARD.h) * MIL;
     const p1 = S(bx0, byTop), p2 = S(bx1, byBot);
+    /* 翻板后 p1 在右、p2 在左，宽高会是负的 —— 取一下 min/max */
+    const fx = Math.min(p1[0], p2[0]), fy = Math.min(p1[1], p2[1]);
+    const fw = Math.abs(p2[0] - p1[0]), fh = Math.abs(p2[1] - p1[1]);
     g.fillStyle = '#F6F6F4';
-    g.fillRect(p1[0], p1[1], p2[0] - p1[0], p2[1] - p1[1]);
+    g.fillRect(fx, fy, fw, fh);
     g.strokeStyle = '#9A9A96'; g.lineWidth = 1.2;
-    g.strokeRect(p1[0], p1[1], p2[0] - p1[0], p2[1] - p1[1]);
+    g.strokeRect(fx, fy, fw, fh);
 
     g.strokeStyle = '#EDEDE9'; g.lineWidth = 1;
     g.fillStyle = '#C2C2BC'; g.font = '9px "Microsoft YaHei",sans-serif';
@@ -1607,7 +1634,9 @@ function drawBase() {
     for (let gx = Math.ceil(bx0 / 10) * 10; gx <= bx1; gx += 10) {
       const a = S(gx, byTop), b = S(gx, byBot);
       g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
-      g.fillText(String(Math.round(gx)), a[0] + 2, b[1] - 12);
+      /* 刻度数字显示「翻板后这个位置对应的原坐标」，否则数字和实际位置对不上 */
+      const shownX = mirrorX == null ? gx : mirrorX / MIL - gx;
+      g.fillText(String(Math.round(shownX)), Math.min(a[0], b[0]) + 2, b[1] - 12);
     }
     for (let gy = Math.ceil(byBot / 10) * 10; gy <= byTop; gy += 10) {
       const a = S(bx0, gy), b = S(bx1, gy);
@@ -1838,9 +1867,10 @@ function updateHeader() {
   const where = isMobileLayout() ? '下面列表' : '左侧';
   if (!active) {
     h1.textContent = PROJNAME || '选一个分组';
-    sub.textContent = USING_DEFAULT
+    const sideTip = HAS_BOTTOM ? (SIDE === 'bottom' ? '　·　正在看背面，点「顶」翻回正面' : '　·　点「底」翻到背面焊') : '';
+    sub.textContent = (USING_DEFAULT
       ? '这是预置示例（mcu修改版plus）· 点左上「导入工程」换成你自己的板'
-      : '点' + where + '里任意一行，板上同阻值同封装的元件会变黑、跳动、带序号';
+      : '点' + where + '里任意一行，板上同阻值同封装的元件会变黑、跳动、带序号') + sideTip;
     btns.forEach(id => document.getElementById(id).disabled = true);
     return;
   }
@@ -1860,7 +1890,7 @@ function renderCats() {
   const box = document.getElementById('cats');
   box.innerHTML = '';
   for (const c of CATS) {
-    const n = COMPS.filter(x => catOf(x) === c.id).length;
+    const n = sideComps().filter(x => catOf(x) === c.id).length;
     const b = document.createElement('button');
     b.className = (cat === c.id ? 'on' : '');
     b.innerHTML = c.label + '<span class="n">' + n + '</span>';
@@ -2236,7 +2266,8 @@ async function exportPng() {
   if (!active) return;
   const c2 = composeExport();
   const blob = await new Promise(r => c2.toBlob(r, 'image/png'));
-  const name = '焊接_' + cat + '_' + String(active.v || 'NA').replace(/[\\/:*?"<>|]/g, '_') + '_' + active.fp + '.png';
+  const sideTag = HAS_BOTTOM ? (SIDE === 'bottom' ? '背面_' : '正面_') : '';
+  const name = '焊接_' + sideTag + cat + '_' + String(active.v || 'NA').replace(/[\\/:*?"<>|]/g, '_') + '_' + active.fp + '.png';
   try {
     if (!EDA) throw new Error('no eda');
     await EDA.sys_FileSystem.saveFile(blob, name);
@@ -2266,6 +2297,7 @@ function buildStandalone() {
     name: PROJNAME || '',
     cat: cat,
     g: active ? (active.raw || active.v || '') : '',
+    side: SIDE,          // 离线页打开时停在同一面
     board: BOARD,
     comps: COMPS.map(c => ({
       d: c.d, v: c.v, fp: c.fp, layer: c.layer, x: c.x, y: c.y,
@@ -2400,12 +2432,14 @@ function applyData(comps, board, opt) {
   BOARD = board || null;
   if (!COMPS.length) { fail('没有读到器件'); return; }
 
+  syncSideBtn();
+  const vis = sideComps();
   const q = new URLSearchParams(location.search);
   const want = (q.get('cat') || opt.cat || '').toUpperCase();
   const curCat = CATS.find(x => x.id === cat) || CATS[0];
-  if (CATS.some(x => x.id === want)) cat = want;
-  else if (!COMPS.some(c => catOf(c) === curCat.id)) {
-    cat = COMPS.some(c => catOf(c) === 'R') ? 'R' : (COMPS.some(c => catOf(c) === 'C') ? 'C' : 'R');
+  if (CATS.some(x => x.id === want) && vis.some(c => catOf(c) === want)) cat = want;
+  else if (!vis.some(c => catOf(c) === curCat.id)) {
+    cat = CATS.find(x => vis.some(c => catOf(c) === x.id))?.id || 'R';
   }
 
   groups = buildGroups(cat);
@@ -2455,6 +2489,7 @@ async function boot() {
       const b = document.getElementById(id);
       if (b) b.style.display = 'none';
     });
+    if (j.side === 'bottom') SIDE = 'bottom';
     applyData(j.comps || [], j.board || null, { cat: j.cat, g: j.g });
     return;
   }
@@ -2524,6 +2559,36 @@ async function boot() {
 /* 导出的交互网页里只有 #app 这一层（没有拖拽层），部分按钮根本不存在。
    直接 .onclick 赋值会抛 TypeError，把后面的 boot() 一起中断掉 —— 必须容错。 */
 function on(id, fn) { const el = document.getElementById(id); if (el) el.onclick = fn; }
+
+/* 翻板按钮：只有工程里确实有底层元件时才出现，免得单面板用户困惑 */
+function syncSideBtn() {
+  HAS_BOTTOM = COMPS.some(c => Number(c.layer) === 2);
+  const b = document.getElementById('btnSide');
+  if (!b) return;
+  b.style.display = HAS_BOTTOM ? '' : 'none';
+  b.textContent = SIDE === 'bottom' ? '底' : '顶';
+  b.title = SIDE === 'bottom' ? '翻到正面（顶层）' : '翻到背面（底层）';
+  const sub = document.getElementById('sub');
+  if (sub && HAS_BOTTOM) {
+    sub.textContent = SIDE === 'bottom'
+      ? '正在看背面　·　点「顶」翻回正面'
+      : '点左侧分组，板上同阻值同封装的元件会变黑并跳动　·　点「底」看背面';
+  }
+}
+on('btnSide', () => {
+  SIDE = SIDE === 'top' ? 'bottom' : 'top';
+  active = null; marks = {};
+  VIEW.k = 1; VIEW.dx = 0; VIEW.dy = 0;   // 翻面后回到适应窗口，免得视野跑偏
+  /* 背面可能没有当前分类的件（比如顶层全是电阻、背面只有芯片），自动切到有的那一类 */
+  const vis = sideComps();
+  if (!vis.some(c => catOf(c) === cat)) {
+    const nx = CATS.find(x => vis.some(c => catOf(c) === x.id));
+    if (nx) cat = nx.id;
+  }
+  groups = buildGroups(cat);
+  syncSideBtn(); renderCats(); renderList(); drawBase();
+});
+
 on('btnHtml', exportHtmlFile);
 on('btnPng', exportPng);
 on('btnPrint', doPrint);
