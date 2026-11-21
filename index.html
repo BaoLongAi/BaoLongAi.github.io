@@ -893,12 +893,33 @@ function parseEpru(text) {
       if (!attrs.has(b.parentId)) attrs.set(b.parentId, {});
       attrs.get(b.parentId)[b.key] = b.value;
     } else if ((h.type === 'POLY' || h.type === 'LINE') && b.layerId === 11 && Array.isArray(b.path) && !board) {
-      if (b.path[0] === 'R') {
-        board = { x: b.path[1], y: b.path[2], w: b.path[3], h: b.path[4] };
+      const path = b.path;
+      if (path[0] === 'R') {
+        board = { x: path[1], y: path[2], w: path[3], h: path[4] };
       } else {
-        const nums = b.path.filter(v => typeof v === 'number');
+        /* 板框除了矩形，还会用带圆弧的 POLY：
+           [x0,y0, 'L', x,y, 'ARC', 角度,x,y, 'L', x,y, ...]
+           指令语义：L 后 2 个数是直线终点；ARC 后 3 个数是「角度 + 圆弧终点」，
+           只有终点是坐标，角度不是！
+           以前把 path 里所有数字两两配对当坐标，ARC 的角度被当成 x，
+           真实终点被错位 —— 算出的板框比实际大出一圈（X86 主板从 7085×8853
+           被算成 15678×15918），元件全挤在角落。这里按指令逐段解析。 */
         const xs = [], ys = [];
-        for (let i = 0; i + 1 < nums.length; i += 2) { xs.push(nums[i]); ys.push(nums[i + 1]); }
+        let i = 0;
+        if (typeof path[0] === 'number' && typeof path[1] === 'number') {
+          xs.push(path[0]); ys.push(path[1]); i = 2;   // 起点
+        }
+        while (i < path.length) {
+          const op = path[i];
+          if (op === 'L' && typeof path[i + 2] === 'number') {
+            xs.push(path[i + 1]); ys.push(path[i + 2]); i += 3;
+          } else if (op === 'ARC' && typeof path[i + 3] === 'number') {
+            /* ARC 角度,终点X,终点Y —— 取终点，跳过角度 */
+            xs.push(path[i + 2]); ys.push(path[i + 3]); i += 4;
+          } else if (typeof op === 'number' && i + 1 < path.length && typeof path[i + 1] === 'number') {
+            xs.push(op); ys.push(path[i + 1]); i += 2;   // 兜底：老格式纯坐标
+          } else i++;
+        }
         if (xs.length > 2) {
           board = {
             x: Math.min(...xs), y: Math.max(...ys),
@@ -1222,18 +1243,20 @@ function buildComps(raw, attrs, devs, fps, fpPads) {
 /* -------------------------- 工程缓存（本机） -------------------------- */
 /* v2：加了旋转角度，v1 的缓存里所有器件都是 0°，留着会一直横着显示
    v3：焊盘推算改过（SOT-23-5 从 3 脚变 5 脚、单焊盘件不再多画一个）。
-       缓存里存的是**算好的焊盘**，不换键的话用户会一直看到旧形状，
-       以为「修了没效果」。 */
-const LSKEY = 'soldermap.proj.v4';
-const LSKEY_OLD = 'soldermap.proj.v3';
+   v4：焊盘改读 .epro2 封装库真 PAD，v3 缓存里是猜的，没有封装 UUID。
+   v5：修了圆角板框（ARC）解析，v4 缓存里存的是**算错的板框**
+       （X86 主板被算成 15678×15918，实际 7085×8853），元件挤在角落。
+       缓存里只有解析结果、没有原始 path，补不回来 —— 必须重新导入。 */
+const LSKEY = 'soldermap.proj.v5';
+const LSKEY_OLD = 'soldermap.proj.v4';
 let NEED_REIMPORT = false;
 function saveProj(o) { try { localStorage.setItem(LSKEY, JSON.stringify(o)); } catch (_) { } }
 function readSaved() {
   try {
     const s = localStorage.getItem(LSKEY);
     if (s) return JSON.parse(s);
-    /* v3 缓存里是按封装名「猜」出来的焊盘，没有封装 UUID，补不出真焊盘。
-       唯一的处理就是提示重新导一次 —— 这次会直接读 .epro2 封装库里的 PAD。 */
+    /* 旧缓存里是上一版解析出来的结果（猜的焊盘 / 算错的板框），
+       没有原始工程数据可重算，只能提示用户重新导入一次。 */
     if (localStorage.getItem(LSKEY_OLD)) NEED_REIMPORT = true;
     return null;
   } catch (_) { return null; }
