@@ -592,20 +592,49 @@ async function loadFromEda(e) {
   const all = await e.pcb_PrimitiveComponent.getAll();
   const out = [];
   for (const c of all) {
+    const fp0 = c.getState_Footprint() || '';
+    const x0 = c.getState_X(), y0 = c.getState_Y();
+    let ang0 = 0;
+    try { ang0 = Number(c.getState_Rotation()) || 0; } catch (_) { }
+    ang0 = ((ang0 % 360) + 360) % 360;
+
     let pins = [];
     try {
       const ps = await e.pcb_PrimitiveComponent.getAllPinsByPrimitiveId(c.getState_PrimitiveId());
-      pins = ps.map(p => [p.getState_X(), p.getState_Y(), p.getState_Net(), p.getState_PadNumber()]);
+      /* 先按封装名推一套焊盘尺寸当模板，再逐个去配 EDA 给的真实数据：
+         坐标一律用 EDA 的（准）；尺寸优先用 getState_Pad() 的焊盘外形，
+         拿不到（或返回枚举数字）就退回模板 —— 反正不能只有一个中心点。 */
+      const tmpl = makePads(fpGeom(fp0), estimateSize(fp0), x0, y0, ang0).pads;
+      pins = ps.map((p, i) => {
+        let w = 0, h = 0, shp = 'rect';
+        try {
+          const sp = p.getState_Pad && p.getState_Pad();
+          if (sp && sp.length >= 3) {
+            const t = String(sp[0] || '').toUpperCase();
+            if (t.indexOf('ELLIPSE') >= 0 || t.indexOf('POLYGON') >= 0) {
+              w = Number(sp[1]) || 0; h = Number(sp[2]) || w; shp = 'circle';
+            } else if (t.indexOf('RECT') >= 0) {
+              w = Number(sp[1]) || 0; h = Number(sp[2]) || 0; shp = 'rect';
+            }
+          }
+        } catch (_) { }
+        if (!w || !h) {
+          const t = tmpl[i] || tmpl[tmpl.length - 1] || null;
+          if (t) { w = t[4]; h = t[5]; shp = t[6]; }
+        }
+        return [p.getState_X(), p.getState_Y(), p.getState_Net(), p.getState_PadNumber(), w, h, shp];
+      });
     } catch (_) { }
     const op = c.getState_OtherProperty() || {};
     out.push({
       pid: c.getState_PrimitiveId(),
       d: c.getState_Designator(),
       v: op['Value'] || '',
-      fp: c.getState_Footprint() || '',
+      fp: fp0,
       layer: c.getState_Layer(),
-      x: c.getState_X(),
-      y: c.getState_Y(),
+      x: x0,
+      y: y0,
+      angle: ang0,
       pins,
       syn: false,          // 焊盘来自 EDA 真实坐标，别用封装名推算覆盖掉
     });
@@ -907,14 +936,30 @@ function fpGeom(fp) {
   else if (n >= 2) kind = 'row';                         // 排针 / 连接器 / SOT / 二极管
   else kind = 'two';                                     // 认不出脚数：当两端元件
 
-  return { n, pitch, L, W, kind };
+  /* 圆柱形封装（电解电容、大电感）名字里带 BD=body diameter，焊盘是圆的。
+     不认出来的话 10mm 电容会被画成两个 5mm 的大方框，中间空空像个相框。 */
+  const round = /(?:^|[_-])BD[\d.]+/i.test(s) || /^CAP-SMD_BD/i.test(s);
+
+  return { n, pitch, L, W, kind, round };
 }
 
-/* 生成焊盘坐标（mil，已按 angle 旋转）+ 本体尺寸（mm）+ 焊盘半径（mm） */
+/* 生成焊盘：每个焊盘带自己的尺寸和形状（mil，已按 angle 旋转）
+ *
+ * 返回值元素：[x, y, net, num, w, h, shape]
+ *   前四个字段和旧版完全一致（老数据/老导出包照常能读），后三个是新增的。
+ *   w/h 单位 mil，shape 是 'rect' 或 'circle'。
+ *
+ * 为什么要带尺寸：以前焊盘只是个「半径 padR 的圆点」，画在元件本体方块中间，
+ * 所以整张图看起来是一堆方块而不是一块板。真实 PCB 上 0603 是两个 0.8×0.9 的
+ * 方块、SOP 是长条、排针是圆孔 —— 尺寸必须跟着封装类型走。
+ */
 function makePads(g, est, x, y, angle) {
   const rad = (Number(angle) || 0) * Math.PI / 180;
   const cs = Math.cos(rad), sn = Math.sin(rad);
-  const put = (px, py) => [x + px * cs - py * sn, y + px * sn + py * cs, '', ''];
+  const put = (px, py, w, h, shp) => [
+    x + px * cs - py * sn, y + px * sn + py * cs, '', '',
+    (w || 0) * MM2MIL, (h || 0) * MM2MIL, shp || 'rect',
+  ];
   const list = [];
   const n = g.n | 0;
   let L = g.L || est[0];
@@ -932,7 +977,9 @@ function makePads(g, est, x, y, angle) {
     if (!g.W) W = Math.max(1.8, p);          // 排针本体高 ≈ 一个间距，1.25 间距的连接器给个下限
     const step = n > 1 ? span / (n - 1) : 0;
     sp = step;
-    for (let i = 0; i < n; i++) list.push(put((i - (n - 1) / 2) * step * MM2MIL, 0));
+    /* 圆孔：直径跟着间距走。2.54 给 1.6、1.27 给 0.8，和实物对得上 */
+    const d = Math.min(1.9, Math.max(0.7, (P || step || 2.54) * 0.62));
+    for (let i = 0; i < n; i++) list.push(put((i - (n - 1) / 2) * step * MM2MIL, 0, d, d, 'circle'));
 
   } else if (g.kind === 'dual' && n >= 2) {
     const per = Math.max(1, Math.round(n / 2));
@@ -944,9 +991,12 @@ function makePads(g, est, x, y, angle) {
     if (!g.L) L = Math.max(L, span + 1.2);
     const step = per > 1 ? span / (per - 1) : 0;
     sp = step;
+    /* SOP / SOIC：沿引脚伸出方向的长条，宽度约半个脚距 */
+    const pl = Math.min(1.7, Math.max(0.9, p * 0.85));
+    const pw = Math.min(0.75, Math.max(0.32, p * 0.44));
     for (let i = 0; i < per; i++) {
       const px = (i - (per - 1) / 2) * step * MM2MIL;
-      list.push(put(px, -yy * MM2MIL), put(px, yy * MM2MIL));
+      list.push(put(px, -yy * MM2MIL, pl, pw), put(px, yy * MM2MIL, pl, pw));
     }
 
   } else if (g.kind === 'quad' && n >= 4) {
@@ -955,17 +1005,30 @@ function makePads(g, est, x, y, angle) {
     const ex = Math.max(0.4, L / 2 - 0.45);
     const ey = Math.max(0.4, W / 2 - 0.45);
     sp = p;
+    /* QFP / QFN：四边各一排，长边都指向本体外侧 */
+    const pl = Math.min(1.6, Math.max(0.6, p * 1.5));
+    const pw = Math.min(0.55, Math.max(0.22, p * 0.45));
     for (let i = 0; i < per; i++) {
       const d = (i - (per - 1) / 2) * p * MM2MIL;
-      list.push(put(d, -ey * MM2MIL), put(d, ey * MM2MIL));
-      list.push(put(-ex * MM2MIL, d), put(ex * MM2MIL, d));
+      list.push(put(d, -ey * MM2MIL, pw, pl), put(d, ey * MM2MIL, pw, pl));
+      list.push(put(-ex * MM2MIL, d, pl, pw), put(ex * MM2MIL, d, pl, pw));
     }
 
-  } else {
-    /* 两端各一个焊盘：0603 / 0805 / SMA / 0805 保险丝都走这里 */
-    const dx = Math.max(0.3, L / 2 - 0.45);
+  } else if (g.round) {
+    /* 圆柱封装：两个圆形焊盘，直径跟本体走 */
+    const d = Math.min(L, W) * 0.42;
+    const dx = L * 0.3;
     sp = 2 * dx;
-    list.push(put(-dx * MM2MIL, 0), put(dx * MM2MIL, 0));
+    list.push(put(-dx * MM2MIL, 0, d, d, 'circle'), put(dx * MM2MIL, 0, d, d, 'circle'));
+
+  } else {
+    /* 两端各一个焊盘：0603 / 0805 / SMA / 0805 保险丝都走这里。
+       0603 实际焊盘 0.8×0.9、中心距 1.5 —— 0.5L / 1.12W / 0.94L 正好对得上。 */
+    const pw = L * 0.5;
+    const ph = W * 1.12;
+    const dx = L * 0.47;
+    sp = 2 * dx;
+    list.push(put(-dx * MM2MIL, 0, pw, ph), put(dx * MM2MIL, 0, pw, ph));
   }
 
   /* 焊盘半径跟着脚距走：2.54 排针画出来是明显的圆孔，0603 还是一个小点 */
@@ -1225,6 +1288,49 @@ function bodyRect(c, pad) {
   return { x: x - 0.8, y: y - 0.4, w: 1.6, h: 0.8 };
 }
 
+/* 画一个器件的全部焊盘。
+ *   strong=true 是选中组：焊盘填黑（已打勾的填灰）
+ *   strong=false 是底图：白底 + 细灰边，像真实板子的裸铜
+ *
+ * 尺寸取 p[4]/p[5]（mil），乘 MIL 变 mm 再乘 ppm 变像素。
+ * 老数据没有尺寸（只有中心点），退回按 padR 画小圆，和以前一样。
+ * 极小焊盘给 1.7px 下限，否则整板视图下会整片消失。
+ */
+function drawPads(g, c, S, ppm, strong, marked) {
+  const pads = c.pins || [];
+  const ra = -(Number(c.angle) || 0) * Math.PI / 180;
+  const MINPX = 1.7;
+  for (const p of pads) {
+    const q = S(p[0] * MIL, p[1] * MIL);
+    let w = Number(p[4]) ? Number(p[4]) * MIL * ppm : 0;
+    let h = Number(p[5]) ? Number(p[5]) * MIL * ppm : 0;
+    let circle = p[6] === 'circle';
+    if (!w || !h) {
+      const d = Math.max(MINPX, (c.padR || 0.12) * 2 * ppm);
+      w = h = d; circle = true;
+    }
+    w = Math.max(MINPX, w); h = Math.max(MINPX, h);
+
+    g.save();
+    g.translate(q[0], q[1]);
+    if (ra) g.rotate(ra);              // 屏幕 Y 向下，PCB 逆时针 → 取负
+    g.beginPath();
+    if (circle) g.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2);
+    else g.rect(-w / 2, -h / 2, w, h);
+    if (strong) {
+      g.fillStyle = marked ? '#A8ACB2' : '#14161A';
+      g.fill();
+    } else {
+      g.fillStyle = '#DCDCD6';
+      g.fill();
+      g.strokeStyle = '#8E8E88';
+      g.lineWidth = Math.max(0.7, Math.min(1.1, Math.min(w, h) * 0.12));
+      g.stroke();
+    }
+    g.restore();
+  }
+}
+
 /* --------------------------------- 绘制 ---------------------------------- */
 function fitCanvas(el, w, h, dpr) {
   el.width = Math.round(w * dpr); el.height = Math.round(h * dpr);
@@ -1303,18 +1409,12 @@ function drawBase() {
     }
   }
 
-  /* --- 非目标器件：浅灰底图，让板子有“地图感”，但把对比度留给选中组 --- */
+  /* --- 非目标器件：画成裸铜焊盘，把对比度留给选中组 --- */
   const target = new Set(active ? active.items.map(c => c.d) : []);
   g.textAlign = 'center'; g.textBaseline = 'middle';
-  for (const { c, r } of rects) {
+  for (const { c } of rects) {
     if (target.has(c.d)) continue;
-    const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
-    const w = p2[0] - p1[0], h = p2[1] - p1[1];
-    g.fillStyle = '#FFFFFF';
-    g.strokeStyle = active ? '#BCBCB6' : '#B0B0AA';
-    g.lineWidth = 1;
-    g.fillRect(p1[0], p1[1], w, h);
-    g.strokeRect(p1[0], p1[1], w, h);
+    drawPads(g, c, S, ppm, false, false);
   }
   if (!active && ppm > 6.5) {
     g.fillStyle = '#9E9E98'; g.font = '8.5px "Microsoft YaHei",sans-serif';
@@ -1334,28 +1434,26 @@ function drawBase() {
     const ordered = orderItems(active.items);
     active._ordered = ordered;
 
-    // 1) 黑块
+    // 1) 焊盘
     ordered.forEach((c, i) => {
       const r = bodyRect(c, 0.15);
       const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
       const w = Math.max(6, p2[0] - p1[0]), h = Math.max(6, p2[1] - p1[1]);
       const isMarked = !!marks[c.d];
 
-      g.save();
-      g.shadowColor = 'rgba(0,0,0,.28)';
-      g.shadowBlur = 4; g.shadowOffsetY = 1;
-      g.fillStyle = isMarked ? '#A8ACB2' : '#14161A';
-      g.fillRect(p1[0], p1[1], w, h);
-      g.restore();
+      drawPads(g, c, S, ppm, true, isMarked);
 
-      // 小到放不下焊盘点就不画，避免糊成一片
-      if (w >= 11) {
-        for (const p of (c.pins || [])) {
-          const q = S(p[0] * MIL, p[1] * MIL);
-          g.fillStyle = '#ffffff';
-          g.beginPath(); g.arc(q[0], q[1], Math.max(1.2, ppm * (c.padR || 0.12)), 0, Math.PI * 2); g.fill();
-        }
+      /* 整板视图下 0603 的两个焊盘只有几个像素，光看黑点找不着；
+         补一圈细虚线当「丝印框」，定位靠它，填充仍留给焊盘 */
+      if (ppm > 3.2) {
+        g.save();
+        g.setLineDash([3, 2]);
+        g.strokeStyle = isMarked ? 'rgba(20,22,26,.22)' : 'rgba(20,22,26,.42)';
+        g.lineWidth = 1;
+        g.strokeRect(p1[0] - 1.5, p1[1] - 1.5, w + 3, h + 3);
+        g.restore();
       }
+
       layout.hits.push({ i, c, x: p1[0], y: p1[1], w, h, marked: isMarked });
     });
 
@@ -1960,7 +2058,7 @@ function buildStandalone() {
     comps: COMPS.map(c => ({
       d: c.d, v: c.v, fp: c.fp, layer: c.layer, x: c.x, y: c.y,
       angle: Number(c.angle) || 0, box: c.box || null, padR: c.padR || 0, syn: c.syn !== false,
-      pins: (c.pins || []).map(p => [p[0], p[1], 0, p[3] || 0]),
+      pins: (c.pins || []).map(p => [p[0], p[1], 0, p[3] || 0, p[4] || 0, p[5] || 0, p[6] || 'rect']),
     })),
   };
   const title = '焊接分组' + (PROJNAME ? ' · ' + PROJNAME : '');
@@ -2053,6 +2151,22 @@ function normalizeComps(list) {
   if (!list) return list;
   let fixed = 0;
   for (const c of list) {
+    /* 老导出包 / 老缓存：焊盘只有中心点，没有尺寸（p[4] 缺失）。
+       坐标如果是 EDA 给的真实值就别动，只按封装名补一套尺寸上去，
+       否则整张图又会退回「一堆小圆点」。 */
+    const ps0 = c.pins || [];
+    if (ps0.length && !Number(ps0[0][4])) {
+      const geo0 = makePads(fpGeom(c.fp), estimateSize(c.fp),
+        Number(c.x) || 0, Number(c.y) || 0, Number(c.angle) || 0);
+      const t = geo0.pads;
+      c.pins = ps0.map((p, i) => {
+        const q = t[i] || t[t.length - 1] || null;
+        return [p[0], p[1], p[2] || '', p[3] || '',
+          q ? q[4] : 0, q ? q[5] : 0, q ? q[6] : 'rect'];
+      });
+      if (!c.padR) c.padR = geo0.padR;
+    }
+
     if (c.box && c.box[0] > 0) continue;
     if (c.syn === false) continue;          // EDA 给的真实焊盘，不能覆盖
     const geo = makePads(fpGeom(c.fp), estimateSize(c.fp),
