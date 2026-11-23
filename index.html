@@ -521,6 +521,7 @@ function applyBoard(i) {
   active = null;
   marks = {};
   VIEW.k = 1; VIEW.dx = 0; VIEW.dy = 0;
+  rebuildMarked();          // 换了板就是另一套标记，必须重算
   renderBoardSwitch();
   renderCats();
   renderList();
@@ -1560,7 +1561,9 @@ function buildGroups(catId) {
 /* -------------------------------- 已焊标记 -------------------------------- */
 /* 焊接标记按「工程 + 板 + 类别 + 阻值」存。板那一层不能省：
    两块板都有 R1/C1，共用 key 会互相顶掉，焊完 A 板切到 B 板全是勾。 */
-const markKey = g => 'solder:' + PROJ + ':' + BOARD_SLUG + ':' + cat + ':' + g.key;
+/* catId 可选：遍历「所有类别」统计已焊件时必须显式传，
+   否则用的都是当前类别，别的类别的标记全读错位 */
+const markKey = (g, catId) => 'solder:' + PROJ + ':' + BOARD_SLUG + ':' + (catId || cat) + ':' + g.key;
 
 /* 焊接标记的内存副本：key -> { 位号: true }。
  * 为什么不能只依赖 localStorage：无痕模式、存储写满、或浏览器策略禁用时，
@@ -1581,12 +1584,28 @@ function saveMarks(g) {
   const k = markKey(g);
   MARKS_MEM.set(k, marks);                       // 先保证内存对
   try { localStorage.setItem(k, JSON.stringify(marks)); } catch (_) { }   // 落盘失败不影响使用
+  rebuildMarked();          // 汇总表跟着更新，别的分组里也能看到这颗已焊
 }
 function countMarked(g) { return g.items.filter(c => marks[c.d]).length; }
 
+/* 当前板上所有已焊的位号，跨分组汇总。
+   板图里非选中组画的是浅色 ghost，光看颜色分不出「没焊」和「焊过了」；
+   切到别的分组后更是完全看不出进度。所以汇总一份，渲染时给已焊件加横线。 */
+let MARKED = new Set();
+function rebuildMarked() {
+  const s = new Set();
+  for (const c of CATS) {
+    for (const g of buildGroups(c.id)) {
+      const m = marksOf(g, c.id);
+      for (const d in m) if (m[d]) s.add(d);
+    }
+  }
+  MARKED = s;
+}
+
 /* 读某一组的已焊数量。同一份数据源，别的地方（行计数）也都走这里 */
-function marksOf(g) {
-  const k = markKey(g);
+function marksOf(g, catId) {
+  const k = markKey(g, catId);
   let m = MARKS_MEM.get(k);
   if (m) return m;
   try { m = JSON.parse(localStorage.getItem(k) || '{}'); } catch (_) { m = {}; }
@@ -1872,8 +1891,9 @@ function drawBase() {
   g.textAlign = 'center'; g.textBaseline = 'middle';
   for (const { c } of rects) {
     if (target.has(c.d)) continue;
-    drawSilk(g, c, S, ppm, 'ghost', false);
-    drawPads(g, c, S, ppm, false, false);
+    const mk = MARKED.has(c.d);        // 这颗焊过没有（跨分组汇总）
+    drawSilk(g, c, S, ppm, 'ghost', mk);
+    drawPads(g, c, S, ppm, false, mk);
   }
   if (!active && ppm > 6.5) {
     /* 位号写在元件中心（放外面会和邻居撞在一起：0603 相邻才 16px，字有 22px）。
@@ -1946,6 +1966,28 @@ function drawBase() {
       g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText(String(t.i + 1), L.x + L.w / 2, L.y + L.h / 2 + .5);
     }
+  }
+
+  /* --- 已焊标记：统一画在所有元件之上 ---
+     不能在 drawSilk 里画：0603 两个焊盘正好盖住中间那段，线画了也看不见。
+     放在最后，任何东西都盖不住它。 */
+  if (MARKED.size) {
+    g.save();
+    g.strokeStyle = '#2E7D32';
+    g.lineCap = 'round';
+    g.lineWidth = Math.max(2.2, Math.min(3.8, ppm * 0.26));   // 整板视图下 1.8px 太细，看不清
+    for (const { c, r } of rects) {
+      if (!MARKED.has(c.d)) continue;
+      const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
+      const x = Math.min(p1[0], p2[0]), y = Math.min(p1[1], p2[1]);
+      const w = Math.abs(p2[0] - p1[0]), h = Math.abs(p2[1] - p1[1]);
+      if (w < 7) continue;            // 整板视图下太小的就别画了，糊成一片
+      g.beginPath();
+      g.moveTo(x + w * 0.04, y + h / 2);
+      g.lineTo(x + w * 0.96, y + h / 2);
+      g.stroke();
+    }
+    g.restore();
   }
 
   updateHeader();
@@ -2724,9 +2766,10 @@ function applyData(comps, board, opt) {
         if (tt) { cat = k.id; groups = gs; t = tt; break; }
       }
     }
-    if (t) { active = t; loadMarks(t); renderList(); renderCats(); drawBase(); return; }
+    if (t) { active = t; loadMarks(t); rebuildMarked(); renderList(); renderCats(); drawBase(); return; }
   }
 
+  rebuildMarked();
   renderCats(); renderList(); drawBase();
 }
 
@@ -2860,6 +2903,7 @@ on('btnSide', () => {
   }
   SIDE = SIDE === 'top' ? 'bottom' : 'top';
   active = null; marks = {};
+  rebuildMarked();                        // 换了一面，已焊件集合也要重算（按当前层统计）
   VIEW.k = 1; VIEW.dx = 0; VIEW.dy = 0;   // 翻面后回到适应窗口，免得视野跑偏
   /* 背面可能没有当前分类的件（比如顶层全是电阻、背面只有芯片），自动切到有的那一类 */
   const vis = sideComps();
