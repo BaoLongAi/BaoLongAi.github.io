@@ -838,6 +838,10 @@ function parseEpru(text) {
      3+2 的脚从「上下两排」变成「左右两列」。既然文件里就有真值，直接用。 */
   const fpPads = new Map();
   let cur = null, curUuid = null, board = null;
+  /* 原理图页的元件数。有些工程只画了原理图、PCB 还没同步元件，
+     这时 PCB 段是空的 —— 要能把这种情况和「文件根本不是嘉立创包」区分开，
+     否则用户只看到「没有元件位号」，不知道该去改什么。 */
+  let schComp = 0;
 
   for (const line of text.split('\n')) {
     const t = line.trim();
@@ -886,6 +890,7 @@ function parseEpru(text) {
       }
       continue;
     }
+    if (cur === 'SCH_PAGE' && h.type === 'COMPONENT') { schComp++; continue; }
     if (cur !== 'PCB') continue;
 
     if (h.type === 'COMPONENT') { b.__id = h.id; comps.push(b); }
@@ -929,7 +934,7 @@ function parseEpru(text) {
       }
     }
   }
-  return { comps: buildComps(comps, attrs, devs, fps, fpPads), board };
+  return { comps: buildComps(comps, attrs, devs, fps, fpPads), board, schComp };
 }
 
 /* 器件名 → 本体尺寸（mm），只用于画个像样的方块 */
@@ -1330,7 +1335,15 @@ async function openProject(file) {
     const epruName = Object.keys(z.out).find(n => /\.epru$/i.test(n));
     if (!epruName) throw new Error('这个包里没有 .epru，可能不是嘉立创工程包');
     const r = parseEpru(await entryText(z, epruName));
-    if (!r.comps.length) throw new Error('解析到了文档，但没有元件位号');
+    if (!r.comps.length) {
+      /* 分两种：PCB 里真没元件（只画了原理图），或者文件压根不是嘉立创工程 */
+      if (r.schComp > 0) {
+        throw new Error('这个工程只导出了原理图，PCB 页里没有元件（原理图有 '
+          + r.schComp + ' 个）。焊接分组图靠 PCB 的元件位置来分组，'
+          + '请在嘉立创 EDA 里把原理图「更新/转换到 PCB」并保存，再重新导出 .epro2');
+      }
+      throw new Error('解析到了文档，但没有元件位号');
+    }
 
     let name = file.name.replace(/\.(epro2|zip)$/i, '');
     const pj = await entryText(z, 'project2.json');
