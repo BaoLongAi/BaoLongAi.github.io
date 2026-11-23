@@ -59,9 +59,6 @@
   }
   .grp .pl.part { background: #fff; color: #14161a; border: 1px solid #14161a; }
   .chip .pd { font-size: 9px; line-height: 1; padding: 1px 2px; border-radius: 2px; background: #14161a; color: #fff; }
-  .grp .bar { height: 3px; background: #e6e8eb; border-radius: 2px; margin-top: 5px; overflow: hidden; }
-  .grp .bar i { display: block; height: 100%; width: 0; background: #14161a; }
-  .grp.done .nm::after { content: " ✓"; font-size: 11px; }
   .chips { display: flex; flex-wrap: wrap; gap: 4px; padding: 1px 4px 8px 12px; }
   .chip {
     font: inherit; font-size: 11px; cursor: pointer; background: #fff; color: #14161a;
@@ -73,9 +70,6 @@
     border-radius: 2px; font-size: 10px; font-weight: 700; padding: 0 2px;
   }
   .chip:hover { border-color: #9aa0a6; background: #f6f7f8; }
-  .chip.m { color: #9aa0a6; border-style: dashed; }
-  .chip.m b { background: #a8acb2; }
-  .chip.m span { text-decoration: line-through; }
   #empty { padding: 18px 14px; color: #8a9099; font-size: 12px; line-height: 1.8; }
 
   /* ---------------- 右侧 ---------------- */
@@ -455,11 +449,9 @@ let EDA = null;
 let COMPS = [];          // 全部器件（当前这一块板的）
 let BOARD = null;        // 板框（mil）
 /* 一个工程可能有多块 PCB（飞控板 + 底板…）。
-   BOARDS 存全部，COMPS/BOARD 永远只是"当前这一块"，切换时由 applyBoard 换掉。
-   BOARD_SLUG 参与焊接标记的存储 key —— 不然两块板的 R1 会互相顶掉。 */
+   BOARDS 存全部，COMPS/BOARD 永远只是"当前这一块"，切换时由 applyBoard 换掉。 */
 let BOARDS = [];
 let BOARD_IDX = 0;
-let BOARD_SLUG = '';
 let PROJ = 'noproj';
 let PROJNAME = '';       // 工程名（导出文件名 / 离线页标题）
 let SOLO = false;        // 是否运行在导出的单文件网页里
@@ -468,7 +460,6 @@ let USING_DEFAULT = false; // 当前显示的是预置示例（还没拖入自�
 let cat = 'R';           // 当前类别
 let groups = [];         // 当前类别的分组
 let active = null;       // 选中的分组对象
-let marks = {};          // 已焊标记 { designator: true }
 let layout = null;       // 绘制坐标系缓存（命中测试 / 动画用）
 
 /* 看板子的哪一面：'top' 顶层 / 'bottom' 底层。
@@ -515,13 +506,10 @@ function applyBoard(i) {
   const b = BOARDS[BOARD_IDX];
   COMPS = b.comps || [];
   BOARD = b.board || null;
-  BOARD_SLUG = String(b.uuid || BOARD_IDX).slice(-6);
   HAS_BOTTOM = COMPS.some(c => (Number(c.layer) || 1) === 2);
   SIDE = 'top';
   active = null;
-  marks = {};
   VIEW.k = 1; VIEW.dx = 0; VIEW.dy = 0;
-  rebuildMarked();          // 换了板就是另一套标记，必须重算
   renderBoardSwitch();
   renderCats();
   renderList();
@@ -1482,7 +1470,6 @@ async function openProject(file) {
     document.getElementById('drop').classList.remove('on');
     BOARDS = boards;
     BOARD_IDX = 0;
-    BOARD_SLUG = String(boards[0].uuid || '0').slice(-6);
     applyData(boards[0].comps, boards[0].board, {});
     renderBoardSwitch();
   } catch (e) {
@@ -1558,65 +1545,6 @@ function buildGroups(catId) {
   return arr;
 }
 
-/* -------------------------------- 已焊标记 -------------------------------- */
-/* 焊接标记按「工程 + 板 + 类别 + 阻值」存。板那一层不能省：
-   两块板都有 R1/C1，共用 key 会互相顶掉，焊完 A 板切到 B 板全是勾。 */
-/* catId 可选：遍历「所有类别」统计已焊件时必须显式传，
-   否则用的都是当前类别，别的类别的标记全读错位 */
-const markKey = (g, catId) => 'solder:' + PROJ + ':' + BOARD_SLUG + ':' + (catId || cat) + ':' + g.key;
-
-/* 焊接标记的内存副本：key -> { 位号: true }。
- * 为什么不能只依赖 localStorage：无痕模式、存储写满、或浏览器策略禁用时，
- * setItem 会抛异常，被 catch 吞掉 —— 内存里 marks 是对的（chip 能变灰），
- * 但落盘没成功，peekMarked 再去读就永远是 0，行右侧一直「已焊 0/xxx」。
- * 现在内存是唯一真相，磁盘只当备份：写失败也不影响界面和统计。 */
-const MARKS_MEM = new Map();
-
-function loadMarks(g) {
-  const k = markKey(g);
-  if (MARKS_MEM.has(k)) { marks = MARKS_MEM.get(k); return; }
-  let m = {};
-  try { m = JSON.parse(localStorage.getItem(k) || '{}'); } catch (_) { m = {}; }
-  MARKS_MEM.set(k, m);
-  marks = m;
-}
-function saveMarks(g) {
-  const k = markKey(g);
-  MARKS_MEM.set(k, marks);                       // 先保证内存对
-  try { localStorage.setItem(k, JSON.stringify(marks)); } catch (_) { }   // 落盘失败不影响使用
-  rebuildMarked();          // 汇总表跟着更新，别的分组里也能看到这颗已焊
-}
-function countMarked(g) { return g.items.filter(c => marks[c.d]).length; }
-
-/* 当前板上所有已焊的位号，跨分组汇总。
-   板图里非选中组画的是浅色 ghost，光看颜色分不出「没焊」和「焊过了」；
-   切到别的分组后更是完全看不出进度。所以汇总一份，渲染时给已焊件加横线。 */
-let MARKED = new Set();
-function rebuildMarked() {
-  const s = new Set();
-  for (const c of CATS) {
-    for (const g of buildGroups(c.id)) {
-      const m = marksOf(g, c.id);
-      for (const d in m) if (m[d]) s.add(d);
-    }
-  }
-  MARKED = s;
-}
-
-/* 读某一组的已焊数量。同一份数据源，别的地方（行计数）也都走这里 */
-function marksOf(g, catId) {
-  const k = markKey(g, catId);
-  let m = MARKS_MEM.get(k);
-  if (m) return m;
-  try { m = JSON.parse(localStorage.getItem(k) || '{}'); } catch (_) { m = {}; }
-  MARKS_MEM.set(k, m);
-  return m;
-}
-function peekMarked(g) {
-  const m = marksOf(g);
-  return g.items.filter(c => m[c.d]).length;
-}
-
 /* --------------------------------- 几何 ---------------------------------- */
 /* 丝印框：把一颗件的所有焊盘圈在一起，像真实 PCB 那样「一眼就是一颗件」。
  *
@@ -1672,14 +1600,14 @@ function bodyRect(c, pad) {
 }
 
 /* 画一个器件的全部焊盘。
- *   strong=true 是选中组：焊盘填黑（已打勾的填灰）
+ *   strong=true 是选中组：焊盘填黑
  *   strong=false 是底图：白底 + 细灰边，像真实板子的裸铜
  *
  * 尺寸取 p[4]/p[5]（mil），乘 MIL 变 mm 再乘 ppm 变像素。
  * 老数据没有尺寸（只有中心点），退回按 padR 画小圆，和以前一样。
  * 极小焊盘给 1.7px 下限，否则整板视图下会整片消失。
  */
-function drawPads(g, c, S, ppm, strong, marked) {
+function drawPads(g, c, S, ppm, strong) {
   const pads = c.pins || [];
   const ra = -(Number(c.angle) || 0) * Math.PI / 180;
   const MINPX = 1.7;
@@ -1707,16 +1635,12 @@ function drawPads(g, c, S, ppm, strong, marked) {
     if (circle) g.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2);
     else g.rect(-w / 2, -h / 2, w, h);
     if (strong) {
-      g.fillStyle = marked ? '#A8ACB2' : '#14161A';
+      g.fillStyle = '#14161A';
       g.fill();
     } else {
-      /* 已焊：整体染紫。用颜色而不是划线 —— 板上不只有长条形的阻容，
-         电解电容、电感、三极管都是圆的/异形的，一条横线穿过去很难看。
-         选紫色而不是绿色：红绿色弱人群（男性约 8%）分不清绿和灰褐，
-         而蓝紫轴几乎不受影响，色弱也能一眼看出。 */
-      g.fillStyle = marked ? '#EBD9F3' : '#DCDCD6';
+      g.fillStyle = '#DCDCD6';
       g.fill();
-      g.strokeStyle = marked ? '#A855C7' : '#8E8E88';
+      g.strokeStyle = '#8E8E88';
       g.lineWidth = Math.max(0.7, Math.min(1.1, Math.min(w, h) * 0.12));
       g.stroke();
     }
@@ -1742,13 +1666,12 @@ function silkPath(g, x, y, w, h, r) {
  *
  *   mode='ghost'  未选中的器件：淡茶灰细线，负责把散落的焊盘圈成一颗件
  *   mode='active' 选中组：黑色实线，和黑焊盘一起构成「这颗要焊」
- *   marked        已打勾：整颗压淡，退到背景里
  *
  * 真实丝印是 0.15mm 线宽的黄/白色，这里保留「线宽跟实物比例走」，
  * 但颜色用灰调 —— 这个工具的卖点是不靠颜色区分（色弱也能用），
  * 丝印如果上黄色，不选中/选中的差别就变成靠色相了。
  */
-function drawSilk(g, c, S, ppm, mode, marked) {
+function drawSilk(g, c, S, ppm, mode) {
   const b = silkBox(c, mode === 'active' ? 0.34 : 0.28);
   const p1 = S(b.x, b.y + b.h), p2 = S(b.x + b.w, b.y);
   /* 翻到底层时 S() 会把 x 镜像，p2[0]-p1[0] 变成负数 ——
@@ -1760,11 +1683,11 @@ function drawSilk(g, c, S, ppm, mode, marked) {
 
   g.save();
   if (mode === 'active') {
-    g.strokeStyle = marked ? 'rgba(20,22,26,.26)' : '#14161A';
+    g.strokeStyle = '#14161A';
     g.lineWidth = Math.max(1.4, Math.min(2.8, ppm * 0.16));
   } else {
-    g.strokeStyle = marked ? '#7B1FA2' : '#B4AEA1';
-    g.lineWidth = Math.max(1, Math.min(2, ppm * 0.13)) * (marked ? 1.2 : 1);
+    g.strokeStyle = '#B4AEA1';
+    g.lineWidth = Math.max(1, Math.min(2, ppm * 0.13));
   }
   g.lineJoin = 'round';
 
@@ -1895,9 +1818,8 @@ function drawBase() {
   g.textAlign = 'center'; g.textBaseline = 'middle';
   for (const { c } of rects) {
     if (target.has(c.d)) continue;
-    const mk = MARKED.has(c.d);        // 这颗焊过没有（跨分组汇总）
-    drawSilk(g, c, S, ppm, 'ghost', mk);
-    drawPads(g, c, S, ppm, false, mk);
+    drawSilk(g, c, S, ppm, 'ghost');
+    drawPads(g, c, S, ppm, false);
   }
   if (!active && ppm > 6.5) {
     /* 位号写在元件中心（放外面会和邻居撞在一起：0603 相邻才 16px，字有 22px）。
@@ -1933,14 +1855,12 @@ function drawBase() {
       const r = bodyRect(c, 0.15);
       const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
       const w = Math.max(6, Math.abs(p2[0] - p1[0])), h = Math.max(6, Math.abs(p2[1] - p1[1]));
-      const isMarked = !!marks[c.d];
-
       /* 丝印先画：它负责把两个焊盘圈成「一颗件」。整板视图下 0603 只有
          十几个像素，光看两个黑点分不清是一颗还是两颗，靠框认。 */
-      drawSilk(g, c, S, ppm, 'active', isMarked);
-      drawPads(g, c, S, ppm, true, isMarked);
+      drawSilk(g, c, S, ppm, 'active');
+      drawPads(g, c, S, ppm, true);
 
-      layout.hits.push({ i, c, x: p1[0], y: p1[1], w, h, marked: isMarked });
+      layout.hits.push({ i, c, x: p1[0], y: p1[1], w, h });
     });
 
     // 2) 标签避让（避开标签、避开元件本体、优先放上方）
@@ -1960,12 +1880,12 @@ function drawBase() {
     // 4) 白底黑字方框
     for (const t of layout.hits) {
       const L = t.label;
-      g.fillStyle = t.marked ? '#EDEEF0' : '#ffffff';
+      g.fillStyle = '#ffffff';
       g.fillRect(L.x, L.y, L.w, L.h);
-      g.strokeStyle = t.marked ? '#9AA0A6' : '#14161A';
+      g.strokeStyle = '#14161A';
       g.lineWidth = 1;
       g.strokeRect(L.x + .5, L.y + .5, L.w - 1, L.h - 1);
-      g.fillStyle = t.marked ? '#7A8088' : '#14161A';
+      g.fillStyle = '#14161A';
       g.font = '700 9.5px "Microsoft YaHei",sans-serif';
       g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText(String(t.i + 1), L.x + L.w / 2, L.y + L.h / 2 + .5);
@@ -2119,12 +2039,12 @@ function updateHeader() {
     btns.forEach(id => document.getElementById(id).disabled = true);
     return;
   }
-  const done = countMarked(active), total = active.items.length;
+  const total = active.items.length;
   h1.innerHTML = '<span>' + fmtVal(active, cat) + '</span>' +
     '<span class="fp">' + active.fp + '</span>' +
     '<span class="cnt">' + total + ' 颗</span>';
-  sub.innerHTML = '已焊 <b>' + done + '/' + total + '</b>　|　点板上的黑块或' +
-    (isMobileLayout() ? '列表里的' : '左侧') + '序号 = 定位并打勾（再点取消）' +
+  sub.innerHTML = '点板上的黑块或' +
+    (isMobileLayout() ? '列表里的' : '左侧') + '序号 = 定位这颗元件' +
     /* 有极性件单独占一行，说清楚「看哪一端」，不能只丢一句「注意方向」 */
     polarLine(total, polarOfGroup(active));
   btns.forEach(id => document.getElementById(id).disabled = false);
@@ -2141,7 +2061,7 @@ function renderCats() {
     b.innerHTML = c.label + '<span class="n">' + n + '</span>';
     b.disabled = n === 0;
     b.onclick = () => {
-      cat = c.id; active = null; marks = {};
+      cat = c.id; active = null;
       groups = buildGroups(cat);
       renderCats(); renderList();
       /* 抽屉收成一条时切了分类也看不见列表，顺手拉开 */
@@ -2157,7 +2077,6 @@ function renderCats() {
 /* 选中一个分组（侧栏点击、键盘上下、URL 书签都走这里） */
 function selectGroup(grp, idx) {
   active = grp;
-  loadMarks(grp);
   renderList();
   drawBase();
   try { history.replaceState(null, '', '#g=' + encodeURIComponent(grp.v)); } catch (_) { }
@@ -2203,20 +2122,17 @@ function renderList() {
     return;
   }
   for (const grp of groups) {
-    const done = peekMarked(grp);
     const pol = polarOfGroup(grp);
     const b = document.createElement('button');
-    b.className = 'grp' + (active && active.key === grp.key ? ' on' : '') +
-      (done === grp.items.length ? ' done' : '');
+    b.className = 'grp' + (active && active.key === grp.key ? ' on' : '');
     b.innerHTML =
       '<div class="l1">' +
       '<span class="nm">' + fmtVal(grp, cat) + '</span>' +
       (pol ? '<span class="pl' + (pol.all ? '' : ' part') + '" title="' +
         pol.kind + '，有方向，焊前确认">' + (pol.all ? '极性' : '部分极性') + '</span>' : '') +
       '<span class="fp">' + grp.fp + '</span>' +
-      '<span class="ct">' + done + '/' + grp.items.length + '</span>' +
-      '</div>' +
-      '<div class="bar"><i style="width:' + Math.round(done / grp.items.length * 100) + '%"></i></div>';
+      '<span class="ct">' + grp.items.length + ' 颗</span>' +
+      '</div>';
     b.onclick = () => {
       selectGroup(grp);
       /* 手机上选完立刻把抽屉收成一条：接下去是低头焊板，屏幕要让给板图 */
@@ -2231,18 +2147,12 @@ function renderList() {
       wrap.className = 'chips';
       ordered.forEach((c, i) => {
         const chip = document.createElement('button');
-        chip.className = 'chip' + (marks[c.d] ? ' m' : '');
+        chip.className = 'chip';
         chip.innerHTML = '<b>' + (i + 1) + '</b><span>' + c.d + '</span>' +
           (polarOf(c) ? '<i class="pd">▲</i>' : '');
         chip.onclick = ev => {
           ev.stopPropagation();
-          focusItem(i);
-          const d = c.d;
-          if (marks[d]) delete marks[d]; else marks[d] = true;
-          saveMarks(active);
-          renderList();
-          updateHeader();      // 标题的「已焊 x/y」也要跟着变，以前只重画了列表
-          drawBase();
+          focusItem(i);        // 点序号：板上画十字准星定位这一颗
         };
         wrap.appendChild(chip);
       });
@@ -2283,14 +2193,9 @@ stage.addEventListener('click', ev => {
       const idx = groups.indexOf(g);
       selectGroup(g, idx >= 0 ? idx : null);
     }
+  } else if (hit) {
+    focusItem(hit.i);            // 本组的件：画十字准星，方便一眼定位
   }
-
-  const d = comp.d;
-  if (marks[d]) delete marks[d]; else marks[d] = true;
-  if (active) saveMarks(active);   // groupFor 万一没匹配到（脏数据），别让保存崩掉
-  renderList();
-  updateHeader();
-  drawBase();
 });
 
 /* ---------------------------- 双指缩放 / 单指拖动 ---------------------------- *
@@ -2450,7 +2355,7 @@ function setDrawer(state) {
   if (!isMobileLayout()) return;
   sideEl.style.height = drawerH(state) + 'px';
   /* 拉开列表时把当前这组滚到中间：否则重新打开还停在列表顶部，
-     要点序号打勾还得先翻半天找自己刚才选的那行 */
+     要找自己刚才选的那行得翻半天 */
   if (state !== 'mini' && active) {
     clearTimeout(setDrawer._s);
     setDrawer._s = setTimeout(() => {
@@ -2522,7 +2427,7 @@ function composeExport() {
   g.fillText(fmtVal(active, cat) + '　' + active.fp + '　' + active.items.length + ' 颗', 16, 30);
   g.fillStyle = '#6b7280';
   g.font = '11.5px "Microsoft YaHei",sans-serif';
-  g.fillText('黑块＝本组元件　数字＝序号　白点＝焊盘　已焊 ' + countMarked(active) + '/' + active.items.length, 16, 50);
+  g.fillText('黑块＝本组元件　数字＝序号　白点＝焊盘　共 ' + active.items.length + ' 颗', 16, 50);
 
   /* 打印出来贴在工位上时，极性提醒比什么都重要 —— 印成黑底白字一条 */
   if (pol) {
@@ -2748,10 +2653,9 @@ function applyData(comps, board, opt) {
         if (tt) { cat = k.id; groups = gs; t = tt; break; }
       }
     }
-    if (t) { active = t; loadMarks(t); rebuildMarked(); renderList(); renderCats(); drawBase(); return; }
+    if (t) { active = t; renderList(); renderCats(); drawBase(); return; }
   }
 
-  rebuildMarked();
   renderCats(); renderList(); drawBase();
 }
 
@@ -2816,7 +2720,6 @@ async function boot() {
       if (bs2) bs2.style.display = 'none';
       BOARDS = bs;
       BOARD_IDX = 0;
-      BOARD_SLUG = String(bs[0].uuid || '0').slice(-6);
       applyData(bs[0].comps, bs[0].board || null, {});
       renderBoardSwitch();
       if (NEED_REIMPORT) {
@@ -2884,8 +2787,7 @@ on('btnSide', () => {
     return;
   }
   SIDE = SIDE === 'top' ? 'bottom' : 'top';
-  active = null; marks = {};
-  rebuildMarked();                        // 换了一面，已焊件集合也要重算（按当前层统计）
+  active = null;
   VIEW.k = 1; VIEW.dx = 0; VIEW.dy = 0;   // 翻面后回到适应窗口，免得视野跑偏
   /* 背面可能没有当前分类的件（比如顶层全是电阻、背面只有芯片），自动切到有的那一类 */
   const vis = sideComps();
@@ -2916,7 +2818,7 @@ window.addEventListener('keydown', ev => {
       : Math.max(0, i < 0 ? 0 : i - 1);
     selectGroup(groups[i], i);
   } else if (k === 'Escape') {
-    active = null; marks = {};
+    active = null;
     renderList(); drawBase();
     try { history.replaceState(null, '', location.pathname + location.search); } catch (_) { }
   }
