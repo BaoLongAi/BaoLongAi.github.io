@@ -1561,20 +1561,41 @@ function buildGroups(catId) {
 /* 焊接标记按「工程 + 板 + 类别 + 阻值」存。板那一层不能省：
    两块板都有 R1/C1，共用 key 会互相顶掉，焊完 A 板切到 B 板全是勾。 */
 const markKey = g => 'solder:' + PROJ + ':' + BOARD_SLUG + ':' + cat + ':' + g.key;
+
+/* 焊接标记的内存副本：key -> { 位号: true }。
+ * 为什么不能只依赖 localStorage：无痕模式、存储写满、或浏览器策略禁用时，
+ * setItem 会抛异常，被 catch 吞掉 —— 内存里 marks 是对的（chip 能变灰），
+ * 但落盘没成功，peekMarked 再去读就永远是 0，行右侧一直「已焊 0/xxx」。
+ * 现在内存是唯一真相，磁盘只当备份：写失败也不影响界面和统计。 */
+const MARKS_MEM = new Map();
+
 function loadMarks(g) {
-  try { marks = JSON.parse(localStorage.getItem(markKey(g)) || '{}'); } catch (_) { marks = {}; }
+  const k = markKey(g);
+  if (MARKS_MEM.has(k)) { marks = MARKS_MEM.get(k); return; }
+  let m = {};
+  try { m = JSON.parse(localStorage.getItem(k) || '{}'); } catch (_) { m = {}; }
+  MARKS_MEM.set(k, m);
+  marks = m;
 }
 function saveMarks(g) {
-  try { localStorage.setItem(markKey(g), JSON.stringify(marks)); } catch (_) { }
+  const k = markKey(g);
+  MARKS_MEM.set(k, marks);                       // 先保证内存对
+  try { localStorage.setItem(k, JSON.stringify(marks)); } catch (_) { }   // 落盘失败不影响使用
 }
 function countMarked(g) { return g.items.filter(c => marks[c.d]).length; }
+
+/* 读某一组的已焊数量。同一份数据源，别的地方（行计数）也都走这里 */
+function marksOf(g) {
+  const k = markKey(g);
+  let m = MARKS_MEM.get(k);
+  if (m) return m;
+  try { m = JSON.parse(localStorage.getItem(k) || '{}'); } catch (_) { m = {}; }
+  MARKS_MEM.set(k, m);
+  return m;
+}
 function peekMarked(g) {
-  try {
-    /* key 必须走 markKey() —— 之前这里手写了一遍，多板改造加 BOARD_SLUG 时漏改，
-       结果写进 A key、读的是 B key，行右侧的「已焊 x/y」永远是 0。 */
-    const m = JSON.parse(localStorage.getItem(markKey(g)) || '{}');
-    return g.items.filter(c => m[c.d]).length;
-  } catch (_) { return 0; }
+  const m = marksOf(g);
+  return g.items.filter(c => m[c.d]).length;
 }
 
 /* --------------------------------- 几何 ---------------------------------- */
