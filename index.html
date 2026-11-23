@@ -1710,11 +1710,13 @@ function drawPads(g, c, S, ppm, strong, marked) {
       g.fillStyle = marked ? '#A8ACB2' : '#14161A';
       g.fill();
     } else {
-      /* 已焊：整体染绿。用颜色而不是划线 —— 板上不只有长条形的阻容，
-         电解电容、电感、三极管都是圆的/异形的，一条横线穿过去很难看。 */
-      g.fillStyle = marked ? '#CFEBD1' : '#DCDCD6';
+      /* 已焊：整体染紫。用颜色而不是划线 —— 板上不只有长条形的阻容，
+         电解电容、电感、三极管都是圆的/异形的，一条横线穿过去很难看。
+         选紫色而不是绿色：红绿色弱人群（男性约 8%）分不清绿和灰褐，
+         而蓝紫轴几乎不受影响，色弱也能一眼看出。 */
+      g.fillStyle = marked ? '#EBD9F3' : '#DCDCD6';
       g.fill();
-      g.strokeStyle = marked ? '#4CAF50' : '#8E8E88';
+      g.strokeStyle = marked ? '#A855C7' : '#8E8E88';
       g.lineWidth = Math.max(0.7, Math.min(1.1, Math.min(w, h) * 0.12));
       g.stroke();
     }
@@ -1761,7 +1763,7 @@ function drawSilk(g, c, S, ppm, mode, marked) {
     g.strokeStyle = marked ? 'rgba(20,22,26,.26)' : '#14161A';
     g.lineWidth = Math.max(1.4, Math.min(2.8, ppm * 0.16));
   } else {
-    g.strokeStyle = marked ? '#2E7D32' : '#B4AEA1';
+    g.strokeStyle = marked ? '#7B1FA2' : '#B4AEA1';
     g.lineWidth = Math.max(1, Math.min(2, ppm * 0.13)) * (marked ? 1.2 : 1);
   }
   g.lineJoin = 'round';
