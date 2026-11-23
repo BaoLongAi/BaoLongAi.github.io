@@ -1710,9 +1710,11 @@ function drawPads(g, c, S, ppm, strong, marked) {
       g.fillStyle = marked ? '#A8ACB2' : '#14161A';
       g.fill();
     } else {
-      g.fillStyle = '#DCDCD6';
+      /* 已焊：整体染绿。用颜色而不是划线 —— 板上不只有长条形的阻容，
+         电解电容、电感、三极管都是圆的/异形的，一条横线穿过去很难看。 */
+      g.fillStyle = marked ? '#CFEBD1' : '#DCDCD6';
       g.fill();
-      g.strokeStyle = '#8E8E88';
+      g.strokeStyle = marked ? '#4CAF50' : '#8E8E88';
       g.lineWidth = Math.max(0.7, Math.min(1.1, Math.min(w, h) * 0.12));
       g.stroke();
     }
@@ -1759,8 +1761,8 @@ function drawSilk(g, c, S, ppm, mode, marked) {
     g.strokeStyle = marked ? 'rgba(20,22,26,.26)' : '#14161A';
     g.lineWidth = Math.max(1.4, Math.min(2.8, ppm * 0.16));
   } else {
-    g.strokeStyle = marked ? '#D2D2CC' : '#B4AEA1';
-    g.lineWidth = Math.max(1, Math.min(2, ppm * 0.13));
+    g.strokeStyle = marked ? '#2E7D32' : '#B4AEA1';
+    g.lineWidth = Math.max(1, Math.min(2, ppm * 0.13)) * (marked ? 1.2 : 1);
   }
   g.lineJoin = 'round';
 
@@ -1966,28 +1968,6 @@ function drawBase() {
       g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText(String(t.i + 1), L.x + L.w / 2, L.y + L.h / 2 + .5);
     }
-  }
-
-  /* --- 已焊标记：统一画在所有元件之上 ---
-     不能在 drawSilk 里画：0603 两个焊盘正好盖住中间那段，线画了也看不见。
-     放在最后，任何东西都盖不住它。 */
-  if (MARKED.size) {
-    g.save();
-    g.strokeStyle = '#2E7D32';
-    g.lineCap = 'round';
-    g.lineWidth = Math.max(2.2, Math.min(3.8, ppm * 0.26));   // 整板视图下 1.8px 太细，看不清
-    for (const { c, r } of rects) {
-      if (!MARKED.has(c.d)) continue;
-      const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
-      const x = Math.min(p1[0], p2[0]), y = Math.min(p1[1], p2[1]);
-      const w = Math.abs(p2[0] - p1[0]), h = Math.abs(p2[1] - p1[1]);
-      if (w < 7) continue;            // 整板视图下太小的就别画了，糊成一片
-      g.beginPath();
-      g.moveTo(x + w * 0.04, y + h / 2);
-      g.lineTo(x + w * 0.96, y + h / 2);
-      g.stroke();
-    }
-    g.restore();
   }
 
   updateHeader();
