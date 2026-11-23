@@ -287,6 +287,16 @@
   #drop .dz button { padding: 10px 22px !important; font-size: 13.5px; }
   #btnPick { font-weight: 700; }
 }
+/* 多板切换：一行小胶囊按钮，当前那块高亮。单板工程整行不显示 */
+#boards { display: none; gap: 6px; margin-bottom: 7px; flex-wrap: wrap; }
+#boards.on { display: flex; }
+#boards .bk {
+  font: inherit; font-size: 12.5px; line-height: 1.35; padding: 4px 11px;
+  border-radius: 99px; border: .5px solid currentColor; background: transparent;
+  color: inherit; cursor: pointer; opacity: .55; white-space: nowrap;
+}
+#boards .bk:hover { opacity: .85; }
+#boards .bk.cur { opacity: 1; font-weight: 700; box-shadow: inset 0 0 0 1px currentColor; }
 </style>
 <!-- 拖拽 / 选文件层。放在 #app 里面：手机竖着拿时整页会转 90°，
      留在外面它就不跟着转，会横躺着盖在屏幕上。 -->
@@ -302,6 +312,8 @@
       <!-- 手机上这一颗固定在左上角，是唯一的入口；电脑上就排在标题左边 -->
       <button class="b" id="btnOpen">导入工程</button>
       <div class="tt" id="ttBox">
+        <!-- 多板工程才显示：一块板时整行隐藏，不占地方 -->
+        <div id="boards"></div>
         <h1 id="h1">焊接分组</h1>
         <p id="sub">点左侧分组，板上同阻值同封装的元件会变黑并跳动</p>
       </div>
@@ -440,8 +452,14 @@ function polarLine(total, pol) {
 }
 
 let EDA = null;
-let COMPS = [];          // 全部器件
+let COMPS = [];          // 全部器件（当前这一块板的）
 let BOARD = null;        // 板框（mil）
+/* 一个工程可能有多块 PCB（飞控板 + 底板…）。
+   BOARDS 存全部，COMPS/BOARD 永远只是"当前这一块"，切换时由 applyBoard 换掉。
+   BOARD_SLUG 参与焊接标记的存储 key —— 不然两块板的 R1 会互相顶掉。 */
+let BOARDS = [];
+let BOARD_IDX = 0;
+let BOARD_SLUG = '';
 let PROJ = 'noproj';
 let PROJNAME = '';       // 工程名（导出文件名 / 离线页标题）
 let SOLO = false;        // 是否运行在导出的单文件网页里
@@ -466,6 +484,47 @@ function sideComps() {
   const want = SIDE === 'bottom' ? 2 : 1;
   const out = COMPS.filter(c => (Number(c.layer) || 1) === want);
   return out.length ? out : (SIDE === 'bottom' ? [] : COMPS);
+}
+
+/**
+ * 切换按钮/胶囊。单板工程直接隐藏整行，不干扰界面
+ */
+function renderBoardSwitch() {
+  const box = document.getElementById('boards');
+  if (!box) return;
+  box.innerHTML = '';
+  if (BOARDS.length < 2) { box.className = ''; return; }
+  box.className = 'on';
+  BOARDS.forEach((b, i) => {
+    const el = document.createElement('button');
+    el.className = 'bk' + (i === BOARD_IDX ? ' cur' : '');
+    el.textContent = b.name + ' · ' + b.comps.length + ' 颗';
+    el.title = '切到这块板';
+    el.onclick = () => { if (i !== BOARD_IDX) applyBoard(i); };
+    box.appendChild(el);
+  });
+}
+
+/**
+ * 切换到第 i 块板。单板工程调用它等于重画一次。
+ * keepView=true 时不重置缩放（切换板还是重置比较符合直觉，默认重置）
+ */
+function applyBoard(i) {
+  if (!BOARDS.length) return;
+  BOARD_IDX = Math.max(0, Math.min(BOARDS.length - 1, i | 0));
+  const b = BOARDS[BOARD_IDX];
+  COMPS = b.comps || [];
+  BOARD = b.board || null;
+  BOARD_SLUG = String(b.uuid || BOARD_IDX).slice(-6);
+  HAS_BOTTOM = COMPS.some(c => (Number(c.layer) || 1) === 2);
+  SIDE = 'top';
+  active = null;
+  marks = {};
+  VIEW.k = 1; VIEW.dx = 0; VIEW.dy = 0;
+  renderBoardSwitch();
+  renderCats();
+  renderList();
+  drawBase();
 }
 
 /* ---------------------- 视图缩放 / 平移（手机端必需） ---------------------- *
@@ -832,12 +891,18 @@ const tryJson = s => { try { return JSON.parse(s); } catch (_) { return null; } 
 
 /* 解析 .epru 文本流：每行 {header}||{body}，按 DOCHEAD 切文档 */
 function parseEpru(text) {
-  const comps = [], attrs = new Map(), devs = new Map(), fps = new Map();
-  /* FOOTPRINT 段里除了 META（封装名），还有真正的 PAD 记录。
-     以前只读 META，焊盘全靠名字猜 —— SOT 系列 guess 错了 90°，
-     3+2 的脚从「上下两排」变成「左右两列」。既然文件里就有真值，直接用。 */
+  /* 一个工程里可能有多块 PCB（飞控板 + 底板、主板 + 小板…）。
+     以前只当一块板解析，两个 PCB 的元件全塞进同一个数组、用同一套坐标系，
+     结果就是两堆元件叠在一张图上（位置全乱）。
+     现在按 PCB 文档的 uuid 分组，每块板独立一套元件/属性/板框。
+     封装库（fpPads/devs/fps）是全局共享的，不分组。 */
+  const devs = new Map(), fps = new Map();
   const fpPads = new Map();
-  let cur = null, curUuid = null, board = null;
+  const pcbGroups = new Map();     // pcbUuid -> { comps:[], attrs:Map, board:null }
+  const boardTitles = new Map();   // BOARD uuid -> 板名（"飞控板"）
+  const pcbMeta = new Map();       // pcbUuid -> { title:"PCB1", board:"<BOARD uuid>" }
+  const schTitles = new Map();     // BOARD uuid -> 原理图名（"飞控板"），比 Board1/PCB1 好认
+  let cur = null, curUuid = null;
   /* 原理图页的元件数。有些工程只画了原理图、PCB 还没同步元件，
      这时 PCB 段是空的 —— 要能把这种情况和「文件根本不是嘉立创包」区分开，
      否则用户只看到「没有元件位号」，不知道该去改什么。 */
@@ -890,17 +955,35 @@ function parseEpru(text) {
       }
       continue;
     }
+    /* BOARD 文档的 META 带板名（"飞控板"），用它给 PCB 起个好认的名字 */
+    if (cur === 'BOARD' && h.type === 'META' && b.title) {
+      boardTitles.set(curUuid, String(b.title));
+      continue;
+    }
+    /* 原理图（SCH）的 META 带板名 + 所属 BOARD，这是最直观的名字（"飞控板"） */
+    if (cur === 'SCH' && h.type === 'META' && b.title && b.board) {
+      schTitles.set(String(b.board), String(b.title));
+      continue;
+    }
     if (cur === 'SCH_PAGE' && h.type === 'COMPONENT') { schComp++; continue; }
     if (cur !== 'PCB') continue;
 
-    if (h.type === 'COMPONENT') { b.__id = h.id; comps.push(b); }
-    else if (h.type === 'ATTR') {
-      if (!attrs.has(b.parentId)) attrs.set(b.parentId, {});
-      attrs.get(b.parentId)[b.key] = b.value;
-    } else if ((h.type === 'POLY' || h.type === 'LINE') && b.layerId === 11 && Array.isArray(b.path) && !board) {
+    if (!pcbGroups.has(curUuid)) {
+      pcbGroups.set(curUuid, { comps: [], attrs: new Map(), board: null });
+    }
+    const P = pcbGroups.get(curUuid);
+
+    if (h.type === 'META') {
+      if (b.title) pcbMeta.set(curUuid, { title: String(b.title), board: String(b.board || '') });
+    } else if (h.type === 'COMPONENT') {
+      b.__id = h.id; P.comps.push(b);
+    } else if (h.type === 'ATTR') {
+      if (!P.attrs.has(b.parentId)) P.attrs.set(b.parentId, {});
+      P.attrs.get(b.parentId)[b.key] = b.value;
+    } else if ((h.type === 'POLY' || h.type === 'LINE') && b.layerId === 11 && Array.isArray(b.path)) {
       const path = b.path;
       if (path[0] === 'R') {
-        board = { x: path[1], y: path[2], w: path[3], h: path[4] };
+        P.board = { x: path[1], y: path[2], w: path[3], h: path[4] };
       } else {
         /* 板框除了矩形，还会用带圆弧的 POLY：
            [x0,y0, 'L', x,y, 'ARC', 角度,x,y, 'L', x,y, ...]
@@ -925,16 +1008,48 @@ function parseEpru(text) {
             xs.push(op); ys.push(path[i + 1]); i += 2;   // 兜底：老格式纯坐标
           } else i++;
         }
-        if (xs.length > 2) {
-          board = {
-            x: Math.min(...xs), y: Math.max(...ys),
-            w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys),
-          };
-        }
+        /* 一块板的板框经常是「多条独立 POLY 段」拼出来的，每段只有 2~4 个点。
+           以前要求单条 POLY 自己就有 >2 个点，遇到这种一条都认不出来，
+           板框变 null、整板缩成一堆。改成把所有 OUTLINE 段的点攒起来，
+           最后统一算包围盒（见下面 for 循环）。 */
+        if (!P.outX) { P.outX = []; P.outY = []; }
+        for (let k = 0; k < xs.length; k++) { P.outX.push(xs[k]); P.outY.push(ys[k]); }
       }
     }
   }
-  return { comps: buildComps(comps, attrs, devs, fps, fpPads), board, schComp };
+  /* 攒完所有 OUTLINE 段，按点集算每块板的包围盒 */
+  for (const P of pcbGroups.values()) {
+    if (!P.board && P.outX && P.outX.length >= 3) {
+      P.board = {
+        x: Math.min(...P.outX), y: Math.max(...P.outY),
+        w: Math.max(...P.outX) - Math.min(...P.outX),
+        h: Math.max(...P.outY) - Math.min(...P.outY),
+      };
+    }
+  }
+  /* 每块 PCB 独立出图。空板（PCB 里没元件）直接跳过，不给用户添乱 */
+  const boards = [];
+  for (const [uuid, P] of pcbGroups) {
+    const cs = buildComps(P.comps, P.attrs, devs, fps, fpPads);
+    if (!cs.length) continue;
+    const meta = pcbMeta.get(uuid) || {};
+    const bt = meta.board ? (schTitles.get(meta.board) || boardTitles.get(meta.board) || '') : '';
+    boards.push({
+      uuid,
+      name: bt || meta.title || ('板 ' + (boards.length + 1)),
+      comps: cs,
+      board: P.board,
+    });
+  }
+  /* 元件多的排前面：主控板一般元件最多，那是用户第一眼想看的 */
+  boards.sort((a, b) => b.comps.length - a.comps.length);
+
+  return {
+    boards,
+    comps: boards.length ? boards[0].comps : [],
+    board: boards.length ? boards[0].board : null,
+    schComp,
+  };
 }
 
 /* 器件名 → 本体尺寸（mm），只用于画个像样的方块 */
@@ -1357,9 +1472,18 @@ async function openProject(file) {
     const bs = document.getElementById('btnSel');
     if (bs) bs.style.display = 'none';
 
-    saveProj({ name, comps: r.comps, board: r.board, ts: Date.now() });
+    /* 多板工程：BOARDS 收全部，默认先看元件最多的那块（解析时已按数量排好） */
+    const boards = (r.boards && r.boards.length)
+      ? r.boards
+      : [{ uuid: '', name, comps: r.comps, board: r.board }];
+
+    saveProj({ name, boards, ts: Date.now() });
     document.getElementById('drop').classList.remove('on');
-    applyData(r.comps, r.board, {});
+    BOARDS = boards;
+    BOARD_IDX = 0;
+    BOARD_SLUG = String(boards[0].uuid || '0').slice(-6);
+    applyData(boards[0].comps, boards[0].board, {});
+    renderBoardSwitch();
   } catch (e) {
     e2.style.color = '#A32D2D';
     e2.textContent = '解析失败：' + (e.message || e);
@@ -1434,7 +1558,9 @@ function buildGroups(catId) {
 }
 
 /* -------------------------------- 已焊标记 -------------------------------- */
-const markKey = g => 'solder:' + PROJ + ':' + cat + ':' + g.key;
+/* 焊接标记按「工程 + 板 + 类别 + 阻值」存。板那一层不能省：
+   两块板都有 R1/C1，共用 key 会互相顶掉，焊完 A 板切到 B 板全是勾。 */
+const markKey = g => 'solder:' + PROJ + ':' + BOARD_SLUG + ':' + cat + ':' + g.key;
 function loadMarks(g) {
   try { marks = JSON.parse(localStorage.getItem(markKey(g)) || '{}'); } catch (_) { marks = {}; }
 }
@@ -2561,16 +2687,26 @@ async function boot() {
      插件窗口里跳过这一步，直接去读正在编辑的 PCB */
   if (!inEdaFrame()) {
     const saved = readSaved();
-    const init = (saved && saved.comps && saved.comps.length) ? saved : window.__DEFAULT__;
-    if (init && init.comps && init.comps.length) {
+    const hasData = d => !!(d && ((d.boards && d.boards.length) || (d.comps && d.comps.length)));
+    const useSaved = hasData(saved);
+    const init = useSaved ? saved : window.__DEFAULT__;
+    if (hasData(init)) {
+      /* 缓存可能来自旧版本（只有一块板的 comps），也可能是多板工程的 boards */
+      const bs = (init.boards && init.boards.length)
+        ? init.boards
+        : [{ uuid: '', name: init.name || '板', comps: init.comps, board: init.board || null }];
       SOLO = true;
-      USING_DEFAULT = !(saved && saved.comps && saved.comps.length);
+      USING_DEFAULT = !useSaved;
       document.body.classList.add('solo');
       PROJNAME = init.name || '';
       document.title = '焊接分组 · ' + (PROJNAME || '工程');
       const bs2 = document.getElementById('btnSel');
       if (bs2) bs2.style.display = 'none';
-      applyData(init.comps, init.board || null, {});
+      BOARDS = bs;
+      BOARD_IDX = 0;
+      BOARD_SLUG = String(bs[0].uuid || '0').slice(-6);
+      applyData(bs[0].comps, bs[0].board || null, {});
+      renderBoardSwitch();
       if (NEED_REIMPORT) {
         showDrop('焊盘已改为直读工程里的真实封装数据。请点「导入工程」重新选一次 .epro2，'
           + '旧缓存是按封装名猜的，方向可能不对。');
