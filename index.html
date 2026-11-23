@@ -1705,7 +1705,11 @@ function silkPath(g, x, y, w, h, r) {
 function drawSilk(g, c, S, ppm, mode, marked) {
   const b = silkBox(c, mode === 'active' ? 0.34 : 0.28);
   const p1 = S(b.x, b.y + b.h), p2 = S(b.x + b.w, b.y);
-  const x = p1[0], y = p1[1], w = p2[0] - p1[0], h = p2[1] - p1[1];
+  /* 翻到底层时 S() 会把 x 镜像，p2[0]-p1[0] 变成负数 ——
+     以前直接判断 w<2.5 就 return，导致底层整板一颗丝印都不画（只剩焊盘）。
+     和板框那段的处理保持一致：取 min + abs。 */
+  const x = Math.min(p1[0], p2[0]), y = Math.min(p1[1], p2[1]);
+  const w = Math.abs(p2[0] - p1[0]), h = Math.abs(p2[1] - p1[1]);
   if (w < 2.5 || h < 2.5) return;          // 太小就别画，否则整板糊成一片
 
   g.save();
@@ -1789,7 +1793,11 @@ function drawBase() {
   // 所有元件的屏幕矩形，供标签避让使用
   const partBoxes = rects.map(({ r }) => {
     const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
-    return { x: p1[0], y: p1[1], w: p2[0] - p1[0], h: p2[1] - p1[1] };
+    /* 底层镜向后宽高会是负的，标签避让会整体失效 */
+    return {
+      x: Math.min(p1[0], p2[0]), y: Math.min(p1[1], p2[1]),
+      w: Math.abs(p2[0] - p1[0]), h: Math.abs(p2[1] - p1[1]),
+    };
   });
 
   /* --- 板框 --- */
@@ -1839,14 +1847,14 @@ function drawBase() {
     g.lineWidth = 2.6; g.strokeStyle = '#FFFFFF'; g.lineJoin = 'round';
     for (const { c, r } of rects) {
       const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
-      if (p2[0] - p1[0] < 15) continue;
+      if (Math.abs(p2[0] - p1[0]) < 15) continue;
       const tx = (p1[0] + p2[0]) / 2, ty = (p1[1] + p2[1]) / 2;
       g.strokeText(c.d, tx, ty);
     }
     g.fillStyle = '#9E9E98';
     for (const { c, r } of rects) {
       const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
-      if (p2[0] - p1[0] < 15) continue;
+      if (Math.abs(p2[0] - p1[0]) < 15) continue;
       g.fillText(c.d, (p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2);
     }
   }
@@ -1864,7 +1872,7 @@ function drawBase() {
     ordered.forEach((c, i) => {
       const r = bodyRect(c, 0.15);
       const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
-      const w = Math.max(6, p2[0] - p1[0]), h = Math.max(6, p2[1] - p1[1]);
+      const w = Math.max(6, Math.abs(p2[0] - p1[0])), h = Math.max(6, Math.abs(p2[1] - p1[1]));
       const isMarked = !!marks[c.d];
 
       /* 丝印先画：它负责把两个焊盘圈成「一颗件」。整板视图下 0603 只有
