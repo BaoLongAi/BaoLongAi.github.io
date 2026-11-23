@@ -97,6 +97,15 @@
   button.b.pri { background: #14161a; border-color: #14161a; color: #fff; font-weight: 700; }
   button.b.pri:hover { background: #2a2f37; border-color: #2a2f37; }
   button.b.pri:disabled { background: #fff; color: #14161a; }
+  /* 顶部推广入口：深色胶囊 + 外链箭头，跟功能按钮一眼分开 */
+  .promo { display: flex; gap: 6px; flex: 0 0 auto; }
+  a.promo-btn {
+    font: inherit; font-size: 12px; font-weight: 700; text-decoration: none;
+    color: #fff; background: #14161a; border: 1px solid #14161a; border-radius: 5px;
+    padding: 5px 11px; white-space: nowrap;
+  }
+  a.promo-btn::after { content: ' ↗'; font-weight: 400; }
+  a.promo-btn:hover { background: #2a2f37; border-color: #2a2f37; }
 
   #stage {
     flex: 1; position: relative; min-height: 0; background: #fff; overflow: hidden;
@@ -172,6 +181,9 @@
     }
     /* 手机上除了导入，其余都是「在电脑前干的事」，收起来不碍事 */
     .acts { display: none; }
+    /* 推广入口留在右上角：手机上也能点到，手指尺寸给够，字体收小一点 */
+    #promo { position: absolute; right: 6px; top: 6px; }
+    #promo a.promo-btn { font-size: 11.5px; padding: 8px 10px; }
 
     /* ---------------- 底部抽屉 ---------------- */
     #side {
@@ -317,6 +329,7 @@
         <button class="b" id="btnPng" disabled>导出 PNG</button>
         <button class="b" id="btnPrint" disabled>打印</button>
       </div>
+      <div class="promo" id="promo"></div>
     </header>
     <div id="stage">
       <canvas id="cvBase"></canvas>
@@ -364,6 +377,39 @@ const SHELL = (function () {
   const el = document.getElementById('app');
   return el ? el.outerHTML : '';
 })();
+
+const escHtml = s => String(s == null ? '' : s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+/* ---------------- 顶部推广入口（可开关，可扩展多个） ----------------
+   enabled: false  → 整块入口消失，不留空位
+   inExport: true  → 导出的单文件交互页也带上（默认 false，发给队友的页保持干净）
+   items 里加对象就能多放按钮：{ label: 显示文字, href: 跳转地址 }
+   全部走 target=_blank 新窗口打开，不打断当前焊板操作。 */
+const PROMO = {
+  enabled: true,
+  inExport: false,
+  items: [
+    { label: 'ChatGPT Plus 代充', href: 'https://ainb666.xyz' },
+  ],
+};
+
+function promoHtml() {
+  return PROMO.items.map(it =>
+    '<a class="promo-btn" href="' + escHtml(it.href) + '" target="_blank" ' +
+    'rel="noopener noreferrer">' + escHtml(it.label) + '</a>').join('');
+}
+function renderPromo() {
+  const box = document.getElementById('promo');
+  if (!box) return;
+  /* 导出的离线页 window.__EMBED__ 存在：默认不塞推广，发给队友的是干净页。
+     要带就设 PROMO.inExport = true。 */
+  const isExport = !!window.__EMBED__;
+  const show = PROMO.enabled && PROMO.items.length && (!isExport || PROMO.inExport);
+  box.innerHTML = show ? promoHtml() : '';
+  box.style.display = show ? '' : 'none';
+}
+renderPromo();
 
 const CATS = [
   { id: 'R', label: '电阻', re: /^R\d/i },
@@ -2477,9 +2523,6 @@ async function exportPng() {
  * 再把当前 PCB 数据以 window.__EMBED__ 的形式内嵌进去。
  * 好处：导出页和插件里跑的是同一份代码，永远不会出现两套逻辑。
  * ------------------------------------------------------------------------ */
-const escHtml = s => String(s == null ? '' : s)
-  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
 function buildStandalone() {
   const css = document.querySelector('style[data-app]').textContent;
   const js = document.querySelector('script[data-app]').textContent;
