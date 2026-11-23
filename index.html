@@ -1788,7 +1788,20 @@ function drawBase() {
     return [CCX + (sx - CCX) * K + VIEW.dx, CCY + (sy - CCY) * K + VIEW.dy];
   };
 
-  layout = { W, H, ppm, ppm0, K, hits: [] };
+  /* all 存「全板每颗元件的屏幕矩形」，供板上点击用：
+     以前只有选中分组后 hits 才有内容，用户想直接点板上的件让它跳分组是做不到的。
+     底层元件也算进来（虽然当前层画不出来），点击时好判断"这颗在背面"。 */
+  layout = {
+    W, H, ppm, ppm0, K, hits: [],
+    all: rects.map(({ c, r }) => {
+      const p1 = S(r.x, r.y + r.h), p2 = S(r.x + r.w, r.y);
+      return {
+        c,
+        x: Math.min(p1[0], p2[0]), y: Math.min(p1[1], p2[1]),
+        w: Math.abs(p2[0] - p1[0]), h: Math.abs(p2[1] - p1[1]),
+      };
+    }),
+  };
 
   // 所有元件的屏幕矩形，供标签避让使用
   const partBoxes = rects.map(({ r }) => {
@@ -2107,6 +2120,34 @@ function selectGroup(grp, idx) {
   }
 }
 
+/* 在一组矩形里找离点击点最近的（容差内）。板子和手指都要用，所以抽出来 */
+function pickHit(list, x, y, tol) {
+  let best = null, bestD = Infinity;
+  for (const r of list) {
+    const dx = Math.max(r.x - x, 0, x - (r.x + r.w));
+    const dy = Math.max(r.y - y, 0, y - (r.y + r.h));
+    const d = Math.hypot(dx, dy);
+    if (d <= tol && d < bestD) { bestD = d; best = r; }
+  }
+  return best;
+}
+
+/* 某颗元件属于哪个分组。分组键必须和 buildGroups 里完全一致，
+   否则点了板上元件找不到对应行。 */
+function groupFor(c) {
+  const cid = catOf(c);
+  if (cat !== cid) {
+    cat = cid;
+    groups = buildGroups(cat);
+    renderCats();
+  }
+  const vv = normVal(c.v), fpp = String(c.fp || '');
+  const key = vv
+    ? vv + '|' + fpp
+    : '∅|' + fpp + '|' + (String(c.dev || '').trim() || String(c.d || ''));
+  return groups.find(x => x.key === key) || null;
+}
+
 function renderList() {
   const box = document.getElementById('list');
   box.innerHTML = '';
@@ -2169,23 +2210,36 @@ let suppressClick = false;   // 刚做完缩放/拖动，紧接着的 click 不�
 stage.addEventListener('click', ev => {
   if (suppressClick) { suppressClick = false; return; }
   if (ev.target.closest && ev.target.closest('#zoom')) return;   // 点的是缩放按钮
-  if (!active || !layout) return;
+  if (!layout) return;
   const p = stagePoint(ev.clientX, ev.clientY);
   const x = p.x, y = p.y;
   /* 手指有面积，容差给大一点；按「离哪个最近」选，不是按命中顺序，
      否则整板视图下元件挤在一起时会选错一颗 */
   const tol = TOUCH ? 13 : 4;
-  let hit = null, bestD = Infinity;
-  for (const r of layout.hits) {
-    const dx = Math.max(r.x - x, 0, x - (r.x + r.w));
-    const dy = Math.max(r.y - y, 0, y - (r.y + r.h));
-    const d = Math.hypot(dx, dy);
-    if (d <= tol && d < bestD) { bestD = d; hit = r; }
+
+  /* 先在当前选中分组里找（精度高），没命中再全板找 —— 
+     这样「直接点板上任意一颗」也能用，不用先去左边选分组 */
+  const hit = pickHit(layout.hits, x, y, tol);
+  let comp = hit ? hit.c : null;
+  let inGroup = !!comp;
+  if (!comp) {
+    const h2 = pickHit(layout.all, x, y, tol);
+    if (h2) comp = h2.c;
   }
-  if (!hit) return;
-  const d = hit.c.d;
+  if (!comp) return;
+
+  /* 点的是别的分组的件：自动切到它所属分组，左侧对应行会高亮并滚到可见处 */
+  if (!inGroup) {
+    const g = groupFor(comp);
+    if (g) {
+      const idx = groups.indexOf(g);
+      selectGroup(g, idx >= 0 ? idx : null);
+    }
+  }
+
+  const d = comp.d;
   if (marks[d]) delete marks[d]; else marks[d] = true;
-  saveMarks(active);
+  if (active) saveMarks(active);   // groupFor 万一没匹配到（脏数据），别让保存崩掉
   renderList();
   drawBase();
 });
