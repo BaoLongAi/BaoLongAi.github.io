@@ -1570,7 +1570,9 @@ function saveMarks(g) {
 function countMarked(g) { return g.items.filter(c => marks[c.d]).length; }
 function peekMarked(g) {
   try {
-    const m = JSON.parse(localStorage.getItem('solder:' + PROJ + ':' + cat + ':' + g.key) || '{}');
+    /* key 必须走 markKey() —— 之前这里手写了一遍，多板改造加 BOARD_SLUG 时漏改，
+       结果写进 A key、读的是 B key，行右侧的「已焊 x/y」永远是 0。 */
+    const m = JSON.parse(localStorage.getItem(markKey(g)) || '{}');
     return g.items.filter(c => m[c.d]).length;
   } catch (_) { return 0; }
 }
@@ -2194,6 +2196,7 @@ function renderList() {
           if (marks[d]) delete marks[d]; else marks[d] = true;
           saveMarks(active);
           renderList();
+          updateHeader();      // 标题的「已焊 x/y」也要跟着变，以前只重画了列表
           drawBase();
         };
         wrap.appendChild(chip);
@@ -2241,6 +2244,7 @@ stage.addEventListener('click', ev => {
   if (marks[d]) delete marks[d]; else marks[d] = true;
   if (active) saveMarks(active);   // groupFor 万一没匹配到（脏数据），别让保存崩掉
   renderList();
+  updateHeader();
   drawBase();
 });
 
