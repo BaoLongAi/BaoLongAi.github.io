@@ -341,6 +341,8 @@
         <button id="zFit" title="回到适应窗口" aria-label="回到适应窗口"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M2.2 6V2.2H6M14 6V2.2H10M2.2 10v3.8H6M14 10v3.8H10"/></svg></button>
         <!-- 双面贴装的板子才有：点一下把板子翻过来，看/焊背面元件 -->
         <button id="btnSide" title="翻板：切换到背面" aria-label="翻板" style="display:none;font-size:13px;font-weight:700">顶</button>
+        <!-- 手机方向切换：竖屏排版 ↔ 横屏工位模式，只在手机布局显示 -->
+        <button id="btnOrient" title="切换竖屏 / 横屏" aria-label="切换竖屏横屏" style="display:none;font-size:13px;font-weight:700">竖</button>
       </div>
     </div>
   </main>
@@ -606,6 +608,14 @@ const hintEl = document.getElementById('hint');
 const appEl = document.getElementById('app');
 let ROT = false;                 // 整页是否转了 90°
 
+/* 手机屏幕方向偏好。
+   portraitDefault: true（默认）→ 竖着拿手机时保持竖屏排版（不转 90°）
+   false → 沿用原来的「竖着拿也转成横屏工位模式」
+   界面上右下角的「竖 / 横」按钮可随时切换，选择只记在当前这次会话。
+   注意：APK 外壳本身锁了横屏，这个开关只对浏览器里打开的网站版有意义。 */
+const ORIENT = { portraitDefault: true };
+let PORTRAIT = ORIENT.portraitDefault;
+
 /* 手指操作（手机 / 平板）—— 只有这类设备才会整页转横屏 */
 function isTouch() {
   return !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
@@ -634,9 +644,12 @@ const IN_APK = (() => {
 function applyOrient() {
   const dw = document.documentElement.clientWidth;
   const dh = document.documentElement.clientHeight;
-  const want = isTouch() && dh > dw + 24;            // 竖着拿手机
+  /* 竖着拿手机 + 没选竖屏偏好 → 才转 90° 当横屏工位用。
+     选了竖屏（PORTRAIT）时 want=false，页面按正常竖屏排版，不旋转。 */
+  const want = isTouch() && !PORTRAIT && dh > dw + 24;
   if (want !== ROT) { ROT = want; VIEW.k = 1; VIEW.dx = 0; VIEW.dy = 0; }
   document.body.classList.toggle('rot', ROT);
+  syncOrientBtn();
   if (ROT) {
     appEl.style.width = dh + 'px';                 // 宽高互换，再顺时针转 90°
     appEl.style.height = dw + 'px';
@@ -650,6 +663,16 @@ function applyOrient() {
   placeInfo(ROT || isMobileLayout());
   fitDrawer();
   if (COMPS.length) drawBase();
+}
+
+/* 右下角方向按钮：显示「接下来会切到哪种」，只在手机布局露出 */
+function syncOrientBtn() {
+  const b = document.getElementById('btnOrient');
+  if (!b) return;
+  b.style.display = isMobileLayout() ? '' : 'none';
+  /* 现在转成了横屏工位 → 按钮写「竖」（点了回竖屏）；现在是竖屏 → 写「横」 */
+  b.textContent = ROT ? '竖' : '横';
+  b.title = ROT ? '切回竖屏排版' : '转成横屏工位模式（板图更大）';
 }
 
 /* 当前分组的信息块在电脑上属于顶栏，在手机上搬到抽屉顶上 ——
@@ -2839,6 +2862,15 @@ on('btnSide', () => {
   }
   groups = buildGroups(cat);
   syncSideBtn(); renderCats(); renderList(); drawBase();
+});
+
+/* 手机方向切换：竖屏排版 ↔ 横屏工位模式。
+   PORTRAIT=true 表示用户选了竖屏，applyOrient 就不转页面。
+   切完强制重排一次；viewport 尺寸不变，直接调 applyOrient 即可。 */
+on('btnOrient', () => {
+  PORTRAIT = !PORTRAIT;
+  applyOrient();
+  toast(PORTRAIT ? '已切竖屏排版' : '已转横屏工位模式');
 });
 
 on('btnHtml', exportHtmlFile);
