@@ -387,10 +387,10 @@ const escHtml = s => String(s == null ? '' : s)
    items 里加对象就能多放按钮：{ label: 显示文字, href: 跳转地址 }
    全部走 target=_blank 新窗口打开，不打断当前焊板操作。 */
 const PROMO = {
-  enabled: true,
+  enabled: false,   // 暂时关闭，需要时改成 true 并往下填 items
   inExport: false,
   items: [
-    { label: 'ChatGPT Plus 代充', href: 'https://ainb666.xyz' },
+    // { label: 'ChatGPT Plus 代充', href: 'https://ainb666.xyz' },
   ],
 };
 
