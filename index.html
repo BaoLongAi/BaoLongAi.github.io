@@ -2355,6 +2355,9 @@ function groupFor(c) {
 
 function renderList() {
   const box = document.getElementById('list');
+  /* 重建列表（点分组 / 切分类）会把内容清空再填，浏览器这时会把 scrollTop 归零，
+     表现就是点了一行之后列表自己跳回顶部，得重新往下翻。先记住位置，末尾还原。 */
+  const keepTop = box.scrollTop;
   box.innerHTML = '';
   if (!groups.length) {
     box.innerHTML = '<div id="empty">这一类没有元件<br>（位号规则：R / C / L / D / Q / LED / Y…）</div>';
@@ -2373,9 +2376,11 @@ function renderList() {
       '<span class="ct">' + grp.items.length + ' 颗</span>' +
       '</div>';
     b.onclick = () => {
+      /* 手机上选分组不收起抽屉：以前这里会 setDrawer('mini')，
+         结果是刚把列表拉上来、点一颗电阻，列表立刻缩回去，
+         既要重新拉一次，板图又会因为画布变高而跳回原来大小。
+         现在选完保持当前抽屉高度，点几颗都是同一个视野。 */
       selectGroup(grp);
-      /* 手机上选完立刻把抽屉收成一条：接下去是低头焊板，屏幕要让给板图 */
-      if (isMobileLayout()) setDrawer('mini');
     };
     box.appendChild(b);
 
@@ -2398,6 +2403,7 @@ function renderList() {
       box.appendChild(wrap);
     }
   }
+  box.scrollTop = keepTop;   // 还原到点之前翻到的位置，视线不跑
 }
 
 /* -------------------------------- 命中测试 ------------------------------- */
