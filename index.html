@@ -350,13 +350,13 @@
   <div id="drop">
     <div class="dz">
       <div class="t1">把嘉立创工程文件拖进来</div>
-      <div class="t2">支持 <code>.epro2</code>（EDA 里「文件 → 导出 → 嘉立创EDA 工程」得到的那个包）<br>
+      <div class="t2">支持 <code>.epro2</code> / <code>.epro</code>（新版、老版嘉立创EDA 工程包都行）<br>
         拖入后自动读出器件、位号、阻值容值、封装和板框</div>
       <div style="margin-top:16px;display:flex;gap:8px;justify-content:center">
         <button class="b" id="btnPick" style="padding:6px 18px">选择文件…</button>
         <button class="b" id="btnCancel" style="padding:6px 14px">取消</button>
       </div>
-      <input type="file" id="fileIn" accept=".epro2,.zip,application/zip,application/x-zip-compressed,application/octet-stream" hidden>
+      <input type="file" id="fileIn" accept=".epro2,.epro,.zip,application/zip,application/x-zip-compressed,application/octet-stream" hidden>
       <div class="t3">全部在本机解析，不上传、不联网、不花钱</div>
       <div class="err" id="dropErr"></div>
     </div>
@@ -946,6 +946,167 @@ async function entryText(z, name) {
 
 const tryJson = s => { try { return JSON.parse(s); } catch (_) { return null; } };
 
+/* ===================== 老版 .epro 解析（嘉立创EDA 5.x / 独立版导出） =====================
+ * 新版 .epro2 = zip(project2.json + xxx.epru)，老版 .epro = zip(project.json
+ *   + PCB/*.epcb + FOOTPRINT/*.efoo + SYMBOL/*.esym + SHEET/*.esch)。
+ * 老版没有 .epru，得单独解析；这里把老版数据整理成和新版 parseEpru 一样的
+ * 返回结构 {boards,comps,board,schComp}，后面的 buildComps/绘图逻辑原样复用。
+ * 老版的 .epcb/.efoo 每行是一个 JSON 数组（不是 epru 的 header||body）。
+ */
+function parseLinesJSON(text) {
+  const rows = [];
+  for (const line of String(text || '').split(/\r?\n/)) {
+    const t = line.trim();
+    if (!t || t[0] !== '[') continue;
+    const a = tryJson(t);
+    if (Array.isArray(a)) rows.push(a);
+  }
+  return rows;
+}
+
+async function parseOldEpro(z) {
+  const names = Object.keys(z.out);
+  const pjName = names.find(n => /(^|\/)project\.json$/i.test(n));
+  if (!pjName) throw new Error('老工程包里没有 project.json');
+  const pj = tryJson(await entryText(z, pjName));
+  if (!pj) throw new Error('project.json 解析失败');
+
+  /* 器件库：uuid -> {attributes,title}，属性里有 Value/Footprint/Designator 等 */
+  const devs = new Map();
+  for (const [uuid, d] of Object.entries(pj.devices || {})) {
+    if (d && typeof d === 'object') devs.set(String(uuid), { a: d.attributes || {}, t: String(d.title || '') });
+  }
+  /* 板名：boards.{name}.schematic / .pcb 是文档 uuid */
+  const boardNames = new Map();
+  for (const [bname, b] of Object.entries(pj.boards || {})) {
+    if (b && b.pcb) boardNames.set(String(b.pcb), String(bname));
+  }
+
+  /* 封装库：uuid(文件名) -> 文件名，PAD 表 uuid -> [{x,y,w,h,shape,num,net,pa}] */
+  const fpPads = new Map();
+  const fpTitles = new Map();
+  for (const n of names) {
+    if (!/\.efoo$/i.test(n)) continue;
+    const uuid = n.split('/').pop().replace(/\.efoo$/i, '');
+    const rows = parseLinesJSON(await entryText(z, n));
+    let title = '';
+    for (const r of rows) {
+      /* 老版 efoo 的 ATTR 行：["ATTR",id,0,"",layer,x,y,key,value,...]
+         key 在 r[7]、值在 r[8]。早先按 r[3]/r[5] 读，永远取不到封装名。
+         同时认 DOCTYPE 后的 HEAD.title（头部对象在 r[1]）。 */
+      if (r[0] === 'ATTR' && String(r[7]) === 'Footprint') { title = String(r[8] || ''); break; }
+      if (r[0] === 'HEAD' && r[1] && r[1].title) { title = String(r[1].title); break; }
+      if (r[0] === 'META' && r[1] && r[1].title) { title = String(r[1].title); break; }
+    }
+    if (title) fpTitles.set(uuid, title);
+    const pads = [];
+    for (const r of rows) {
+      if (r[0] !== 'PAD') continue;
+      /* ["PAD",id,0,"",layer,num,x,y,ang,["ROUND",..],["RECT",w,h,0],..., pa,...] */
+      const num = String(r[5] ?? '');
+      const px = Number(r[6]) || 0, py = Number(r[7]) || 0;
+      const shape = Array.isArray(r[9]) ? String(r[9][0] || '') : '';
+      const box = Array.isArray(r[10]) ? r[10] : null;
+      const w = Number(box && box[1]) || 0, h = Number(box && box[2]) || 0;
+      if (w <= 0 || h <= 0) continue;
+      /* 老版尺寸单位 10mil；buildComps 里 MIL 常量按 mil 换算，这里保持一致 */
+      pads.push({
+        x: px, y: py, w, h,
+        shape: shape === 'RECT' || shape === 'OVAL' ? 'rect' : 'circle',
+        num, net: '', pa: Number(r[8]) || 0,
+      });
+    }
+    if (pads.length) fpPads.set(uuid, pads);
+  }
+
+  /* 每个 .epcb 一块板 */
+  const boards = [];
+  for (const n of names) {
+    if (!/\.epcb$/i.test(n)) continue;
+    const puuid = n.split('/').pop().replace(/\.epcb$/i, '');
+    const rows = parseLinesJSON(await entryText(z, n));
+    const compsRaw = [];
+    const attrs = new Map();          // 元件 id -> {key:value}
+    const outX = [], outY = [];
+    let board = null;
+    for (const r of rows) {
+      if (r[0] === 'COMPONENT') {
+        /* ["COMPONENT",id,?,layer,x,y,rotation,meta,?] */
+        compsRaw.push({ __id: String(r[1]), x: Number(r[4]) || 0, y: Number(r[5]) || 0,
+          rotation: Number(r[6]) || 0, layerId: Number(r[3]) || 1, attrs: r[7] || {} });
+      } else if (r[0] === 'ATTR') {
+        /* ["ATTR",attrId,0,parentId,layer,x,y,key,value,...] */
+        const parent = String(r[3]), key = String(r[7]), val = r[8];
+        if (!attrs.has(parent)) attrs.set(parent, {});
+        attrs.get(parent)[key] = val;
+      } else if (r[0] === 'POLY' || r[0] === 'LINE') {
+        /* 板框在 OUTLINE 层。老版 POLY 行是
+           ["POLY",id,name,"",layer,?,path,...]，层号在 r[4]、路径在 r[6]，
+           早先按 r[2] 读层号，永远取不到 11，所以所有老工程的板框都是 null。 */
+        const layer = Number(r[4]);
+        const path = r.find(v => Array.isArray(v));
+        if (layer === 11 && Array.isArray(path)) {
+          /* 圆形板框：["CIRCLE",cx,cy,r] —— 直接按圆心±半径给包围盒 */
+          if (path[0] === 'CIRCLE' && typeof path[3] === 'number') {
+            const cx = Number(path[1]) || 0, cy = Number(path[2]) || 0, rr = Number(path[3]) || 0;
+            outX.push(cx - rr, cx + rr); outY.push(cy - rr, cy + rr);
+          } else if (path[0] === 'R' && typeof path[4] === 'number') {
+            /* 矩形板框：["R",x,y,w,h,...] */
+            outX.push(path[1], path[1] + path[3]); outY.push(path[2], path[2] + path[4]);
+          } else {
+            let i = 0;
+            if (typeof path[0] === 'number' && typeof path[1] === 'number') { outX.push(path[0]); outY.push(path[1]); i = 2; }
+            while (i < path.length) {
+              const op = path[i];
+              if (op === 'L' && typeof path[i + 2] === 'number') { outX.push(path[i + 1]); outY.push(path[i + 2]); i += 3; }
+              else if (op === 'ARC' && typeof path[i + 3] === 'number') { outX.push(path[i + 2]); outY.push(path[i + 3]); i += 4; }
+              else if (typeof op === 'number' && i + 1 < path.length && typeof path[i + 1] === 'number') { outX.push(op); outY.push(path[i + 1]); i += 2; }
+              else i++;
+            }
+          }
+        }
+      }
+    }
+    /* 圆形板框只给两个对角点（圆心±半径），所以 2 个点就够算包围盒 */
+    if (outX.length >= 2) {
+      board = { x: Math.min(...outX), y: Math.max(...outY),
+        w: Math.max(...outX) - Math.min(...outX), h: Math.max(...outY) - Math.min(...outY) };
+    }
+    /* 把 ATTR 里的 Device/Footprint 等映射成 buildComps 认识的形式。
+       buildComps 从 c.attrs.DeviceName 取器件 uuid，从 attrs.get(__id).Designator/Footprint 取值。 */
+    const comps2 = compsRaw.map(c => {
+      const a = attrs.get(c.__id) || {};
+      const devUuid = a.Device || '';
+      const fpUuid = a.Footprint || (devs.get(devUuid) || {}).a?.Footprint || '';
+      const dev = devs.get(devUuid) || { a: {}, t: '' };
+      return {
+        __id: c.__id, x: c.x, y: c.y, rotation: c.rotation, layerId: c.layerId,
+        attrs: {
+          DeviceName: JSON.stringify({ uuid: devUuid, name: dev.t }),
+          /* 老版元件实例的覆盖值键可能写成 VALUE（全大写），兼容两种大小写 */
+          Value: a.Value || a.VALUE || dev.a.Value || '',
+        },
+        __fpUuid: fpUuid,
+      };
+    });
+    /* fpPads 的 key 要是 buildComps 用的 fpuuid；这里把它按 attrs.Footprint 已对上 */
+    const cs = buildComps(comps2, attrs, devs, fpTitles, fpPads);
+    if (!cs.length) continue;
+    boards.push({ uuid: puuid, name: boardNames.get(puuid) || ('板 ' + (boards.length + 1)),
+      comps: cs, board });
+  }
+  boards.sort((a, b) => b.comps.length - a.comps.length);
+  /* 老版原理图元件数：从 .esch 里数 SCH_COMPONENT */
+  let schComp = 0;
+  for (const n of names) {
+    if (!/\.esch$/i.test(n)) continue;
+    const rows = parseLinesJSON(await entryText(z, n));
+    schComp += rows.filter(r => r[0] === 'COMPONENT' || r[0] === 'SCH_COMPONENT').length;
+  }
+  return { boards, comps: boards.length ? boards[0].comps : [],
+    board: boards.length ? boards[0].board : null, schComp };
+}
+
 /* 解析 .epru 文本流：每行 {header}||{body}，按 DOCHEAD 切文档 */
 function parseEpru(text) {
   /* 一个工程里可能有多块 PCB（飞控板 + 底板、主板 + 小板…）。
@@ -1459,13 +1620,13 @@ if (isMobileLayout()) {
   const t1 = document.querySelector('#drop .t1');
   const t2 = document.querySelector('#drop .t2');
   if (t1) t1.textContent = '选择嘉立创工程文件';
-  if (t2) t2.innerHTML = '支持 <code>.epro2</code>（EDA 里「文件 → 导出 → 嘉立创EDA 工程」得到的那个包）<br>选好后自动读出器件、位号、阻值容值、封装和板框';
+  if (t2) t2.innerHTML = '支持 <code>.epro2</code> / <code>.epro</code>（新版、老版嘉立创工程包都行）<br>选好后自动读出器件、位号、阻值容值、封装和板框';
 }
 /* APK 里「选择文件」是原生弹出的两个入口，还能接微信的「用其他应用打开」，
    这几句得写在手机版文案之后覆盖掉，否则用户不知道有这条路 */
 if (IN_APK) {
   const t2 = document.querySelector('#drop .t2');
-  if (t2) t2.innerHTML = '支持 <code>.epro2</code>（EDA 里「文件 → 导出 → 嘉立创EDA 工程」）<br>'
+  if (t2) t2.innerHTML = '支持 <code>.epro2</code> / <code>.epro</code>（新版、老版工程包都行）<br>'
     + '点「选择文件」能直接翻 <b>微信 / QQ 收到的文件</b><br>'
     + '也可以在微信里长按文件 →「用其他应用打开」→ 焊接分组';
   const t3 = document.querySelector('#drop .t3');
@@ -1504,9 +1665,13 @@ async function openProject(file) {
   e2.classList.add('on');
   try {
     const z = await unzip(await file.arrayBuffer());
-    const epruName = Object.keys(z.out).find(n => /\.epru$/i.test(n));
-    if (!epruName) throw new Error('这个包里没有 .epru，可能不是嘉立创工程包');
-    const r = parseEpru(await entryText(z, epruName));
+    const names = Object.keys(z.out);
+    const epruName = names.find(n => /\.epru$/i.test(n));
+    const oldEpro = !epruName && names.some(n => /\.epcb$/i.test(n)) && names.some(n => /(^|\/)project\.json$/i.test(n));
+    let r;
+    if (epruName) r = parseEpru(await entryText(z, epruName));
+    else if (oldEpro) r = await parseOldEpro(z);
+    else throw new Error('这个包里既没有新版 .epru，也没有老版 .epcb，可能不是嘉立创工程包');
     if (!r.comps.length) {
       /* 分两种：PCB 里真没元件（只画了原理图），或者文件压根不是嘉立创工程 */
       if (r.schComp > 0) {
@@ -1517,9 +1682,15 @@ async function openProject(file) {
       throw new Error('解析到了文档，但没有元件位号');
     }
 
-    let name = file.name.replace(/\.(epro2|zip)$/i, '');
-    const pj = await entryText(z, 'project2.json');
-    if (pj) { const o = tryJson(pj); if (o && o.title) name = o.title; }
+    let name = file.name.replace(/\.(epro2|epro|zip)$/i, '');
+    /* 新版工程名在 project2.json.title；老版在 project.json.config.title。
+       早先只读新版，老版工程标题「作业」一直显示成文件名。 */
+    const pj2 = await entryText(z, 'project2.json');
+    if (pj2) { const o = tryJson(pj2); if (o && o.title) name = o.title; }
+    if (!pj2) {
+      const pjOld = tryJson(await entryText(z, 'project.json'));
+      if (pjOld && pjOld.config && pjOld.config.title) name = pjOld.config.title;
+    }
 
     PROJNAME = name;
     SOLO = true;
